@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+/* ── Variables CSS — Travel World Colombia ── */
+:root {
+  /* Fondos */
+  --navy:          #0a1628;
+  --blue:          #1a3a6b;
+  --dark:          #060e1a;
+
+  /* Marca */
+  --orange:        #f4821f;
+  --orange-dark:   #e06b10;
+  --orange-glow:   rgba(244, 130, 31, 0.35);
+  --gold:          #e6a817;
+  --gold-light:    rgba(230, 168, 23, 0.15);
+
+  /* Texto */
+  --white:         #ffffff;
+  --text-primary:  #f0ece4;
+  --text-dim:      rgba(255, 255, 255, 0.6);
+  --text-muted:    rgba(255, 255, 255, 0.35);
+
+  /* UI */
+  --border:        rgba(255, 255, 255, 0.1);
+  --border-orange: rgba(244, 130, 31, 0.3);
+  --card-bg:       rgba(26, 58, 107, 0.4);
+  --card-hover:    rgba(244, 130, 31, 0.08);
+  --overlay:       rgba(5, 5, 15, 0.92);
+}
+
+/* ── Tailwind v4 — Custom theme tokens ── */
+@theme {
+  /* Colores */
+  --color-navy:   #0a1628;
+  --color-blue:   #1a3a6b;
+  --color-dark:   #060e1a;
+  --color-orange: #f4821f;
+  --color-gold:   #e6a817;
+  --color-white:  #ffffff;
+
+  /* Tipografías */
+  --font-playfair: var(--font-playfair), serif;
+  --font-cinzel:   var(--font-cinzel), serif;
+  --font-inter:    var(--font-inter), sans-serif;
+
+  /* Gradientes */
+  --background-image-gradient-orange: linear-gradient(135deg, #f4821f, #e06b10);
+  --background-image-gradient-navy:   linear-gradient(to bottom, #0a1628, #060e1a);
+  --background-image-gradient-hero:   linear-gradient(to right, rgba(5, 5, 15, 0.92) 38%, rgba(5, 5, 15, 0.2) 100%);
+
+  /* Sombras */
+  --shadow-orange:    0 8px 24px rgba(244, 130, 31, 0.4);
+  --shadow-orange-lg: 0 16px 40px rgba(244, 130, 31, 0.5);
+  --shadow-card:      0 4px 16px rgba(0, 0, 0, 0.3);
+
+  /* Animaciones */
+  --animate-pulse-slow: pulse 4s ease-in-out infinite;
+  --animate-fade-up:    fadeUp 0.9s ease both;
+  --animate-fade-down:  fadeDown 0.8s ease both;
+  --animate-slow-zoom:  slowZoom 18s ease-out forwards;
+
+  /* Keyframes */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slowZoom {
+    from { transform: scale(1.08); }
+    to   { transform: scale(1.00); }
+  }
+}
+
+/* ── Base styles ── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--navy);
+  color: var(--text-primary);
+  font-family: var(--font-inter), Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Focus visible ── */
+:focus-visible {
+  outline: 2px solid #f4821f;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── Accesibilidad — reducir movimiento ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
