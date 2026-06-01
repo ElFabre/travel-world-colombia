@@ -39,9 +39,9 @@
   --color-white:  #ffffff;
 
   /* Tipografías */
-  --font-playfair: var(--font-playfair), serif;
-  --font-cinzel:   var(--font-cinzel), serif;
-  --font-inter:    var(--font-inter), sans-serif;
+  --font-plus-jakarta: var(--font-plus-jakarta), sans-serif;
+  --font-cinzel:       var(--font-cinzel), serif;
+  --font-inter:        var(--font-inter), sans-serif;
 
   /* Gradientes */
   --background-image-gradient-orange: linear-gradient(135deg, #f4821f, #e06b10);

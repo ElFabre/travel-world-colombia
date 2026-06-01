@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
-import { Playfair_Display, Cinzel, Inter } from 'next/font/google'
+import { Plus_Jakarta_Sans, Cinzel, Inter } from 'next/font/google'
 import './globals.css'
 
-const playfair = Playfair_Display({
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  weight: ['700', '900'],
-  variable: '--font-playfair',
+  weight: ['700', '800'],
+  variable: '--font-plus-jakarta',
   display: 'swap',
 })
 
@@ -56,7 +56,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${playfair.variable} ${cinzel.variable} ${inter.variable}`}
+      className={`${plusJakarta.variable} ${cinzel.variable} ${inter.variable}`}
     >
       <body className="min-h-screen antialiased">
         {children}
