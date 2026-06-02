@@ -1,43 +1,50 @@
 import { z } from 'zod'
 
+export const PRESUPUESTO_OPCIONES = [
+  { value: 'menos-2m',  label: 'Menos de $2.000.000 COP' },
+  { value: '2m-5m',     label: '$2.000.000 – $5.000.000 COP' },
+  { value: '5m-10m',    label: '$5.000.000 – $10.000.000 COP' },
+  { value: 'mas-10m',   label: 'Más de $10.000.000 COP' },
+] as const
+
+export const MESES = [
+  'Enero','Febrero','Marzo','Abril','Mayo','Junio',
+  'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre',
+] as const
+
 export const cotizacionSchema = z.object({
   nombre: z
     .string()
-    .min(2, 'El nombre debe tener al menos 2 caracteres')
+    .min(2, 'Mínimo 2 caracteres')
     .max(100, 'Nombre demasiado largo')
-    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, 'Solo se permiten letras y espacios')
+    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/, 'Solo letras y espacios')
     .transform(val => val.trim()),
 
-  email: z
+  whatsapp: z
     .string()
-    .email('Correo electrónico inválido')
-    .max(254)
-    .toLowerCase()
-    .transform(val => val.trim()),
+    .min(10, 'Ingresa los 10 dígitos de tu celular')
+    .max(10, 'Solo 10 dígitos sin el prefijo +57')
+    .regex(/^\d{10}$/, 'Debe ser un número de 10 dígitos'),
 
-  telefono: z
-    .string()
-    .min(7, 'Teléfono inválido')
-    .max(15, 'Teléfono inválido')
-    .regex(/^[\d\s+\-()]+$/, 'Formato de teléfono inválido')
-    .transform(val => val.replace(/\s/g, '')),
+  destino_interes: z.string().min(1, 'Selecciona un destino').max(100),
 
-  destino_interes: z.string().max(100).optional(),
+  num_viajeros: z
+    .number({ error: 'Número inválido' })
+    .int()
+    .min(1, 'Mínimo 1 viajero')
+    .max(20, 'Máximo 20 viajeros'),
 
-  num_personas: z.coerce.number().int().min(1).max(50).optional(),
+  fecha_mes: z.string().min(1, 'Selecciona un mes'),
+  fecha_año: z.string().min(1, 'Selecciona un año'),
 
-  fecha_viaje: z.string().max(50).optional(),
+  presupuesto: z.enum(
+    ['menos-2m', '2m-5m', '5m-10m', 'mas-10m'] as const,
+    { error: 'Selecciona un rango de presupuesto' }
+  ),
 
-  presupuesto: z
-    .enum(['menos-500', '500-1000', '1000-2000', 'mas-2000', 'sin-definir'])
-    .optional(),
+  mensaje: z.string().max(1000, 'Máximo 1000 caracteres').optional(),
 
-  mensaje: z
-    .string()
-    .max(1000, 'Mensaje demasiado largo')
-    .optional()
-    .transform(val => val?.trim()),
-
+  // Honeypot anti-bot
   website: z.string().max(0, 'Bot detectado').optional(),
 })
 

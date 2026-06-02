@@ -1,6 +1,69 @@
 import type { Metadata } from 'next'
 import { Plus_Jakarta_Sans, Cinzel, Inter } from 'next/font/google'
 import './globals.css'
+import { Navbar } from '@/components/layout/Navbar'
+import { Footer } from '@/components/layout/Footer'
+import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
+import { SITE, WHATSAPP, SOCIALS } from '@/lib/site'
+
+const schemaOrg = {
+  '@context': 'https://schema.org',
+  '@type': 'TravelAgency',
+  name: SITE.nombre,
+  url: SITE.url,
+  logo: `${SITE.url}/logo.png`,
+  image: `${SITE.url}/og-image.jpg`,
+  description:
+    'Agencia de viajes en Fusagasugá con más de 126 reseñas ⭐⭐⭐⭐⭐. Paquetes nacionales e internacionales todo incluido. RNT 27287.',
+  telephone: WHATSAPP.telefonoDisplay,
+  email: SITE.email,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: SITE.direccion,
+    addressLocality: SITE.ciudad,
+    addressRegion: SITE.region,
+    addressCountry: 'CO',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: 4.3376,
+    longitude: -74.3677,
+  },
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      opens: '09:00',
+      closes: '18:00',
+    },
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: 'Saturday',
+      opens: '09:00',
+      closes: '13:00',
+    },
+  ],
+  sameAs: [
+    SOCIALS.facebook,
+    SOCIALS.instagram,
+    SOCIALS.youtube,
+    SOCIALS.tiktok,
+  ],
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '5',
+    reviewCount: String(SITE.reseñas),
+    bestRating: '5',
+    worstRating: '1',
+  },
+  currenciesAccepted: 'COP, USD',
+  paymentAccepted: 'Cash, Credit Card, Bank Transfer',
+  priceRange: '$$',
+  areaServed: {
+    '@type': 'Country',
+    name: 'Colombia',
+  },
+}
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -59,7 +122,14 @@ export default function RootLayout({
       className={`${plusJakarta.variable} ${cinzel.variable} ${inter.variable}`}
     >
       <body className="min-h-screen antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaOrg) }}
+        />
+        <Navbar />
         {children}
+        <Footer />
+        <WhatsAppButton />
       </body>
     </html>
   )
