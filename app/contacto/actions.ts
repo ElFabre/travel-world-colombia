@@ -35,7 +35,7 @@ export async function submitCotizacion(raw: unknown): Promise<ActionResult> {
       num_personas:     d.num_viajeros,
       fecha_viaje,
       presupuesto:      d.presupuesto,
-      mensaje:          d.mensaje,
+      mensaje:          d.mensaje?.trim() || undefined,
       origen:           'formulario-web',
     })
 

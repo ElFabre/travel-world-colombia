@@ -28,8 +28,8 @@ export const cotizacionSchema = z.object({
 
   destino_interes: z.string().min(1, 'Selecciona un destino').max(100),
 
-  num_viajeros: z.coerce
-    .number({ invalid_type_error: 'Número inválido' })
+  num_viajeros: z
+    .number({ error: 'Número inválido' })
     .int()
     .min(1, 'Mínimo 1 viajero')
     .max(20, 'Máximo 20 viajeros'),
@@ -38,12 +38,11 @@ export const cotizacionSchema = z.object({
   fecha_año: z.string().min(1, 'Selecciona un año'),
 
   presupuesto: z.enum(
-    ['menos-2m', '2m-5m', '5m-10m', 'mas-10m'],
-    { error_map: () => ({ message: 'Selecciona un rango' }) }
+    ['menos-2m', '2m-5m', '5m-10m', 'mas-10m'] as const,
+    { error: 'Selecciona un rango de presupuesto' }
   ),
 
-  mensaje: z.string().max(1000, 'Máximo 1000 caracteres').optional()
-    .transform(val => val?.trim() || undefined),
+  mensaje: z.string().max(1000, 'Máximo 1000 caracteres').optional(),
 
   // Honeypot anti-bot
   website: z.string().max(0, 'Bot detectado').optional(),

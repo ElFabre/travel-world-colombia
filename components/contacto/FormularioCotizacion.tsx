@@ -166,7 +166,7 @@ export function FormularioCotizacion({ destinos }: Props) {
             id="num_viajeros"
             className={`${inputBase} ${errors.num_viajeros ? inputError : inputNormal} cursor-pointer`}
             style={{ appearance: 'none' }}
-            {...register('num_viajeros')}
+            {...register('num_viajeros', { valueAsNumber: true })}
           >
             {Array.from({ length: 20 }, (_, i) => i + 1).map(n => (
               <option key={n} value={n} style={{ background: '#0a1628' }}>
