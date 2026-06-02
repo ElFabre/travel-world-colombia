@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import { Plus_Jakarta_Sans, Cinzel, Inter } from 'next/font/google'
 import './globals.css'
+import { Navbar } from '@/components/layout/Navbar'
+import { Footer } from '@/components/layout/Footer'
+import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -59,7 +62,10 @@ export default function RootLayout({
       className={`${plusJakarta.variable} ${cinzel.variable} ${inter.variable}`}
     >
       <body className="min-h-screen antialiased">
+        <Navbar />
         {children}
+        <Footer />
+        <WhatsAppButton />
       </body>
     </html>
   )
