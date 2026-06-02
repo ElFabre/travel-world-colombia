@@ -5,6 +5,53 @@ import { SectionTag } from '@/components/ui/SectionTag'
 import { Button } from '@/components/ui/Button'
 import { SITE, WHATSAPP, whatsappUrl } from '@/lib/site'
 
+const schemaFAQ = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Travel World Colombia es una agencia legalmente registrada?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: `Sí. Travel World Colombia está registrada en el Registro Nacional de Turismo con el número RNT ${SITE.rnt}, cumpliendo todos los requisitos del Ministerio de Comercio, Industria y Turismo de Colombia.`,
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Dónde están ubicados?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: `Estamos ubicados en ${SITE.direccion}, ${SITE.ciudad}, ${SITE.region}, Colombia. Atendemos de ${SITE.horario}.`,
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo puedo cotizar un viaje?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: `Puedes cotizar tu viaje de forma gratuita a través de nuestro formulario en línea en ${SITE.url}/contacto, o escribirnos directamente por WhatsApp al ${WHATSAPP.telefonoDisplay}. Respondemos en menos de 24 horas.`,
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántos años de experiencia tienen?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Travel World Colombia tiene más de 5 años de experiencia organizando viajes nacionales e internacionales para familias colombianas, con más de 126 reseñas de 5 estrellas verificadas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué destinos manejan?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: `Manejamos más de 8 destinos nacionales e internacionales incluyendo República Dominicana, Estados Unidos, España, Panamá, Brasil, Japón, París y Santorini. Consulta todos en ${SITE.url}/destinos.`,
+      },
+    },
+  ],
+}
+
 export const revalidate = 86400
 
 export const metadata: Metadata = {
@@ -67,6 +114,11 @@ function LogoBadge({ name }: { name: string }) {
 export default function NosotrosPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaFAQ) }}
+      />
+
       {/* ── HERO ── */}
       <section
         className="relative overflow-hidden pt-36 pb-20 px-6 text-center"
