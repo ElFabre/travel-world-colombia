@@ -107,6 +107,38 @@ body {
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 
+/* ── Destinos grid — card hover ── */
+.destino-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: border-color 0.25s, box-shadow 0.25s;
+  outline-offset: 2px;
+}
+.destino-card:hover {
+  border-color: var(--border-orange);
+  box-shadow: 0 8px 32px rgba(244, 130, 31, 0.15);
+}
+.destino-card:focus-visible {
+  outline: 2px solid var(--orange);
+}
+
+/* ── Destinos grid — botón ver todos ── */
+.destinos-ver-todos {
+  border-color: var(--border-orange);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.destinos-ver-todos:hover {
+  background: rgba(244, 130, 31, 0.1);
+  color: var(--orange);
+}
+.destinos-ver-todos:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+}
+
 /* ── Accesibilidad — reducir movimiento ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
