@@ -5,7 +5,8 @@
       "name": "travel-world-colombia",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
-      "port": 3100
+      "port": 3100,
+      "openPath": "/contacto"
     }
   ]
 }
