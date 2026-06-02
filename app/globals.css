@@ -97,6 +97,16 @@ body {
   outline: none;
 }
 
+/* ── Hero — glow pulsante ── */
+@keyframes pulseGlow {
+  from { opacity: 0.5; }
+  to   { opacity: 0.9; }
+}
+
+/* Ocultar scrollbar en la barra de thumbnails */
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
 /* ── Accesibilidad — reducir movimiento ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
