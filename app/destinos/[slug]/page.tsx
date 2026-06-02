@@ -5,7 +5,7 @@ import { Clock, Users, Check, X } from 'lucide-react'
 import { getDestino } from '@/lib/destinos'
 import { SectionTag } from '@/components/ui/SectionTag'
 import { Button } from '@/components/ui/Button'
-import { whatsappUrl } from '@/lib/site'
+import { SITE, whatsappUrl } from '@/lib/site'
 
 export const revalidate = 1800
 
@@ -36,8 +36,40 @@ export default async function DestinoPage({ params }: Props) {
 
   const waUrl = whatsappUrl(d.nombre)
 
+  const schemaTouristDestination = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'TouristDestination',
+        name: d.nombre,
+        description: d.descripcion ?? undefined,
+        url: `${SITE.url}/destinos/${d.slug}`,
+        image: d.imagen_hero ?? d.imagen_thumb ?? undefined,
+        touristType: { '@type': 'Audience', audienceType: 'Travelers' },
+        includesAttraction: d.highlights?.map(h => ({
+          '@type': 'TouristAttraction',
+          name: h.titulo,
+          description: h.descripcion,
+        })),
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Inicio',    item: SITE.url },
+          { '@type': 'ListItem', position: 2, name: 'Destinos',  item: `${SITE.url}/destinos` },
+          { '@type': 'ListItem', position: 3, name: d.nombre,    item: `${SITE.url}/destinos/${d.slug}` },
+        ],
+      },
+    ],
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaTouristDestination) }}
+      />
+
       {/* ── HERO ── */}
       <section className="relative flex items-end overflow-hidden" style={{ minHeight: '90svh' }}>
         {/* Imagen de fondo */}
