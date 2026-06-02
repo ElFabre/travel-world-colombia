@@ -48,7 +48,7 @@ export function Navbar() {
             <li key={link.href}>
               <Link
                 href={link.href}
-                className="font-cinzel text-[11px] tracking-[0.25em] uppercase transition-colors hover:text-orange"
+                className="font-plus-jakarta text-[11px] font-bold tracking-[0.15em] uppercase transition-colors hover:text-orange"
                 style={{ color: 'var(--text-primary)' }}
               >
                 {link.label}
@@ -88,7 +88,7 @@ export function Navbar() {
                 <Link
                   href={link.href}
                   onClick={() => setOpen(false)}
-                  className="block py-3 font-cinzel text-[12px] tracking-[0.25em] uppercase transition-colors hover:text-orange"
+                  className="block py-3 font-plus-jakarta text-[12px] font-bold tracking-[0.15em] uppercase transition-colors hover:text-orange"
                   style={{ color: 'var(--text-primary)' }}
                 >
                   {link.label}

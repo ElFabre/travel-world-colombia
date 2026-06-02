@@ -34,7 +34,7 @@ export function WhatsAppButton({ destino }: WhatsAppButtonProps) {
 
       <span className="relative flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-3 text-white shadow-lg transition-all duration-300 hover:bg-[#20BA5A] hover:scale-105">
         <WhatsAppIcon />
-        <span className="hidden font-cinzel text-[11px] tracking-[0.2em] uppercase sm:inline">
+        <span className="hidden font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase sm:inline">
           ¡Cotiza ahora!
         </span>
       </span>

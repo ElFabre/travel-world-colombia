@@ -83,7 +83,7 @@ export function Footer() {
 
         {/* Navegación */}
         <div>
-          <h3 className="font-cinzel text-[11px] tracking-[0.2em] uppercase text-orange">
+          <h3 className="font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase text-orange">
             Navegación
           </h3>
           <ul className="mt-4 space-y-2">
@@ -102,7 +102,7 @@ export function Footer() {
 
         {/* Contacto / NAP */}
         <div>
-          <h3 className="font-cinzel text-[11px] tracking-[0.2em] uppercase text-orange">
+          <h3 className="font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase text-orange">
             Contacto
           </h3>
           <ul className="mt-4 space-y-3 font-inter text-[13px]">
