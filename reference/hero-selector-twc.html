@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero — Travel World Colombia</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800;900&family=Cinzel:wght@400;600&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#0a1628;--blue:#1a3a6b;
+  --orange:#f4821f;--gold:#e6a817;
+  --white:#f0ece4;--dim:rgba(240,236,228,0.55);
+}
+html,body{height:100%;overflow:hidden;background:var(--navy)}
+
+/* ── HERO ── */
+.hero{
+  position:relative;width:100%;height:100vh;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+
+.bg-a,.bg-b{
+  position:absolute;inset:0;
+  background-size:cover;background-position:center;
+  transition:opacity 1s ease;
+}
+.bg-b{opacity:0}
+
+.overlay{
+  position:absolute;inset:0;z-index:1;
+  background:
+    linear-gradient(to right,rgba(8,16,32,0.96) 32%,rgba(8,16,32,0.15) 100%),
+    linear-gradient(to top,rgba(8,16,32,1) 0%,transparent 50%);
+}
+@media(max-width:768px){
+  .overlay{
+    background:
+      linear-gradient(to bottom,rgba(8,16,32,0.7) 0%,rgba(8,16,32,0.5) 50%,rgba(8,16,32,0.95) 100%);
+  }
+}
+
+.grain{
+  position:absolute;inset:0;z-index:2;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:0.15;pointer-events:none;
+}
+
+.glow{
+  position:absolute;width:360px;height:360px;border-radius:50%;
+  background:radial-gradient(circle,rgba(244,130,31,0.22) 0%,transparent 70%);
+  top:20%;right:20%;filter:blur(60px);z-index:2;
+  animation:pulseGlow 5s ease-in-out infinite alternate;
+  pointer-events:none;transition:background 0.8s;
+}
+@keyframes pulseGlow{from{opacity:0.5}to{opacity:1}}
+
+/* ── NAV ── */
+nav{
+  position:relative;z-index:20;
+  display:flex;align-items:center;gap:32px;
+  padding:20px 48px;
+}
+@media(max-width:768px){nav{padding:16px 20px;gap:0}}
+
+.logo{
+  display:flex;align-items:center;gap:10px;margin-right:auto;
+  font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.3em;color:var(--white);
+}
+.logo-mark{
+  width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(135deg,var(--orange),var(--gold));
+  display:grid;place-items:center;font-size:14px;font-weight:700;color:#fff;
+}
+
+.nav-links{display:flex;gap:28px;list-style:none}
+.nav-links a{
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.2em;
+  color:var(--dim);text-decoration:none;text-transform:uppercase;transition:color 0.3s;
+}
+.nav-links a:hover{color:var(--white)}
+@media(max-width:768px){.nav-links{display:none}}
+
+.nav-cta{
+  background:linear-gradient(135deg,var(--orange),#e06b10);
+  color:#fff;border:none;cursor:pointer;
+  padding:10px 20px;font-family:'Cinzel',serif;font-size:10px;
+  letter-spacing:0.2em;text-transform:uppercase;border-radius:3px;
+  box-shadow:0 4px 16px rgba(244,130,31,0.35);transition:all 0.3s;
+  white-space:nowrap;
+}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(244,130,31,0.5)}
+@media(max-width:480px){.nav-cta{padding:9px 14px;font-size:9px}}
+
+/* Hamburger */
+.hamburger{
+  display:none;background:none;border:none;cursor:pointer;
+  flex-direction:column;gap:5px;padding:4px;
+}
+.hamburger span{display:block;width:22px;height:1.5px;background:var(--white);transition:all 0.3s}
+@media(max-width:768px){.hamburger{display:flex}}
+
+/* ── CONTENT ── */
+.content{
+  position:relative;z-index:10;
+  padding:0 48px;
+  flex:1;display:flex;flex-direction:column;justify-content:center;
+  max-width:640px;
+}
+@media(max-width:768px){
+  .content{padding:0 20px;max-width:100%;justify-content:flex-end;padding-bottom:16px}
+}
+
+.ct{transition:opacity 0.35s ease,transform 0.35s ease}
+.ct.fading{opacity:0;transform:translateY(12px)}
+
+.dest-tag{
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.45em;
+  color:var(--gold);text-transform:uppercase;margin-bottom:8px;opacity:0.9;
+}
+.dest-title{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:clamp(42px,9vw,110px);
+  font-weight:800;line-height:0.88;
+  color:var(--white);letter-spacing:-0.03em;margin-bottom:6px;
+}
+.dest-title span{color:var(--orange)}
+
+@media(max-width:768px){
+  .dest-title{font-size:clamp(38px,11vw,60px)}
+}
+
+.divider{
+  width:44px;height:3px;
+  background:linear-gradient(to right,var(--orange),var(--gold));
+  margin:14px 0;border-radius:2px;
+}
+.dest-desc{
+  font-family:'Inter',sans-serif;font-size:13px;
+  line-height:1.75;color:var(--dim);max-width:340px;font-weight:300;
+  margin-bottom:24px;
+}
+@media(max-width:768px){
+  .dest-desc{font-size:12px;max-width:100%;margin-bottom:20px}
+}
+
+.cta-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:8px;
+  background:linear-gradient(135deg,var(--orange),#e06b10);
+  color:#fff;border:none;cursor:pointer;
+  padding:13px 24px;font-family:'Cinzel',serif;font-size:10px;
+  letter-spacing:0.22em;text-transform:uppercase;border-radius:3px;
+  box-shadow:0 6px 20px rgba(244,130,31,0.4);transition:all 0.3s;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(244,130,31,0.55)}
+.btn-outline{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.2);
+  color:var(--white);cursor:pointer;
+  padding:13px 18px;font-family:'Cinzel',serif;font-size:10px;
+  letter-spacing:0.18em;text-transform:uppercase;border-radius:3px;
+  transition:all 0.3s;backdrop-filter:blur(4px);
+}
+.btn-outline:hover{border-color:var(--orange);background:rgba(244,130,31,0.1)}
+@media(max-width:480px){
+  .btn-primary,.btn-outline{padding:12px 16px;font-size:9px}
+}
+
+/* Trust */
+.trust{
+  position:relative;z-index:10;
+  padding:8px 48px 10px;
+  display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+}
+@media(max-width:768px){.trust{padding:8px 20px;gap:12px}}
+.trust-item{
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.15em;
+  color:var(--dim);text-transform:uppercase;
+  display:flex;align-items:center;gap:5px;
+}
+.trust-dot{width:3px;height:3px;border-radius:50%;background:var(--orange);flex-shrink:0}
+@media(max-width:480px){.trust-item:last-child{display:none}}
+
+/* ── COVERFLOW — DESKTOP ── */
+.selector-wrap{
+  position:relative;z-index:10;
+  padding:8px 0 24px;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+}
+
+/* Desktop coverflow */
+.coverflow{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  width:100%;height:96px;
+  perspective:900px;
+}
+@media(max-width:768px){.coverflow{display:none}}
+
+.cf-arrow{
+  position:absolute;
+  width:30px;height:30px;
+  border:1.5px solid rgba(244,130,31,0.4);border-radius:50%;
+  display:grid;place-items:center;
+  cursor:pointer;background:rgba(10,22,40,0.8);
+  color:var(--dim);transition:all 0.3s;z-index:5;
+  backdrop-filter:blur(4px);
+}
+.cf-arrow:hover{border-color:var(--orange);color:var(--orange)}
+.cf-arrow.left{left:calc(50% - 290px)}
+.cf-arrow.right{right:calc(50% - 290px)}
+
+.cf-item{
+  position:absolute;
+  width:76px;height:76px;border-radius:50%;overflow:hidden;
+  cursor:pointer;border:2px solid transparent;
+  transition:all 0.5s cubic-bezier(0.34,1.1,0.64,1);
+  transform-style:preserve-3d;
+}
+.cf-item img{width:100%;height:100%;object-fit:cover;display:block;transition:filter 0.5s}
+
+.cf-item.pos-active{
+  transform:translateX(0) scale(1.38) translateZ(60px);
+  border-color:var(--orange);
+  box-shadow:0 0 0 3px rgba(244,130,31,0.3),0 10px 28px rgba(0,0,0,0.6);
+  z-index:5;
+}
+.cf-item.pos-active img{filter:brightness(1) saturate(1.2)}
+.cf-item.pos-left1{transform:translateX(-118px) scale(1.0) translateZ(20px) rotateY(28deg);z-index:4}
+.cf-item.pos-left1 img{filter:brightness(0.6) saturate(0.7)}
+.cf-item.pos-right1{transform:translateX(118px) scale(1.0) translateZ(20px) rotateY(-28deg);z-index:4}
+.cf-item.pos-right1 img{filter:brightness(0.6) saturate(0.7)}
+.cf-item.pos-left2{transform:translateX(-218px) scale(0.72) translateZ(0px) rotateY(42deg);z-index:3}
+.cf-item.pos-left2 img{filter:brightness(0.35) saturate(0.5)}
+.cf-item.pos-right2{transform:translateX(218px) scale(0.72) translateZ(0px) rotateY(-42deg);z-index:3}
+.cf-item.pos-right2 img{filter:brightness(0.35) saturate(0.5)}
+.cf-item.pos-hidden{transform:translateX(0) scale(0.4) translateZ(-40px);opacity:0;pointer-events:none;z-index:1}
+
+/* ── MOBILE SELECTOR — scroll horizontal de thumbnails ── */
+.mobile-selector{
+  display:none;
+  width:100%;overflow-x:auto;scrollbar-width:none;
+  padding:0 20px;
+  gap:10px;
+  -webkit-overflow-scrolling:touch;
+  scroll-snap-type:x mandatory;
+}
+.mobile-selector::-webkit-scrollbar{display:none}
+@media(max-width:768px){.mobile-selector{display:flex}}
+
+.mob-item{
+  flex-shrink:0;
+  width:56px;height:56px;border-radius:50%;overflow:hidden;
+  cursor:pointer;border:2px solid transparent;
+  transition:all 0.35s;scroll-snap-align:center;
+  position:relative;
+}
+.mob-item::after{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  background:rgba(0,0,0,0.4);transition:background 0.3s;
+}
+.mob-item.active{
+  border-color:var(--orange);transform:scale(1.18);
+  box-shadow:0 0 0 2px rgba(244,130,31,0.3);
+}
+.mob-item.active::after{background:transparent}
+.mob-item img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* Dots */
+.dest-dots{display:flex;gap:5px;align-items:center}
+.dest-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:rgba(240,236,228,0.2);
+  transition:all 0.3s;cursor:pointer;
+}
+.dest-dot.active{background:var(--orange);width:16px;border-radius:3px}
+
+/* WhatsApp flotante */
+.wa-btn{
+  position:fixed;bottom:24px;right:24px;z-index:100;
+  width:54px;height:54px;border-radius:50%;
+  background:#25D366;display:grid;place-items:center;
+  box-shadow:0 4px 20px rgba(37,211,102,0.5);
+  cursor:pointer;border:none;
+  animation:waPulse 3s ease-in-out infinite;transition:transform 0.3s;
+}
+.wa-btn:hover{transform:scale(1.1)}
+@keyframes waPulse{
+  0%,100%{box-shadow:0 4px 20px rgba(37,211,102,0.5)}
+  50%{box-shadow:0 4px 32px rgba(37,211,102,0.8),0 0 0 8px rgba(37,211,102,0.12)}
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.content{animation:fadeUp 0.9s 0.3s both}
+.selector-wrap{animation:fadeUp 0.9s 0.6s both}
+</style>
+</head>
+<body>
+<section class="hero">
+  <div class="bg-a" id="bgA"></div>
+  <div class="bg-b" id="bgB"></div>
+  <div class="overlay"></div>
+  <div class="grain"></div>
+  <div class="glow" id="glow"></div>
+
+  <nav>
+    <div class="logo"><div class="logo-mark">✦</div>TRAVEL WORLD</div>
+    <ul class="nav-links">
+      <li><a href="#">Inicio</a></li>
+      <li><a href="#">Destinos</a></li>
+      <li><a href="#">Nosotros</a></li>
+      <li><a href="#">Contacto</a></li>
+    </ul>
+    <button class="nav-cta">Cotizar Ahora</button>
+    <button class="hamburger"><span></span><span></span></button>
+  </nav>
+
+  <div class="content">
+    <div class="ct" id="ct">
+      <p class="dest-tag" id="tag"></p>
+      <h1 class="dest-title" id="title"></h1>
+      <div class="divider"></div>
+      <p class="dest-desc" id="desc"></p>
+      <div class="cta-row">
+        <button class="btn-primary">
+          Ver destino
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
+        </button>
+        <button class="btn-outline">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.855L0 24l6.335-1.508A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.655-.502-5.19-1.382l-.37-.22-3.863.92.976-3.768-.242-.387A9.97 9.97 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+          WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="trust">
+    <div class="trust-item"><div class="trust-dot"></div>126 reseñas ⭐⭐⭐⭐⭐</div>
+    <div class="trust-item"><div class="trust-dot"></div>RNT 27287</div>
+    <div class="trust-item"><div class="trust-dot"></div>Colombia · Perú · Florida</div>
+  </div>
+
+  <div class="selector-wrap">
+    <!-- Desktop coverflow -->
+    <div class="coverflow" id="coverflow">
+      <button class="cf-arrow left" id="prevBtn">
+        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>
+      </button>
+      <button class="cf-arrow right" id="nextBtn">
+        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg>
+      </button>
+    </div>
+
+    <!-- Mobile thumbnails -->
+    <div class="mobile-selector" id="mobileSel"></div>
+
+    <!-- Dots -->
+    <div class="dest-dots" id="dots"></div>
+  </div>
+</section>
+
+<button class="wa-btn" aria-label="WhatsApp">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.855L0 24l6.335-1.508A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.655-.502-5.19-1.382l-.37-.22-3.863.92.976-3.768-.242-.387A9.97 9.97 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+</button>
+
+<script>
+const destinos = [
+  { slug:'republica-dominicana', tag:'🇩🇴 Caribe', title:'REPÚBLICA\nDOMINICANA', desc:'Playas de arena blanca, aguas turquesas y resorts de lujo. El destino favorito de los colombianos en el Caribe.', bg:'https://picsum.photos/seed/dominicana-bg/1600/900', thumb:'https://picsum.photos/seed/dominicana/200/200', glow:'rgba(244,130,31,0.25)' },
+  { slug:'estados-unidos', tag:'🇺🇸 Norte América', title:'ESTADOS\nUNIDOS', desc:'Miami, Orlando, Nueva York, Las Vegas. El destino #1 de los colombianos con 1.7 millones de viajeros al año.', bg:'https://picsum.photos/seed/usa-bg/1600/900', thumb:'https://picsum.photos/seed/usa/200/200', glow:'rgba(96,165,250,0.25)' },
+  { slug:'japon', tag:'🇯🇵 Asia', title:'JAPÓN', desc:'Tokyo, Kyoto, Osaka. Donde la modernidad y la tradición milenaria conviven en perfecta armonía.', bg:'https://picsum.photos/seed/japan-bg/1600/900', thumb:'https://picsum.photos/seed/japan/200/200', glow:'rgba(230,168,23,0.25)' },
+  { slug:'paris', tag:'🇫🇷 Europa', title:'PARÍS', desc:'La ciudad del amor, el arte y la elegancia. Torre Eiffel, Versalles y la mejor gastronomía del mundo.', bg:'https://picsum.photos/seed/paris-bg/1600/900', thumb:'https://picsum.photos/seed/paris/200/200', glow:'rgba(167,139,250,0.25)' },
+  { slug:'santorini', tag:'🇬🇷 Mediterráneo', title:'SANTORINI', desc:'Casas blancas sobre el mar Egeo, atardeceres únicos en Oia y la magia del Mediterráneo griego.', bg:'https://picsum.photos/seed/santorini-bg/1600/900', thumb:'https://picsum.photos/seed/santorini/200/200', glow:'rgba(56,189,248,0.25)' },
+  { slug:'cancun', tag:'🇲🇽 Caribe Mexicano', title:'CANCÚN', desc:'La Riviera Maya, cenotes mágicos y los mejores hoteles todo incluido del Caribe mexicano.', bg:'https://picsum.photos/seed/cancun-bg/1600/900', thumb:'https://picsum.photos/seed/cancun/200/200', glow:'rgba(52,211,153,0.25)' },
+  { slug:'peru', tag:'🇵🇪 Sudamérica', title:'PERÚ', desc:'Machu Picchu, Cusco y el Valle Sagrado. La joya histórica de América del Sur.', bg:'https://picsum.photos/seed/peru-bg/1600/900', thumb:'https://picsum.photos/seed/peru/200/200', glow:'rgba(251,191,36,0.25)' },
+  { slug:'espana', tag:'🇪🇸 Europa', title:'ESPAÑA', desc:'Madrid, Barcelona, Sevilla. Historia, gastronomía, flamenco y la calidez del pueblo español.', bg:'https://picsum.photos/seed/espana-bg/1600/900', thumb:'https://picsum.photos/seed/espana/200/200', glow:'rgba(244,63,94,0.25)' },
+]
+
+let active = 0
+let bgCurrent = 'a'
+let autoTimer = null
+
+const bgA = document.getElementById('bgA')
+const bgB = document.getElementById('bgB')
+const glowEl = document.getElementById('glow')
+const ct = document.getElementById('ct')
+const coverflow = document.getElementById('coverflow')
+const mobileSel = document.getElementById('mobileSel')
+const dotsEl = document.getElementById('dots')
+
+// Build desktop coverflow items
+const cfItems = destinos.map((d, i) => {
+  const el = document.createElement('div')
+  el.className = 'cf-item'
+  el.innerHTML = `<img src="${d.thumb}" alt="${d.title}" loading="lazy">`
+  el.addEventListener('click', () => goTo(i))
+  coverflow.insertBefore(el, document.getElementById('nextBtn'))
+  return el
+})
+
+// Build mobile thumbnails
+const mobItems = destinos.map((d, i) => {
+  const el = document.createElement('div')
+  el.className = 'mob-item'
+  el.innerHTML = `<img src="${d.thumb}" alt="${d.title}" loading="lazy">`
+  el.addEventListener('click', () => goTo(i))
+  mobileSel.appendChild(el)
+  return el
+})
+
+// Build dots
+destinos.forEach((_, i) => {
+  const dot = document.createElement('div')
+  dot.className = 'dest-dot'
+  dot.addEventListener('click', () => goTo(i))
+  dotsEl.appendChild(dot)
+})
+
+function getPos(itemIdx, activeIdx, total) {
+  let diff = itemIdx - activeIdx
+  if (diff > total / 2) diff -= total
+  if (diff < -total / 2) diff += total
+  return diff
+}
+
+function updateCoverflow() {
+  const total = destinos.length
+  cfItems.forEach((el, i) => {
+    const diff = getPos(i, active, total)
+    el.className = 'cf-item'
+    if      (diff === 0)  el.classList.add('pos-active')
+    else if (diff === -1) el.classList.add('pos-left1')
+    else if (diff === 1)  el.classList.add('pos-right1')
+    else if (diff === -2) el.classList.add('pos-left2')
+    else if (diff === 2)  el.classList.add('pos-right2')
+    else                  el.classList.add('pos-hidden')
+  })
+
+  // Mobile
+  mobItems.forEach((el, i) => el.classList.toggle('active', i === active))
+
+  // Scroll mobile item into view
+  const mobActive = mobItems[active]
+  if (mobActive) {
+    mobActive.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' })
+  }
+
+  // Dots
+  document.querySelectorAll('.dest-dot').forEach((d, i) => d.classList.toggle('active', i === active))
+}
+
+function setBg(url) {
+  if (bgCurrent === 'a') {
+    bgB.style.backgroundImage = `url('${url}')`
+    bgB.style.opacity = '1'
+    bgA.style.opacity = '0'
+    bgCurrent = 'b'
+  } else {
+    bgA.style.backgroundImage = `url('${url}')`
+    bgA.style.opacity = '1'
+    bgB.style.opacity = '0'
+    bgCurrent = 'a'
+  }
+}
+
+function updateContent() {
+  const d = destinos[active]
+  ct.classList.add('fading')
+  setTimeout(() => {
+    document.getElementById('tag').textContent = d.tag
+    const lines = d.title.split('\n')
+    document.getElementById('title').innerHTML =
+      lines.map((l, i) => i === lines.length - 1 ? `<span>${l}</span>` : l + '<br>').join('')
+    document.getElementById('desc').textContent = d.desc
+    glowEl.style.background = `radial-gradient(circle, ${d.glow} 0%, transparent 70%)`
+    ct.classList.remove('fading')
+  }, 350)
+  setBg(d.bg)
+}
+
+function goTo(index) {
+  active = (index + destinos.length) % destinos.length
+  updateCoverflow()
+  updateContent()
+  resetAuto()
+}
+
+function resetAuto() {
+  clearInterval(autoTimer)
+  autoTimer = setInterval(() => goTo(active + 1), 5000)
+}
+
+// Init
+bgA.style.backgroundImage = `url('${destinos[0].bg}')`
+bgA.style.opacity = '1'
+updateCoverflow()
+updateContent()
+resetAuto()
+
+document.getElementById('prevBtn').addEventListener('click', () => goTo(active - 1))
+document.getElementById('nextBtn').addEventListener('click', () => goTo(active + 1))
+
+// Touch swipe on mobile
+let touchStartX = 0
+document.querySelector('.hero').addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX }, {passive:true})
+document.querySelector('.hero').addEventListener('touchend', e => {
+  const diff = touchStartX - e.changedTouches[0].clientX
+  if (Math.abs(diff) > 50) goTo(diff > 0 ? active + 1 : active - 1)
+}, {passive:true})
+</script>
+</body>
+</html>

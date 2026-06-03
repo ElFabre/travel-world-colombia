@@ -43,3 +43,11 @@ next-env.d.ts
 
 # screenshots de verificacion (playwright)
 scripts/*.png
+
+# imágenes brutas y optimizadas (no van al repo — subir a Supabase Storage)
+/raw-images/
+/optimized-images/
+# fotos de destinos van a Supabase; logos de alianzas y fotos de viajeros SÍ se commitean (assets estáticos)
+/public/img/*
+!/public/img/alianzas/
+!/public/img/viajeros/
