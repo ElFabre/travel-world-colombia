@@ -17,12 +17,14 @@ const labelStyle = { color: 'var(--text-dim)' } as const
 
 function Seccion({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
-    <fieldset className="rounded-lg p-5" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
-      <legend className="px-2 font-cinzel text-[10px] tracking-[0.2em] uppercase" style={{ color: 'var(--orange)' }}>
+    <section>
+      <p className="mb-2 px-1 font-cinzel text-[11px] tracking-[0.2em] uppercase" style={{ color: 'var(--orange)' }}>
         {titulo}
-      </legend>
-      <div className="grid gap-4 sm:grid-cols-2">{children}</div>
-    </fieldset>
+      </p>
+      <div className="rounded-lg p-5" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+        <div className="grid gap-4 sm:grid-cols-2">{children}</div>
+      </div>
+    </section>
   )
 }
 
