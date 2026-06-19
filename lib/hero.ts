@@ -1,31 +1,34 @@
 import type { Destino } from '@/types/destino'
 
 /**
- * Imagen de fondo del hero.
- * Prioridad: imagen_hero de Supabase → /img/{slug}/hero.webp → Picsum placeholder
+ * ¿La URL es una imagen subida a Supabase Storage (vs. placeholder externo
+ * como Unsplash)? Permite migración gradual: si el viaje ya tiene su foto
+ * propia en Storage (subida desde el panel) se usa; si no, fallback local.
+ */
+function esStorage(url?: string): boolean {
+  return !!url && url.includes('/storage/v1/object/public/')
+}
+
+/**
+ * Imagen de fondo del hero. Storage-first → fallback local (/img/{slug}/hero.webp).
  */
 export function heroBg(destino: Pick<Destino, 'slug' | 'imagen_hero'>): string {
-  // LOCAL PREVIEW — usa siempre la imagen local optimizada
-  // Cuando apruebes las fotos: subir a Supabase y cambiar a destino.imagen_hero
-  return `/img/${destino.slug}/hero.webp`
+  return esStorage(destino.imagen_hero) ? destino.imagen_hero! : `/img/${destino.slug}/hero.webp`
 }
 
 /**
- * Thumbnail circular del coverflow.
- * LOCAL PREVIEW — usa siempre la imagen local optimizada
+ * Thumbnail circular del coverflow. Storage-first → fallback local.
  */
 export function heroThumb(destino: Pick<Destino, 'slug' | 'imagen_thumb'>): string {
-  return `/img/${destino.slug}/thumb.webp`
+  return esStorage(destino.imagen_thumb) ? destino.imagen_thumb! : `/img/${destino.slug}/thumb.webp`
 }
 
 /**
- * Imagen de la tarjeta de destino (grid del home y /destinos).
- * LOCAL PREVIEW — usa la MISMA imagen del hero para que tarjeta y hero
- * queden sincronizados (ej. República Dominicana → la playa).
- * Cuando subas las fotos a Supabase: cambiar a destino.imagen_thumb.
+ * Imagen de la tarjeta de destino (grid del home y /destinos), sincronizada
+ * con el hero. Storage-first → fallback local.
  */
-export function destinoCardImg(destino: Pick<Destino, 'slug' | 'imagen_thumb'>): string {
-  return `/img/${destino.slug}/hero.webp`
+export function destinoCardImg(destino: Pick<Destino, 'slug' | 'imagen_hero'>): string {
+  return esStorage(destino.imagen_hero) ? destino.imagen_hero! : `/img/${destino.slug}/hero.webp`
 }
 
 /** Color RGB del glow del hero según la región del destino. */
