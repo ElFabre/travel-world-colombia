@@ -5,6 +5,8 @@ import { useActionState } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import type { Destino } from '@/types/destino'
 import type { FormState } from '../destinos/actions'
+import { RepetidorObjetos } from './RepetidorObjetos'
+import { GaleriaEditor } from './GaleriaEditor'
 
 type Action = (prev: FormState, fd: FormData) => Promise<FormState>
 
@@ -143,6 +145,49 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
       <Seccion titulo="Qué incluye">
         <Area label="Incluye (uno por línea)" name="incluye" defaultValue={d?.incluye?.join('\n')} hint="Una característica por línea." />
         <Area label="No incluye (uno por línea)" name="no_incluye" defaultValue={d?.no_incluye?.join('\n')} hint="Una por línea." />
+      </Seccion>
+
+      <Seccion titulo="Stats (barra de cifras)">
+        <RepetidorObjetos
+          name="stats"
+          etiqueta="cifra"
+          inicial={d?.stats as unknown as Record<string, string>[] | undefined}
+          campos={[
+            { key: 'num', label: 'Cifra (ej. 500+)', ancho: 'corto' },
+            { key: 'label', label: 'Etiqueta (ej. familias viajaron)' },
+          ]}
+        />
+      </Seccion>
+
+      <Seccion titulo="Highlights (lo que te espera)">
+        <RepetidorObjetos
+          name="highlights"
+          etiqueta="highlight"
+          inicial={d?.highlights as unknown as Record<string, string>[] | undefined}
+          campos={[
+            { key: 'icono', label: 'Emoji', ancho: 'corto' },
+            { key: 'titulo', label: 'Título' },
+            { key: 'descripcion', label: 'Descripción' },
+          ]}
+        />
+      </Seccion>
+
+      <Seccion titulo="Información clave">
+        <RepetidorObjetos
+          name="info_clave"
+          etiqueta="dato"
+          inicial={d?.info_clave as unknown as Record<string, string>[] | undefined}
+          campos={[
+            { key: 'icono', label: 'Emoji', ancho: 'corto' },
+            { key: 'label', label: 'Etiqueta' },
+            { key: 'valor', label: 'Valor' },
+            { key: 'sub', label: 'Sub (opcional)' },
+          ]}
+        />
+      </Seccion>
+
+      <Seccion titulo="Galería">
+        <GaleriaEditor name="galeria" inicial={d?.galeria} />
       </Seccion>
 
       <Seccion titulo="SEO & CTA">

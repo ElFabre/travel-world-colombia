@@ -32,6 +32,16 @@ function texto(v: FormDataEntryValue | null): string | undefined {
   return s === '' ? undefined : s
 }
 
+/** Parsea un array JSON serializado (repetidores del formulario). */
+function jsonArray(v: FormDataEntryValue | null): unknown[] {
+  try {
+    const p = JSON.parse(String(v ?? '[]'))
+    return Array.isArray(p) ? p : []
+  } catch {
+    return []
+  }
+}
+
 /** Sube un archivo al bucket si viene uno nuevo; si no, conserva la URL actual. */
 async function subirImagen(
   admin: SupabaseClient,
@@ -73,6 +83,10 @@ async function construirPayload(formData: FormData, admin: SupabaseClient) {
     incluye: lineas(formData.get('incluye')),
     no_incluye: lineas(formData.get('no_incluye')),
     keywords: lineas(formData.get('keywords')),
+    stats: jsonArray(formData.get('stats')),
+    highlights: jsonArray(formData.get('highlights')),
+    info_clave: jsonArray(formData.get('info_clave')),
+    galeria: jsonArray(formData.get('galeria')),
     cta_titulo: texto(formData.get('cta_titulo')),
     cta_subtitulo: texto(formData.get('cta_subtitulo')),
     meta_title: texto(formData.get('meta_title')),
@@ -89,6 +103,22 @@ async function construirPayload(formData: FormData, admin: SupabaseClient) {
   const imagen_about = await subirImagen(admin, slug, 'about', formData.get('imagen_about_file') as File, texto(formData.get('imagen_about')))
 
   return { ...parsed.data, imagen_hero, imagen_thumb, imagen_about }
+}
+
+/** Sube un archivo individual (galería) y devuelve su URL pública. */
+export async function subirArchivo(formData: FormData): Promise<{ url?: string; error?: string }> {
+  await requireAdmin()
+  const admin = createAdminClient()
+  const file = formData.get('file') as File | null
+  const slug = String(formData.get('slug') ?? '').trim() || 'galeria'
+  if (!file || file.size === 0) return { error: 'No se seleccionó archivo.' }
+  try {
+    const rand = Math.random().toString(36).slice(2, 8)
+    const url = await subirImagen(admin, slug, `galeria-${rand}`, file)
+    return { url }
+  } catch (e) {
+    return { error: (e as Error).message }
+  }
 }
 
 function revalidar(slug?: string) {

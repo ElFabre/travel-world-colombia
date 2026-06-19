@@ -27,6 +27,11 @@ export const destinoSchema = z.object({
   no_incluye: z.array(z.string()).optional(),
   keywords: z.array(z.string()).optional(),
 
+  stats: z.array(z.object({ num: z.string(), label: z.string() })).optional(),
+  highlights: z.array(z.object({ icono: z.string(), titulo: z.string(), descripcion: z.string() })).optional(),
+  info_clave: z.array(z.object({ icono: z.string(), label: z.string(), valor: z.string(), sub: z.string().optional() })).optional(),
+  galeria: z.array(z.string()).optional(),
+
   cta_titulo: z.string().optional(),
   cta_subtitulo: z.string().optional(),
   meta_title: z.string().optional(),
