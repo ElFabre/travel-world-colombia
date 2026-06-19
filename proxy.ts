@@ -1,10 +1,10 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const res = NextResponse.next()
 
-  // ── 1. Protección del panel admin ──
+  // ── 1. Protección del panel admin (chequeo optimista) ──
   if (req.nextUrl.pathname.startsWith('/admin')) {
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -23,15 +23,17 @@ export async function middleware(req: NextRequest) {
       }
     )
 
-    const { data: { session } } = await supabase.auth.getSession()
+    // getUser() revalida el JWT contra el servidor de Supabase
+    // (más seguro que getSession(), que solo confía en la cookie).
+    const { data: { user } } = await supabase.auth.getUser()
 
-    if (!session && !req.nextUrl.pathname.startsWith('/admin/login')) {
+    if (!user && !req.nextUrl.pathname.startsWith('/admin/login')) {
       return NextResponse.redirect(new URL('/admin/login', req.url))
     }
 
-    if (session) {
-      const adminEmails = process.env.ADMIN_EMAILS?.split(',') ?? []
-      if (!adminEmails.includes(session.user.email ?? '')) {
+    if (user) {
+      const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim()) ?? []
+      if (!adminEmails.includes(user.email ?? '')) {
         return NextResponse.redirect(new URL('/', req.url))
       }
     }

@@ -28,7 +28,7 @@ const nextConfig: NextConfig = {
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' *.googletagmanager.com *.facebook.net reputationhub.site",
-              "frame-src 'self' reputationhub.site *.google.com",
+              "frame-src 'self' reputationhub.site *.google.com www.googletagmanager.com",
               "img-src * data: blob:",
               "connect-src * 'self'",
               "style-src 'self' 'unsafe-inline' fonts.googleapis.com",

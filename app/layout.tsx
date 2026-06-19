@@ -4,6 +4,7 @@ import './globals.css'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
+import { Analytics, AnalyticsNoScript } from '@/components/analytics/Analytics'
 import { SITE, WHATSAPP, SOCIALS } from '@/lib/site'
 
 const schemaOrg = {
@@ -11,7 +12,7 @@ const schemaOrg = {
   '@type': 'TravelAgency',
   name: SITE.nombre,
   url: SITE.url,
-  logo: `${SITE.url}/logo.png`,
+  logo: `${SITE.url}/images/travel-world-colombia-logo.png`,
   image: `${SITE.url}/og-image.jpg`,
   description:
     'Agencia de viajes en Fusagasugá con más de 126 reseñas ⭐⭐⭐⭐⭐. Paquetes nacionales e internacionales todo incluido. RNT 27287.',
@@ -104,6 +105,25 @@ export const metadata: Metadata = {
     siteName: 'Travel World Colombia',
     locale: 'es_CO',
     type: 'website',
+    url: '/',
+    title: 'Agencia de Viajes Fusagasugá | Travel World Colombia',
+    description:
+      'Agencia de viajes en Fusagasugá con más de 126 reseñas ⭐⭐⭐⭐⭐ Paquetes a todo el mundo. Cotiza gratis ✈️ RNT 27287.',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Travel World Colombia — Agencia de viajes en Fusagasugá',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Agencia de Viajes Fusagasugá | Travel World Colombia',
+    description:
+      'Agencia de viajes en Fusagasugá. Paquetes nacionales e internacionales todo incluido. Cotiza gratis. RNT 27287.',
+    images: ['/og-image.jpg'],
   },
   robots: {
     index: true,
@@ -122,6 +142,8 @@ export default function RootLayout({
       className={`${plusJakarta.variable} ${cinzel.variable} ${inter.variable}`}
     >
       <body className="min-h-screen antialiased">
+        <Analytics />
+        <AnalyticsNoScript />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaOrg) }}

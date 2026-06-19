@@ -1,13 +1,29 @@
 'use server'
 
+import { headers } from 'next/headers'
 import { cotizacionSchema } from '@/lib/validations/cotizacion'
 import { enviarLeadAGHL } from '@/lib/ghl/webhook'
+import { rateLimitByIp } from '@/lib/security/rateLimit'
 
 export type ActionResult =
   | { ok: true }
   | { ok: false; message: string }
 
 export async function submitCotizacion(raw: unknown): Promise<ActionResult> {
+  // Rate limit por IP — máx. 5 envíos por minuto.
+  const h = await headers()
+  const ip =
+    h.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    h.get('x-real-ip') ??
+    'unknown'
+  const rl = rateLimitByIp(ip, { limit: 5, windowMs: 60_000 })
+  if (!rl.success) {
+    return {
+      ok: false,
+      message: `Demasiados envíos. Espera ${rl.retryAfter}s e intenta de nuevo, o escríbenos por WhatsApp.`,
+    }
+  }
+
   const parsed = cotizacionSchema.safeParse(raw)
 
   if (!parsed.success) {

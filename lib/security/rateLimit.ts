@@ -1,5 +1,8 @@
 import { NextRequest } from 'next/server'
 
+// NOTA: store en memoria — válido para un solo proceso. En serverless con
+// múltiples instancias no es 100% fiable; para producción de alto tráfico,
+// migrar a un store distribuido (Upstash Redis / Vercel KV).
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
 
 interface RateLimitOptions {
@@ -7,12 +10,17 @@ interface RateLimitOptions {
   windowMs: number
 }
 
-export function rateLimit(req: NextRequest, options: RateLimitOptions = { limit: 5, windowMs: 60_000 }) {
-  const ip =
-    req.headers.get('x-forwarded-for')?.split(',')[0] ??
-    req.headers.get('x-real-ip') ??
-    'unknown'
+interface RateLimitResult {
+  success: boolean
+  remaining: number
+  retryAfter: number
+}
 
+/** Rate limit por identificador (normalmente la IP). */
+export function rateLimitByIp(
+  ip: string,
+  options: RateLimitOptions = { limit: 5, windowMs: 60_000 }
+): RateLimitResult {
   const now = Date.now()
   const record = rateLimitMap.get(ip)
 
@@ -31,4 +39,13 @@ export function rateLimit(req: NextRequest, options: RateLimitOptions = { limit:
 
   record.count++
   return { success: true, remaining: options.limit - record.count, retryAfter: 0 }
+}
+
+/** Wrapper para middleware / API routes a partir de un NextRequest. */
+export function rateLimit(req: NextRequest, options?: RateLimitOptions) {
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    req.headers.get('x-real-ip') ??
+    'unknown'
+  return rateLimitByIp(ip, options)
 }
