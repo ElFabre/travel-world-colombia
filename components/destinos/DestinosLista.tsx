@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { MapPin, Clock, ChevronRight } from 'lucide-react'
 import type { Destino } from '@/types/destino'
 import { SectionTag } from '@/components/ui/SectionTag'
+import { destinoCardImg } from '@/lib/hero'
 
 interface DestinosListaProps {
   destinos: Destino[]
@@ -66,19 +67,15 @@ export function DestinosLista({ destinos }: DestinosListaProps) {
               style={{ animationDelay: `${Math.min(i, 8) * 60}ms`, animationFillMode: 'both' }}
             >
               <Link href={`/destinos/${d.slug}`} className="destino-card group flex flex-col overflow-hidden rounded-lg">
-                {/* Imagen */}
+                {/* Imagen — sincronizada con el hero (preview local) */}
                 <div className="relative h-56 overflow-hidden">
-                  {d.imagen_thumb ? (
-                    <Image
-                      src={d.imagen_thumb}
-                      alt={d.nombre}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="h-full w-full" style={{ background: 'var(--blue)' }} />
-                  )}
+                  <Image
+                    src={destinoCardImg(d)}
+                    alt={d.nombre}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
                   <div
                     className="absolute inset-0"
                     style={{ background: 'linear-gradient(to top, rgba(6,14,26,0.85) 0%, transparent 55%)' }}

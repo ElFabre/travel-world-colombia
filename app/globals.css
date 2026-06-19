@@ -124,6 +124,32 @@ body {
 }
 
 /* ── Destinos grid — botón ver todos ── */
+.destinos-cargar-mas {
+  background: var(--orange);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(244, 130, 31, 0.3);
+  transition: filter 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.destinos-cargar-mas:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 8px 22px rgba(244, 130, 31, 0.45);
+  transform: translateY(-2px);
+}
+.destinos-cargar-mas:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+}
+
+/* Fade-in de las tarjetas reveladas con "Cargar más" */
+.destino-fade-in {
+  animation: destino-fade-in 0.45s ease both;
+}
+@keyframes destino-fade-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .destinos-ver-todos {
   border-color: var(--border-orange);
   color: var(--text-primary);
@@ -242,6 +268,64 @@ body {
 }
 .como-funciona-video:hover {
   color: var(--orange);
+}
+
+/* Línea punteada con guiones que "marchan" de izquierda a derecha */
+.como-flujo-linea {
+  background-image: repeating-linear-gradient(to right, var(--orange) 0 10px, transparent 10px 20px);
+  opacity: 0.5;
+  animation: como-flujo-dash 1s linear infinite;
+}
+@keyframes como-flujo-dash {
+  to { background-position-x: 20px; }
+}
+
+/* Avión que recorre la línea (16% → 84%) en loop, con fade en los extremos */
+.como-flujo-avion {
+  left: 16%;
+  animation: como-flujo-avion 12s linear infinite;
+}
+@keyframes como-flujo-avion {
+  0%   { left: 14%; opacity: 0; }
+  12%  { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { left: 84%; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .como-flujo-linea { animation: none !important; }
+  .como-flujo-avion { animation: none !important; left: 82%; opacity: 1; }
+}
+
+/* ── Equipo Travel World — tarjetas y navegación ── */
+.equipo-card {
+  background: rgba(26, 58, 107, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+}
+.equipo-card:hover {
+  border-color: var(--orange);
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px -10px rgba(244, 130, 31, 0.2), 0 0 20px rgba(244, 130, 31, 0.1);
+}
+/* Marquee continuo del equipo — loop infinito, pausa al hover */
+.equipo-marquee {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+}
+.equipo-marquee-track {
+  animation: equipo-marquee 60s linear infinite;
+  will-change: transform;
+}
+@keyframes equipo-marquee {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .equipo-marquee-track { animation: none !important; }
 }
 
 /* ── Accesibilidad — reducir movimiento ── */

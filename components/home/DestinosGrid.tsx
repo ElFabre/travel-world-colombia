@@ -1,16 +1,27 @@
+'use client'
+
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { MapPin, Clock } from 'lucide-react'
 import type { Destino } from '@/types/destino'
 import { SectionTag } from '@/components/ui/SectionTag'
+import { destinoCardImg } from '@/lib/hero'
 
 interface DestinosGridProps {
   destinos: Destino[]
 }
 
+const INICIAL = 3
+const PASO = 3
+
 export function DestinosGrid({ destinos }: DestinosGridProps) {
-  const featured = destinos.filter(d => d.destacado).slice(0, 6)
-  const list = featured.length >= 3 ? featured : destinos.slice(0, 6)
+  // Destacados primero, luego el resto.
+  const ordenados = [...destinos].sort((a, b) => Number(b.destacado) - Number(a.destacado))
+  const [visibles, setVisibles] = useState(INICIAL)
+
+  const lista = ordenados.slice(0, visibles)
+  const hayMas = visibles < ordenados.length
 
   return (
     <section aria-labelledby="destinos-title" className="py-20 px-6">
@@ -33,25 +44,21 @@ export function DestinosGrid({ destinos }: DestinosGridProps) {
         </div>
 
         <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {list.map(d => (
-            <li key={d.id}>
+          {lista.map((d, i) => (
+            <li key={d.id} className={i >= INICIAL ? 'destino-fade-in' : undefined}>
               <Link
                 href={`/destinos/${d.slug}`}
                 className="destino-card group relative flex flex-col overflow-hidden rounded-lg"
               >
-                {/* Imagen */}
+                {/* Imagen — sincronizada con el hero (preview local) */}
                 <div className="relative h-52 overflow-hidden">
-                  {d.imagen_thumb ? (
-                    <Image
-                      src={d.imagen_thumb}
-                      alt={d.nombre}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="h-full w-full" style={{ background: 'var(--blue)' }} />
-                  )}
+                  <Image
+                    src={destinoCardImg(d)}
+                    alt={d.nombre}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
                   <div
                     className="absolute inset-0"
                     style={{
@@ -119,16 +126,23 @@ export function DestinosGrid({ destinos }: DestinosGridProps) {
           ))}
         </ul>
 
-        {destinos.length > 6 && (
-          <div className="mt-10 text-center">
-            <Link
-              href="/destinos"
-              className="destinos-ver-todos font-plus-jakarta text-[11px] font-bold tracking-[0.15em] uppercase px-6 py-3 rounded-sm border inline-block"
+        <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          {hayMas && (
+            <button
+              type="button"
+              onClick={() => setVisibles(v => Math.min(v + PASO, ordenados.length))}
+              className="destinos-cargar-mas font-plus-jakarta text-[11px] font-bold tracking-[0.15em] uppercase px-6 py-3 rounded-sm"
             >
-              Ver todos los destinos
-            </Link>
-          </div>
-        )}
+              Cargar más
+            </button>
+          )}
+          <Link
+            href="/destinos"
+            className="destinos-ver-todos font-plus-jakarta text-[11px] font-bold tracking-[0.15em] uppercase px-6 py-3 rounded-sm border inline-block"
+          >
+            Ver todos los destinos
+          </Link>
+        </div>
       </div>
     </section>
   )

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import { getDestinos } from '@/lib/destinos'
 import { DestinosLista } from '@/components/destinos/DestinosLista'
 import { SectionTag } from '@/components/ui/SectionTag'
@@ -17,28 +18,32 @@ export default async function DestinosPage() {
   return (
     <>
       {/* Hero */}
-      <section
-        className="relative overflow-hidden pt-32 pb-16 px-6"
-        style={{ background: 'linear-gradient(to bottom, rgba(10,22,40,0.95), var(--navy))' }}
-      >
-        {/* Decoración fondo */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -right-32 top-0 h-[500px] w-[500px] rounded-full opacity-10"
-          style={{ background: 'radial-gradient(circle, var(--orange) 0%, transparent 70%)' }}
+      <section className="relative overflow-hidden pt-32 pb-16 px-6">
+        {/* Mapa de rutas de fondo */}
+        <Image
+          src="/img/paginas/mapa-rutas-destinos-travel-world-colombia.webp"
+          alt="Mapa mundial de rutas de viaje de Travel World Colombia, con destinos nacionales e internacionales desde Fusagasugá"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
         />
+        {/* Overlay: oscurece la izquierda para el texto, revela el mapa a la derecha */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -left-20 bottom-0 h-80 w-80 rounded-full opacity-10"
-          style={{ background: 'radial-gradient(circle, var(--gold) 0%, transparent 70%)' }}
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(90deg, rgba(10,22,40,0.96) 0%, rgba(10,22,40,0.8) 35%, rgba(10,22,40,0.5) 70%, rgba(10,22,40,0.2) 100%)',
+          }}
         />
 
-        <div className="relative mx-auto max-w-6xl">
+        <div className="relative z-10 mx-auto max-w-6xl">
           <SectionTag className="mb-4">Explora el mundo</SectionTag>
 
           <h1
             className="font-plus-jakarta text-4xl font-extrabold leading-tight sm:text-6xl"
-            style={{ color: 'var(--text-primary)' }}
+            style={{ color: 'var(--text-primary)', textShadow: '0 2px 16px rgba(0,0,0,0.5)' }}
           >
             Todos nuestros
             <br />
@@ -47,7 +52,7 @@ export default async function DestinosPage() {
 
           <p
             className="mt-5 max-w-lg font-inter text-sm leading-relaxed sm:text-base"
-            style={{ color: 'var(--text-dim)' }}
+            style={{ color: 'var(--text-primary)', opacity: 0.9, textShadow: '0 1px 10px rgba(0,0,0,0.5)' }}
           >
             {destinos.length} destinos seleccionados para ti. Nacionales e internacionales,
             con atención personalizada desde Fusagasugá.

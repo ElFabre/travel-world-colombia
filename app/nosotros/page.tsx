@@ -1,9 +1,12 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Script from 'next/script'
 import { Target, Eye, Award, Users, MapPin, Star, Globe } from 'lucide-react'
 import { SectionTag } from '@/components/ui/SectionTag'
 import { Button } from '@/components/ui/Button'
+import { EquipoSection } from '@/components/equipo/EquipoSection'
 import { SITE, WHATSAPP, whatsappUrl } from '@/lib/site'
+import { HOTELES_CRUCEROS, AEROLINEAS, type Alianza } from '@/lib/alianzas'
 
 const schemaFAQ = {
   '@context': 'https://schema.org',
@@ -69,23 +72,6 @@ const STATS = [
   { icon: MapPin,num: '3',    label: 'centros de operación' },
 ]
 
-const EQUIPO = [
-  { nombre: 'Luisa Fernanda',  cargo: 'Fundadora & Directora',       iniciales: 'LF', color: '#f4821f' },
-  { nombre: 'Carlos Herrera',  cargo: 'Asesor Senior Internacional',  iniciales: 'CH', color: '#1a3a6b' },
-  { nombre: 'Valentina Mora',  cargo: 'Asesora Destinos Nacionales',  iniciales: 'VM', color: '#e6a817' },
-  { nombre: 'Andrés Castillo', cargo: 'Soporte & Operaciones',        iniciales: 'AC', color: '#1a3a6b' },
-]
-
-const HOTELES = [
-  'Xcaret', 'Estelar', 'On Vacation', 'Princess',
-  'Dorado Plaza', 'RIU', 'Decameron', 'AMResorts',
-]
-
-const AEROLINEAS = [
-  'American Airlines', 'Avianca', 'Copa Airlines', 'LATAM',
-  'Wingo', 'Viva', 'Delta', 'Satena',
-]
-
 /* ─────────── COMPONENTES INTERNOS ─────────── */
 
 function Divider() {
@@ -94,18 +80,27 @@ function Divider() {
   )
 }
 
-function LogoBadge({ name }: { name: string }) {
+function LogoCard({ alianza }: { alianza: Alianza }) {
   return (
-    <span
-      className="inline-flex shrink-0 items-center rounded-full px-5 py-2.5 font-plus-jakarta text-xs font-bold tracking-wide whitespace-nowrap"
-      style={{
-        background: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(255,255,255,0.12)',
-        color: 'var(--text-dim)',
-      }}
-    >
-      {name}
-    </span>
+    <div className="alianza-item shrink-0">
+      {alianza.logo ? (
+        <Image
+          src={alianza.logo}
+          alt={alianza.alt}
+          width={160}
+          height={64}
+          className="alianza-logo h-9 w-auto object-contain sm:h-11"
+          draggable={false}
+        />
+      ) : (
+        <span
+          className="alianza-wordmark font-plus-jakarta text-base font-bold whitespace-nowrap"
+          aria-label={alianza.alt}
+        >
+          {alianza.nombre}
+        </span>
+      )}
+    </div>
   )
 }
 
@@ -120,31 +115,37 @@ export default function NosotrosPage() {
       />
 
       {/* ── HERO ── */}
-      <section
-        className="relative overflow-hidden pt-36 pb-20 px-6 text-center"
-        style={{
-          background:
-            'linear-gradient(160deg, rgba(26,58,107,0.45) 0%, rgba(6,14,26,0.98) 55%)',
-        }}
-      >
-        {/* Decos */}
+      <section className="relative overflow-hidden pt-36 pb-24 px-6 text-center">
+        {/* Imagen de fondo — paisaje andino del Sumapaz */}
+        <Image
+          src="/img/paginas/paisaje-andino-sumapaz-fusagasuga.webp"
+          alt="Paisaje andino del Sumapaz cerca de Fusagasugá al amanecer — Travel World Colombia"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+        {/* Overlay navy para legibilidad del texto */}
         <div
           aria-hidden
-          className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[420px] -translate-x-1/2 rounded-full opacity-10"
-          style={{ background: 'radial-gradient(circle, var(--orange) 0%, transparent 70%)' }}
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(180deg, rgba(6,14,26,0.92) 0%, rgba(6,14,26,0.66) 55%, rgba(6,14,26,0.45) 100%)',
+          }}
         />
-        <div className="relative mx-auto max-w-3xl">
+        <div className="relative z-10 mx-auto max-w-3xl">
           <SectionTag className="mb-4">Quiénes somos</SectionTag>
           <h1
             className="font-plus-jakarta text-4xl font-extrabold leading-tight sm:text-6xl"
-            style={{ color: 'var(--text-primary)' }}
+            style={{ color: 'var(--text-primary)', textShadow: '0 2px 16px rgba(0,0,0,0.45)' }}
           >
             Nuestra historia
           </h1>
           <Divider />
           <p
             className="mt-6 font-inter text-base leading-relaxed sm:text-lg"
-            style={{ color: 'var(--text-dim)', lineHeight: '1.75' }}
+            style={{ color: 'var(--text-primary)', opacity: 0.92, lineHeight: '1.75', textShadow: '0 1px 10px rgba(0,0,0,0.4)' }}
           >
             Nacimos en Fusagasugá con un propósito claro: hacer que viajar sea
             accesible, seguro y memorable para cada familia colombiana.
@@ -247,51 +248,7 @@ export default function NosotrosPage() {
       </section>
 
       {/* ── EQUIPO ── */}
-      <section
-        className="px-6 py-20"
-        style={{ background: 'rgba(10,22,40,0.6)' }}
-      >
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-12 text-center">
-            <SectionTag className="mb-3">Las personas detrás</SectionTag>
-            <h2
-              className="font-plus-jakarta text-3xl font-bold sm:text-4xl"
-              style={{ color: 'var(--text-primary)' }}
-            >
-              Nuestro equipo
-            </h2>
-            <p className="mt-4 font-inter text-sm" style={{ color: 'var(--text-muted)' }}>
-              Fotos del equipo próximamente
-            </p>
-          </div>
-
-          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {EQUIPO.map(({ nombre, cargo, iniciales, color }) => (
-              <li
-                key={nombre}
-                className="flex flex-col items-center gap-4 rounded-xl p-6 text-center"
-                style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
-              >
-                {/* Avatar placeholder */}
-                <div
-                  className="flex h-20 w-20 items-center justify-center rounded-full font-plus-jakarta text-2xl font-extrabold text-white"
-                  style={{ background: color, boxShadow: `0 4px 20px ${color}55` }}
-                >
-                  {iniciales}
-                </div>
-                <div>
-                  <p className="font-plus-jakarta text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
-                    {nombre}
-                  </p>
-                  <p className="mt-1 font-inter text-xs leading-snug" style={{ color: 'var(--text-dim)' }}>
-                    {cargo}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
+      <EquipoSection />
 
       {/* ── ALIADOS HOTELEROS ── */}
       <section className="px-6 py-16">
@@ -308,8 +265,8 @@ export default function NosotrosPage() {
               Trabajamos directamente con las mejores cadenas del Caribe y Colombia
             </p>
           </div>
-          <div className="flex flex-wrap justify-center gap-3">
-            {HOTELES.map(name => <LogoBadge key={name} name={name} />)}
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            {HOTELES_CRUCEROS.map(a => <LogoCard key={a.nombre} alianza={a} />)}
           </div>
         </div>
       </section>
@@ -332,8 +289,8 @@ export default function NosotrosPage() {
               Acceso a tarifas especiales con las principales aerolíneas
             </p>
           </div>
-          <div className="flex flex-wrap justify-center gap-3">
-            {AEROLINEAS.map(name => <LogoBadge key={name} name={name} />)}
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            {AEROLINEAS.map(a => <LogoCard key={a.nombre} alianza={a} />)}
           </div>
         </div>
       </section>

@@ -51,3 +51,5 @@ scripts/*.png
 /public/img/*
 !/public/img/alianzas/
 !/public/img/viajeros/
+!/public/img/equipo/
+!/public/img/paginas/

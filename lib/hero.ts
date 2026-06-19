@@ -1,13 +1,31 @@
 import type { Destino } from '@/types/destino'
 
-/** Imagen de fondo del hero — Picsum con seed fijo por slug (placeholder temporal). */
-export function heroBg(destino: Pick<Destino, 'slug'>): string {
-  return `https://picsum.photos/seed/${destino.slug}-hero/1600/900`
+/**
+ * Imagen de fondo del hero.
+ * Prioridad: imagen_hero de Supabase → /img/{slug}/hero.webp → Picsum placeholder
+ */
+export function heroBg(destino: Pick<Destino, 'slug' | 'imagen_hero'>): string {
+  // LOCAL PREVIEW — usa siempre la imagen local optimizada
+  // Cuando apruebes las fotos: subir a Supabase y cambiar a destino.imagen_hero
+  return `/img/${destino.slug}/hero.webp`
 }
 
-/** Thumbnail circular — Picsum con seed fijo por slug. */
-export function heroThumb(destino: Pick<Destino, 'slug'>): string {
-  return `https://picsum.photos/seed/${destino.slug}-hero/120/120`
+/**
+ * Thumbnail circular del coverflow.
+ * LOCAL PREVIEW — usa siempre la imagen local optimizada
+ */
+export function heroThumb(destino: Pick<Destino, 'slug' | 'imagen_thumb'>): string {
+  return `/img/${destino.slug}/thumb.webp`
+}
+
+/**
+ * Imagen de la tarjeta de destino (grid del home y /destinos).
+ * LOCAL PREVIEW — usa la MISMA imagen del hero para que tarjeta y hero
+ * queden sincronizados (ej. República Dominicana → la playa).
+ * Cuando subas las fotos a Supabase: cambiar a destino.imagen_thumb.
+ */
+export function destinoCardImg(destino: Pick<Destino, 'slug' | 'imagen_thumb'>): string {
+  return `/img/${destino.slug}/hero.webp`
 }
 
 /** Color RGB del glow del hero según la región del destino. */

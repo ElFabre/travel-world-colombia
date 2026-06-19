@@ -84,28 +84,23 @@ export function ComoFunciona() {
 
         {/* Pasos */}
         <div className="relative mb-16">
-          {/* Línea punteada conectora (solo desktop) */}
+          {/* Línea punteada conectora con flujo izquierda → derecha (solo desktop) */}
           <div
             aria-hidden
-            className="absolute left-[16%] right-[16%] top-12 hidden h-0.5 lg:block"
-            style={{
-              backgroundImage:
-                'repeating-linear-gradient(to right, var(--orange) 0 10px, transparent 10px 20px)',
-              opacity: 0.5,
-            }}
+            className="como-flujo-linea absolute left-[16%] right-[16%] top-12 hidden h-0.5 lg:block"
           />
 
-          {/* Avión decorativo sobre la línea */}
+          {/* Avión que recorre la línea indicando el flujo del proceso */}
           <div
             aria-hidden
-            className="absolute left-[82%] top-12 hidden -translate-y-1/2 lg:flex"
+            className="como-flujo-avion absolute top-12 hidden -translate-y-1/2 lg:flex"
             style={{ zIndex: 5 }}
           >
             <span
-              className="flex h-9 w-9 items-center justify-center rounded-full"
+              className="flex h-14 w-14 items-center justify-center rounded-full"
               style={{ background: 'var(--navy)', border: '1px solid var(--border-orange)' }}
             >
-              <Plane size={16} style={{ color: 'var(--orange)', transform: 'rotate(45deg)' }} />
+              <Plane size={26} style={{ color: 'var(--orange)', transform: 'rotate(45deg)' }} />
             </span>
           </div>
 
