@@ -4,7 +4,8 @@
 export const SITE = {
   nombre: 'Travel World Colombia',
   rnt: '27287',
-  url: 'https://travelworldcolombia.com',
+  // TEMP: dominio en Vercel hasta conectar travelworldcolombia.com (al final).
+  url: 'https://travel-world-colombia.vercel.app',
   email: 'info@travelworldcolombia.com',
 
   // NAP — Name, Address, Phone (no modificar el formato sin actualizar GBP/Schema)
