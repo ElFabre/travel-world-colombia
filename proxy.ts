@@ -27,14 +27,28 @@ export async function proxy(req: NextRequest) {
     // (más seguro que getSession(), que solo confía en la cookie).
     const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user && !req.nextUrl.pathname.startsWith('/admin/login')) {
+    // Páginas de auth públicas: login (entrar) y registro (crear cuenta / ver
+    // estado "pendiente de aprobación"). No deben forzar redirecciones.
+    const path = req.nextUrl.pathname
+    const isAuthPage = path.startsWith('/admin/login') || path.startsWith('/admin/registro')
+
+    if (!user && !isAuthPage) {
       return NextResponse.redirect(new URL('/admin/login', req.url))
     }
 
-    if (user) {
-      const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim()) ?? []
-      if (!adminEmails.includes(user.email ?? '')) {
-        return NextResponse.redirect(new URL('/', req.url))
+    if (user && !isAuthPage) {
+      const email = (user.email ?? '').toLowerCase()
+      const superadmins = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) ?? []
+      let aprobado = superadmins.includes(email)
+      if (!aprobado) {
+        // ¿Aprobado desde el panel? (tabla admin_allowlist). El usuario está
+        // autenticado, así que la política RLS de lectura lo permite.
+        const { data } = await supabase.from('admin_allowlist').select('email').eq('email', email).maybeSingle()
+        aprobado = Boolean(data)
+      }
+      if (!aprobado) {
+        // Autenticado pero fuera de la allowlist → pantalla de "pendiente".
+        return NextResponse.redirect(new URL('/admin/registro', req.url))
       }
     }
   }

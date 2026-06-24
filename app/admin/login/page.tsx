@@ -1,6 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
+import Link from 'next/link'
 import { signIn, type LoginState } from '../actions'
 
 const initial: LoginState = {}
@@ -54,6 +55,11 @@ export default function LoginPage() {
         >
           {pending ? 'Entrando…' : 'Entrar'}
         </button>
+
+        <p className="mt-5 text-center font-inter text-xs" style={{ color: 'var(--text-dim)' }}>
+          ¿No tienes cuenta?{' '}
+          <Link href="/admin/registro" style={{ color: 'var(--orange)' }}>Crear cuenta</Link>
+        </p>
       </form>
     </div>
   )

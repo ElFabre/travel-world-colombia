@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { requireAdmin } from '@/lib/admin/guard'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { registrarActividad } from '@/lib/admin/audit'
 import { destinoSchema } from '@/lib/validations/destino'
 
 export type FormState = { error?: string }
@@ -126,12 +127,13 @@ function revalidar(slug?: string) {
   revalidatePath('/destinos')
   if (slug) revalidatePath(`/destinos/${slug}`)
   revalidatePath('/admin')
+  revalidatePath('/admin/viajes')
   revalidatePath('/sitemap.xml')
 }
 
 /** Crea un nuevo destino. */
 export async function crearDestino(_prev: FormState, formData: FormData): Promise<FormState> {
-  await requireAdmin()
+  const user = await requireAdmin()
   const admin = createAdminClient()
 
   let payload
@@ -146,13 +148,20 @@ export async function crearDestino(_prev: FormState, formData: FormData): Promis
     return { error: error.code === '23505' ? 'Ya existe un viaje con ese slug.' : error.message }
   }
 
+  await registrarActividad({
+    email: user.email!,
+    accion: 'crear',
+    slug: payload.slug,
+    nombre: payload.nombre,
+  })
+
   revalidar(payload.slug)
-  redirect('/admin')
+  redirect('/admin/viajes')
 }
 
 /** Actualiza un destino existente (id se enlaza con .bind). */
 export async function actualizarDestino(id: string, _prev: FormState, formData: FormData): Promise<FormState> {
-  await requireAdmin()
+  const user = await requireAdmin()
   const admin = createAdminClient()
 
   let payload
@@ -167,6 +176,13 @@ export async function actualizarDestino(id: string, _prev: FormState, formData: 
     return { error: error.code === '23505' ? 'Ya existe un viaje con ese slug.' : error.message }
   }
 
+  await registrarActividad({
+    email: user.email!,
+    accion: 'actualizar',
+    slug: payload.slug,
+    nombre: payload.nombre,
+  })
+
   revalidar(payload.slug)
-  redirect('/admin')
+  redirect('/admin/viajes')
 }
