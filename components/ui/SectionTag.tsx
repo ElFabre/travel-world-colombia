@@ -5,11 +5,11 @@ interface SectionTagProps {
   className?: string
 }
 
-/** Etiqueta de sección — naranja · Cinzel · 9px · letter-spacing 0.4em · UPPERCASE */
+/** Etiqueta de sección — naranja · Cinzel · letter-spacing 0.3em · UPPERCASE */
 export function SectionTag({ children, className = '' }: SectionTagProps) {
   return (
     <p
-      className={`font-cinzel text-[9px] tracking-[0.4em] uppercase ${className}`}
+      className={`font-cinzel text-xs font-semibold tracking-[0.3em] uppercase sm:text-sm ${className}`}
       style={{ color: 'var(--eyebrow)' }}
     >
       {children}

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import type { ComponentProps, ReactNode } from 'react'
+import type { ComponentProps, CSSProperties, ReactNode } from 'react'
 
 type Variant = 'primary' | 'outline' | 'whatsapp'
 type Size = 'sm' | 'md'
@@ -11,7 +11,7 @@ const variants: Record<Variant, string> = {
   primary:
     'bg-gradient-orange text-white shadow-orange hover:shadow-orange-lg hover:-translate-y-0.5',
   outline:
-    'border border-orange/50 text-white hover:border-orange hover:bg-orange/10',
+    'border border-orange/50 hover:border-orange hover:bg-orange/10',
   whatsapp:
     'bg-[#25D366] text-white shadow-lg hover:bg-[#20BA5A] hover:-translate-y-0.5',
 }
@@ -37,18 +37,23 @@ type ButtonAsLink = CommonProps &
 export function Button(props: ButtonAsButton | ButtonAsLink) {
   const { variant = 'primary', size = 'md', className = '', children, ...rest } = props
   const classes = `${base} ${variants[variant]} ${sizes[size]} ${className}`
+  // El outline toma el color de texto adaptativo del tema, para mantener
+  // contraste tanto en secciones claras como oscuras.
+  const outlineStyle: CSSProperties | undefined =
+    variant === 'outline' ? { color: 'var(--text-primary)' } : undefined
 
   if ('href' in props && props.href !== undefined) {
-    const { href, ...linkRest } = rest as ButtonAsLink
+    const { href, style, ...linkRest } = rest as ButtonAsLink & { style?: CSSProperties }
     return (
-      <Link href={href} className={classes} {...linkRest}>
+      <Link href={href} className={classes} style={{ ...outlineStyle, ...style }} {...linkRest}>
         {children}
       </Link>
     )
   }
 
+  const { style, ...btnRest } = rest as ButtonAsButton & { style?: CSSProperties }
   return (
-    <button className={classes} {...(rest as ButtonAsButton)}>
+    <button className={classes} style={{ ...outlineStyle, ...style }} {...btnRest}>
       {children}
     </button>
   )
