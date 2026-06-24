@@ -19,30 +19,30 @@ export default async function RegistroPage() {
       {user ? (
         // Autenticado pero fuera de la allowlist → pendiente de aprobación.
         <div
-          className="w-full max-w-sm rounded-xl p-8 text-center"
-          style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+          className="w-full max-w-sm rounded-2xl p-8 text-center"
+          style={{ background: '#16315a', border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 30px 60px -24px rgba(10,22,40,0.45)' }}
         >
           <div
             className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full"
-            style={{ background: 'var(--navy)', border: '1px solid var(--border)', color: 'var(--orange)' }}
+            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--orange)' }}
           >
             <Clock size={22} />
           </div>
-          <h1 className="mb-2 font-plus-jakarta text-xl font-extrabold" style={{ color: 'var(--text-primary)' }}>
+          <h1 className="mb-2 font-plus-jakarta text-xl font-extrabold" style={{ color: '#fff' }}>
             Pendiente de aprobación
           </h1>
-          <p className="mb-1 font-inter text-sm" style={{ color: 'var(--text-dim)' }}>
-            Tu cuenta <span style={{ color: 'var(--text-primary)' }}>{user.email}</span> fue creada,
+          <p className="mb-1 font-inter text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>
+            Tu cuenta <span style={{ color: '#fff' }}>{user.email}</span> fue creada,
             pero aún no tiene acceso al panel.
           </p>
-          <p className="mb-6 font-inter text-sm" style={{ color: 'var(--text-dim)' }}>
+          <p className="mb-6 font-inter text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>
             El administrador debe aprobar tu correo. Vuelve a intentar más tarde.
           </p>
           <form action={signOut}>
             <button
               type="submit"
               className="inline-flex items-center gap-1.5 rounded-md px-4 py-2 font-inter text-xs"
-              style={{ color: 'var(--text-dim)', border: '1px solid var(--border)' }}
+              style={{ color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.2)' }}
             >
               <LogOut size={14} />
               Cerrar sesión

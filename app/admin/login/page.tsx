@@ -6,6 +6,12 @@ import { signIn, type LoginState } from '../actions'
 
 const initial: LoginState = {}
 
+const inputStyle = {
+  background: '#fff',
+  border: '1px solid rgba(255,255,255,0.18)',
+  color: '#0a1628',
+} as const
+
 export default function LoginPage() {
   const [state, action, pending] = useActionState(signIn, initial)
 
@@ -13,38 +19,38 @@ export default function LoginPage() {
     <div className="flex min-h-[70vh] items-center justify-center">
       <form
         action={action}
-        className="w-full max-w-sm rounded-xl p-8"
-        style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+        className="w-full max-w-sm rounded-2xl p-8"
+        style={{ background: '#16315a', border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 30px 60px -24px rgba(10,22,40,0.45)' }}
       >
-        <h1 className="mb-1 font-plus-jakarta text-2xl font-extrabold" style={{ color: 'var(--text-primary)' }}>
+        <h1 className="mb-1 font-plus-jakarta text-2xl font-extrabold" style={{ color: '#fff' }}>
           Panel de administración
         </h1>
-        <p className="mb-6 font-inter text-sm" style={{ color: 'var(--text-dim)' }}>
+        <p className="mb-6 font-inter text-sm" style={{ color: 'rgba(255,255,255,0.65)' }}>
           Travel World Colombia
         </p>
 
-        <label className="mb-1 block font-inter text-xs" style={{ color: 'var(--text-dim)' }}>Email</label>
+        <label className="mb-1 block font-inter text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>Email</label>
         <input
           name="email"
           type="email"
           autoComplete="email"
           required
           className="mb-4 w-full rounded-md px-3 py-2 font-inter text-sm outline-none"
-          style={{ background: 'var(--navy)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+          style={inputStyle}
         />
 
-        <label className="mb-1 block font-inter text-xs" style={{ color: 'var(--text-dim)' }}>Contraseña</label>
+        <label className="mb-1 block font-inter text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>Contraseña</label>
         <input
           name="password"
           type="password"
           autoComplete="current-password"
           required
           className="mb-6 w-full rounded-md px-3 py-2 font-inter text-sm outline-none"
-          style={{ background: 'var(--navy)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+          style={inputStyle}
         />
 
         {state.error && (
-          <p className="mb-4 font-inter text-xs" style={{ color: '#ef4444' }}>{state.error}</p>
+          <p className="mb-4 font-inter text-xs" style={{ color: '#fca5a5' }}>{state.error}</p>
         )}
 
         <button
@@ -56,7 +62,7 @@ export default function LoginPage() {
           {pending ? 'Entrando…' : 'Entrar'}
         </button>
 
-        <p className="mt-5 text-center font-inter text-xs" style={{ color: 'var(--text-dim)' }}>
+        <p className="mt-5 text-center font-inter text-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>
           ¿No tienes cuenta?{' '}
           <Link href="/admin/registro" style={{ color: 'var(--orange)' }}>Crear cuenta</Link>
         </p>

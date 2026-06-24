@@ -13,7 +13,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   if (!user) {
     return (
-      <div className="min-h-screen" style={{ background: 'var(--navy)' }}>
+      <div className="min-h-screen" style={{ background: '#f4f7fb' }}>
         <main className="mx-auto max-w-6xl px-6 py-8">{children}</main>
       </div>
     )

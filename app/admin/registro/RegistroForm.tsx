@@ -6,33 +6,36 @@ import { signUp, type RegisterState } from '../actions'
 
 const initial: RegisterState = {}
 
+const labelStyle = { color: 'rgba(255,255,255,0.7)' } as const
+const inputStyle = { background: '#fff', border: '1px solid rgba(255,255,255,0.18)', color: '#0a1628' } as const
+
 export default function RegistroForm() {
   const [state, action, pending] = useActionState(signUp, initial)
 
   return (
     <form
       action={action}
-      className="w-full max-w-sm rounded-xl p-8"
-      style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+      className="w-full max-w-sm rounded-2xl p-8"
+      style={{ background: '#16315a', border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 30px 60px -24px rgba(10,22,40,0.45)' }}
     >
-      <h1 className="mb-1 font-plus-jakarta text-2xl font-extrabold" style={{ color: 'var(--text-primary)' }}>
+      <h1 className="mb-1 font-plus-jakarta text-2xl font-extrabold" style={{ color: '#fff' }}>
         Crear cuenta
       </h1>
-      <p className="mb-6 font-inter text-sm" style={{ color: 'var(--text-dim)' }}>
+      <p className="mb-6 font-inter text-sm" style={{ color: 'rgba(255,255,255,0.65)' }}>
         Acceso al panel de Travel World Colombia
       </p>
 
-      <label className="mb-1 block font-inter text-xs" style={{ color: 'var(--text-dim)' }}>Email</label>
+      <label className="mb-1 block font-inter text-xs" style={labelStyle}>Email</label>
       <input
         name="email"
         type="email"
         autoComplete="email"
         required
         className="mb-4 w-full rounded-md px-3 py-2 font-inter text-sm outline-none"
-        style={{ background: 'var(--navy)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+        style={inputStyle}
       />
 
-      <label className="mb-1 block font-inter text-xs" style={{ color: 'var(--text-dim)' }}>Contraseña</label>
+      <label className="mb-1 block font-inter text-xs" style={labelStyle}>Contraseña</label>
       <input
         name="password"
         type="password"
@@ -40,10 +43,10 @@ export default function RegistroForm() {
         required
         minLength={8}
         className="mb-4 w-full rounded-md px-3 py-2 font-inter text-sm outline-none"
-        style={{ background: 'var(--navy)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+        style={inputStyle}
       />
 
-      <label className="mb-1 block font-inter text-xs" style={{ color: 'var(--text-dim)' }}>Repetir contraseña</label>
+      <label className="mb-1 block font-inter text-xs" style={labelStyle}>Repetir contraseña</label>
       <input
         name="confirm"
         type="password"
@@ -51,14 +54,14 @@ export default function RegistroForm() {
         required
         minLength={8}
         className="mb-6 w-full rounded-md px-3 py-2 font-inter text-sm outline-none"
-        style={{ background: 'var(--navy)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+        style={inputStyle}
       />
 
       {state.error && (
-        <p className="mb-4 font-inter text-xs" style={{ color: '#ef4444' }}>{state.error}</p>
+        <p className="mb-4 font-inter text-xs" style={{ color: '#fca5a5' }}>{state.error}</p>
       )}
       {state.ok && (
-        <p className="mb-4 rounded-md p-3 font-inter text-xs" style={{ background: 'rgba(74,222,128,0.1)', color: '#86efac' }}>
+        <p className="mb-4 rounded-md p-3 font-inter text-xs" style={{ background: 'rgba(74,222,128,0.12)', color: '#86efac' }}>
           {state.ok}
         </p>
       )}
@@ -72,7 +75,7 @@ export default function RegistroForm() {
         {pending ? 'Creando…' : 'Crear cuenta'}
       </button>
 
-      <p className="mt-5 text-center font-inter text-xs" style={{ color: 'var(--text-dim)' }}>
+      <p className="mt-5 text-center font-inter text-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>
         ¿Ya tienes cuenta?{' '}
         <Link href="/admin/login" style={{ color: 'var(--orange)' }}>Inicia sesión</Link>
       </p>
