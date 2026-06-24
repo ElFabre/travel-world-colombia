@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { requireAdmin } from '@/lib/admin/guard'
+import { requireEditor } from '@/lib/admin/guard'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { registrarActividad } from '@/lib/admin/audit'
 import { destinoSchema } from '@/lib/validations/destino'
@@ -108,7 +108,7 @@ async function construirPayload(formData: FormData, admin: SupabaseClient) {
 
 /** Sube un archivo individual (galería) y devuelve su URL pública. */
 export async function subirArchivo(formData: FormData): Promise<{ url?: string; error?: string }> {
-  await requireAdmin()
+  await requireEditor()
   const admin = createAdminClient()
   const file = formData.get('file') as File | null
   const slug = String(formData.get('slug') ?? '').trim() || 'galeria'
@@ -133,7 +133,7 @@ function revalidar(slug?: string) {
 
 /** Crea un nuevo destino. */
 export async function crearDestino(_prev: FormState, formData: FormData): Promise<FormState> {
-  const user = await requireAdmin()
+  const { user } = await requireEditor()
   const admin = createAdminClient()
 
   let payload
@@ -161,7 +161,7 @@ export async function crearDestino(_prev: FormState, formData: FormData): Promis
 
 /** Actualiza un destino existente (id se enlaza con .bind). */
 export async function actualizarDestino(id: string, _prev: FormState, formData: FormData): Promise<FormState> {
-  const user = await requireAdmin()
+  const { user } = await requireEditor()
   const admin = createAdminClient()
 
   let payload

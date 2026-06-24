@@ -3,8 +3,9 @@
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
-import { requireAdmin } from '@/lib/admin/guard'
+import { requireEditor, requireAdminRole } from '@/lib/admin/guard'
 import { isSuperadmin, isApprovedEmail } from '@/lib/admin/allowlist'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { registrarActividad } from '@/lib/admin/audit'
 
 export type LoginState = { error?: string }
@@ -49,11 +50,17 @@ export async function signUp(_prev: RegisterState, formData: FormData): Promise<
     return { error: msg }
   }
 
-  // El acceso real lo decide la allowlist, no el registro.
+  // Auto-aprobación: el nuevo usuario entra como 'editor' de inmediato.
+  // (Los superadmins de ADMIN_EMAILS ya son admin y no necesitan fila.)
+  if (!isSuperadmin(email)) {
+    const admin = createAdminClient()
+    await admin
+      .from('admin_allowlist')
+      .upsert({ email: email.toLowerCase(), rol: 'editor', aprobado_por: 'auto' }, { onConflict: 'email' })
+  }
+
   return {
-    ok: isSuperadmin(email)
-      ? 'Cuenta creada. Si Supabase pide confirmar tu correo, revisa tu bandeja; luego inicia sesión.'
-      : 'Cuenta creada. Tu acceso queda pendiente de aprobación del administrador.',
+    ok: 'Cuenta creada. Ya tienes acceso como editor. Si Supabase pide confirmar tu correo, revísalo; luego inicia sesión.',
   }
 }
 
@@ -78,7 +85,7 @@ export async function toggleCampo(
   campo: 'activo' | 'destacado',
   valor: boolean
 ): Promise<void> {
-  const user = await requireAdmin()
+  const { user } = await requireEditor()
   const supabase = await createClient()
   // Leemos nombre/slug antes de mutar para enriquecer la bitácora.
   const { data: destino } = await supabase
@@ -107,7 +114,7 @@ export async function toggleCampo(
 
 /** Elimina un destino. */
 export async function eliminarDestino(id: string): Promise<void> {
-  const user = await requireAdmin()
+  const { user } = await requireAdminRole()
   const supabase = await createClient()
   // Leemos nombre/slug antes de borrar: después ya no existen.
   const { data: destino } = await supabase

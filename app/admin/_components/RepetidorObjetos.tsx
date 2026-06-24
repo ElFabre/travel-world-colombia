@@ -42,7 +42,7 @@ export function RepetidorObjetos({
           <div
             key={i}
             className="flex flex-wrap items-center gap-2 rounded-md p-2"
-            style={{ background: 'var(--navy)', border: '1px solid var(--border)' }}
+            style={{ background: 'var(--bg-alt)', border: '1px solid var(--border)' }}
           >
             {campos.map(c => (
               <input

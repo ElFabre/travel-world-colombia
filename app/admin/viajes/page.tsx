@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Plus } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
-import { getAdminUser } from '@/lib/admin/guard'
+import { getAdminSession } from '@/lib/admin/guard'
 import { destinoCardImg } from '@/lib/hero'
 import type { Destino } from '@/types/destino'
 import { RowActions } from '../_components/RowActions'
@@ -11,8 +11,9 @@ import { RowActions } from '../_components/RowActions'
 export const dynamic = 'force-dynamic'
 
 export default async function ViajesPage() {
-  const user = await getAdminUser()
-  if (!user) redirect('/admin/login')
+  const session = await getAdminSession()
+  if (!session) redirect('/admin/login')
+  const { rol } = session
 
   const supabase = await createClient()
   const { data, error } = await supabase
@@ -33,14 +34,16 @@ export default async function ViajesPage() {
             {destinos.length} {destinos.length === 1 ? 'destino' : 'destinos'} · se publican automáticamente en la web
           </p>
         </div>
-        <Link
-          href="/admin/destinos/nuevo"
-          className="flex items-center gap-2 rounded-md px-4 py-2.5 font-plus-jakarta text-sm font-bold"
-          style={{ background: 'var(--orange)', color: '#fff' }}
-        >
-          <Plus size={16} />
-          Nuevo viaje
-        </Link>
+        {rol !== 'lector' && (
+          <Link
+            href="/admin/destinos/nuevo"
+            className="flex items-center gap-2 rounded-md px-4 py-2.5 font-plus-jakarta text-sm font-bold"
+            style={{ background: 'var(--orange)', color: '#fff' }}
+          >
+            <Plus size={16} />
+            Nuevo viaje
+          </Link>
+        )}
       </div>
 
       {error && (
@@ -63,7 +66,7 @@ export default async function ViajesPage() {
               className="flex items-center gap-4 rounded-lg p-3"
               style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', opacity: d.activo ? 1 : 0.55 }}
             >
-              <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-md" style={{ background: 'var(--navy)' }}>
+              <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-md" style={{ background: 'var(--bg-alt)' }}>
                 <Image src={destinoCardImg(d)} alt={d.nombre} fill sizes="64px" className="object-cover" />
               </div>
 
@@ -76,7 +79,7 @@ export default async function ViajesPage() {
                 </p>
               </div>
 
-              <RowActions id={d.id} nombre={d.nombre} activo={d.activo} destacado={d.destacado} />
+              <RowActions id={d.id} nombre={d.nombre} activo={d.activo} destacado={d.destacado} rol={rol} />
             </li>
           ))}
         </ul>

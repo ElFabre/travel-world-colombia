@@ -20,7 +20,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--navy)' }}>
+    <div className="tema-claro min-h-screen" style={{ background: 'var(--bg-alt)' }}>
       <Sidebar email={user.email ?? ''} />
       <div className="md:pl-60">
         <main className="mx-auto max-w-6xl px-6 py-8">{children}</main>

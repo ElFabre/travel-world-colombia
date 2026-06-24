@@ -3,8 +3,19 @@ import { createAdminClient } from '@/lib/supabase/admin'
 /**
  * Gestión de la allowlist del panel. Dos fuentes:
  *  - Superadmins fijos en la env `ADMIN_EMAILS` (arranque; nunca se bloquean).
- *  - Tabla `admin_allowlist`, editable desde /admin/usuarios (Aprobar/Revocar).
+ *  - Tabla `admin_allowlist`, editable desde /admin/usuarios.
  */
+
+/** Roles del panel: admin (todo) · editor (todo menos eliminar) · lector (solo ver). */
+export type Role = 'admin' | 'editor' | 'lector'
+
+export const ROLES: Role[] = ['admin', 'editor', 'lector']
+
+export const ROLE_LABEL: Record<Role, string> = {
+  admin: 'Admin',
+  editor: 'Editor',
+  lector: 'Lector',
+}
 
 /** Superadmins definidos en env (en minúsculas). */
 export function superadmins(): string[] {
@@ -21,10 +32,19 @@ export function isSuperadmin(email: string | null | undefined): boolean {
  * Usa service-role (omite RLS) para que el chequeo funcione en cualquier contexto.
  */
 export async function isApprovedEmail(email: string | null | undefined): Promise<boolean> {
+  return (await getRole(email)) !== null
+}
+
+/**
+ * Devuelve el rol del correo, o null si no tiene acceso al panel.
+ * Superadmins (env) siempre 'admin'. El resto, según la tabla `admin_allowlist`.
+ */
+export async function getRole(email: string | null | undefined): Promise<Role | null> {
   const e = (email ?? '').toLowerCase()
-  if (!e) return false
-  if (superadmins().includes(e)) return true
+  if (!e) return null
+  if (superadmins().includes(e)) return 'admin'
   const admin = createAdminClient()
-  const { data } = await admin.from('admin_allowlist').select('email').eq('email', e).maybeSingle()
-  return Boolean(data)
+  const { data } = await admin.from('admin_allowlist').select('rol').eq('email', e).maybeSingle()
+  if (!data) return null
+  return (data.rol as Role) ?? 'lector'
 }

@@ -11,6 +11,7 @@ export type AccionAudit =
   | 'quitar-destacado'
   | 'aprobar-usuario'
   | 'revocar-usuario'
+  | 'cambiar-rol'
 
 interface RegistroActividad {
   email: string

@@ -4,13 +4,18 @@
 -- ============================================================
 
 -- Correos aprobados para acceder al panel. Se gestiona desde
--- /admin/usuarios (Aprobar / Revocar). Los superadmins de
--- ADMIN_EMAILS (env) siempre tienen acceso aunque no estén aquí.
+-- /admin/usuarios (rol / Revocar). Los superadmins de ADMIN_EMAILS
+-- (env) siempre tienen acceso como admin aunque no estén aquí.
+-- rol: 'admin' (todo) | 'editor' (todo menos eliminar) | 'lector' (solo ver).
 create table if not exists admin_allowlist (
   email        text primary key,
-  aprobado_por text,                       -- correo del admin que aprobó
+  rol          text not null default 'editor',
+  aprobado_por text,                       -- correo de quien lo aprobó, o 'auto'
   created_at   timestamptz default now()
 );
+
+-- Si la tabla ya existía sin la columna rol, agregarla.
+alter table admin_allowlist add column if not exists rol text not null default 'editor';
 
 alter table admin_allowlist enable row level security;
 

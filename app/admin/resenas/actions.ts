@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { requireAdmin } from '@/lib/admin/guard'
+import { requireEditor, requireAdminRole } from '@/lib/admin/guard'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { registrarActividad } from '@/lib/admin/audit'
 
@@ -15,7 +15,7 @@ function revalidar() {
 
 /** Crea una reseña/testimonio. */
 export async function crearResena(_prev: ResenaState, formData: FormData): Promise<ResenaState> {
-  const user = await requireAdmin()
+  const { user } = await requireEditor()
   const nombre = String(formData.get('nombre') ?? '').trim()
   const texto = String(formData.get('texto') ?? '').trim()
   if (!nombre || !texto) return { error: 'Nombre y texto son obligatorios.' }
@@ -35,7 +35,7 @@ export async function crearResena(_prev: ResenaState, formData: FormData): Promi
 
 /** Activa/oculta una reseña. */
 export async function toggleResenaActiva(id: string, valor: boolean, nombre: string): Promise<void> {
-  const user = await requireAdmin()
+  const { user } = await requireEditor()
   const admin = createAdminClient()
   const { error } = await admin.from('resenas').update({ activa: valor }).eq('id', id)
   if (error) throw new Error(error.message)
@@ -46,7 +46,7 @@ export async function toggleResenaActiva(id: string, valor: boolean, nombre: str
 
 /** Elimina una reseña. */
 export async function eliminarResena(id: string, nombre: string): Promise<void> {
-  const user = await requireAdmin()
+  const { user } = await requireAdminRole()
   const admin = createAdminClient()
   const { error } = await admin.from('resenas').delete().eq('id', id)
   if (error) throw new Error(error.message)

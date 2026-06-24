@@ -12,7 +12,7 @@ import { PAISES } from '@/lib/paises'
 type Action = (prev: FormState, fd: FormData) => Promise<FormState>
 
 const inputCls = 'w-full rounded-md px-3 py-2 font-inter text-sm outline-none'
-const inputStyle = { background: 'var(--navy)', border: '1px solid var(--border)', color: 'var(--text-primary)' } as const
+const inputStyle = { background: 'var(--bg-alt)', border: '1px solid var(--border)', color: 'var(--text-primary)' } as const
 const labelCls = 'mb-1 block font-inter text-xs'
 const labelStyle = { color: 'var(--text-dim)' } as const
 
@@ -83,9 +83,9 @@ function CampoSelect({
         className={inputCls}
         style={inputStyle}
       >
-        <option value="" disabled style={{ background: 'var(--navy)' }}>Selecciona…</option>
+        <option value="" disabled style={{ background: 'var(--bg-alt)' }}>Selecciona…</option>
         {ops.map(o => (
-          <option key={o} value={o} style={{ background: 'var(--navy)' }}>{o}</option>
+          <option key={o} value={o} style={{ background: 'var(--bg-alt)' }}>{o}</option>
         ))}
       </select>
       {hint && <p className="mt-1 font-inter text-[11px]" style={{ color: 'var(--text-muted)' }}>{hint}</p>}

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import {
-  PlusCircle, Pencil, Trash2, Eye, EyeOff, Star, StarOff, Activity, UserCheck, UserX,
+  PlusCircle, Pencil, Trash2, Eye, EyeOff, Star, StarOff, Activity, UserCheck, UserX, UserCog,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { getAdminUser } from '@/lib/admin/guard'
@@ -29,6 +29,7 @@ const ACCIONES: Record<AccionAudit, { label: string; color: string; Icon: typeof
   'quitar-destacado':  { label: 'Quitó destacado', color: 'var(--text-muted)', Icon: StarOff },
   'aprobar-usuario':   { label: 'Aprobó acceso',   color: '#4ade80', Icon: UserCheck },
   'revocar-usuario':   { label: 'Revocó acceso',   color: '#ef4444', Icon: UserX },
+  'cambiar-rol':       { label: 'Cambió rol',      color: 'var(--orange)', Icon: UserCog },
 }
 
 const fmtFecha = new Intl.DateTimeFormat('es-CO', {
@@ -84,7 +85,7 @@ export default async function ActividadPage() {
               >
                 <div
                   className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md"
-                  style={{ background: 'var(--navy)', border: '1px solid var(--border)', color: meta.color }}
+                  style={{ background: 'var(--bg-alt)', border: '1px solid var(--border)', color: meta.color }}
                 >
                   <Icon size={16} />
                 </div>

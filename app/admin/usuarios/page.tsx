@@ -1,29 +1,34 @@
 import { redirect } from 'next/navigation'
-import { ShieldCheck, Clock, UserCheck } from 'lucide-react'
-import { getAdminUser } from '@/lib/admin/guard'
-import { superadmins } from '@/lib/admin/allowlist'
+import { ShieldCheck, Clock, Users as UsersIcon } from 'lucide-react'
+import { getAdminSession } from '@/lib/admin/guard'
+import { superadmins, ROLE_LABEL, type Role } from '@/lib/admin/allowlist'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { AprobarBtn, RevocarBtn } from './UserActions'
+import { AprobarBtn, RevocarBtn, RoleSelect } from './UserActions'
 
 export const dynamic = 'force-dynamic'
 
 const fmtFecha = new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })
 
+interface AllowRow { email: string; rol: Role | null; aprobado_por: string | null; created_at: string }
+
 export default async function UsuariosPage() {
-  const user = await getAdminUser()
-  if (!user) redirect('/admin/login')
+  const session = await getAdminSession()
+  if (!session) redirect('/admin/login')
+  const { user, rol: miRol } = session
+  const esAdmin = miRol === 'admin'
+  const puedeModificar = miRol !== 'lector'
 
   const admin = createAdminClient()
   const [{ data: aprobados }, { data: usersData }] = await Promise.all([
-    admin.from('admin_allowlist').select('email, aprobado_por, created_at').order('created_at', { ascending: false }),
+    admin.from('admin_allowlist').select('email, rol, aprobado_por, created_at').order('created_at', { ascending: false }),
     admin.auth.admin.listUsers(),
   ])
 
   const supers = superadmins()
-  const aprobadosEmails = new Set((aprobados ?? []).map(a => a.email.toLowerCase()))
+  const filas = (aprobados ?? []) as AllowRow[]
+  const aprobadosEmails = new Set(filas.map(a => a.email.toLowerCase()))
   const registrados = usersData?.users ?? []
 
-  // Pendientes: se registraron pero no son superadmin ni están aprobados.
   const pendientes = registrados.filter(u => {
     const e = (u.email ?? '').toLowerCase()
     return e && !supers.includes(e) && !aprobadosEmails.has(e)
@@ -36,48 +41,50 @@ export default async function UsuariosPage() {
           Usuarios
         </h1>
         <p className="mt-1 font-inter text-sm" style={{ color: 'var(--text-dim)' }}>
-          Aprueba quién puede entrar al panel · los cambios aplican de inmediato
+          Los nuevos registros entran como <strong>editor</strong> automáticamente · cambia su rol aquí
         </p>
       </div>
 
-      {/* ── Pendientes de aprobación ── */}
-      <Seccion icon={<Clock size={16} />} titulo="Pendientes de aprobación" n={pendientes.length}>
-        {pendientes.length === 0 ? (
-          <Vacio>Nadie pendiente. Cuando alguien se registre en /admin/registro aparecerá aquí.</Vacio>
-        ) : (
-          pendientes.map(u => (
-            <Fila key={u.id} email={u.email ?? '—'} sub={
-              <>Registrado el {fmtFecha.format(new Date(u.created_at))}
-                {!u.email_confirmed_at ? <span style={{ color: '#f59e0b' }}> · sin confirmar correo</span> : null}
-              </>
-            }>
-              <AprobarBtn email={u.email ?? ''} />
+      {/* Pendientes (raro con auto-aprobación; p.ej. cuentas creadas a mano en Supabase) */}
+      {pendientes.length > 0 && (
+        <Seccion icon={<Clock size={16} />} titulo="Pendientes" n={pendientes.length}>
+          {pendientes.map(u => (
+            <Fila key={u.id} email={u.email ?? '—'} sub={`Registrado el ${fmtFecha.format(new Date(u.created_at))}`}>
+              {puedeModificar ? <AprobarBtn email={u.email ?? ''} /> : null}
             </Fila>
-          ))
+          ))}
+        </Seccion>
+      )}
+
+      {/* Aprobados (gestionables) */}
+      <Seccion icon={<UsersIcon size={16} />} titulo="Con acceso" n={filas.length}>
+        {filas.length === 0 ? (
+          <Vacio>Aún no hay usuarios además de los superadmins.</Vacio>
+        ) : (
+          filas.map(a => {
+            const esYo = a.email.toLowerCase() === (user.email ?? '').toLowerCase()
+            return (
+              <Fila
+                key={a.email}
+                email={a.email}
+                sub={<>Rol: {ROLE_LABEL[(a.rol ?? 'lector') as Role]} · alta {fmtFecha.format(new Date(a.created_at))}{a.aprobado_por ? ` · por ${a.aprobado_por}` : ''}{esYo ? ' · (tú)' : ''}</>}
+              >
+                {puedeModificar && (
+                  <div className="flex items-center gap-2">
+                    <RoleSelect email={a.email} rol={(a.rol ?? 'lector') as Role} puedeAdmin={esAdmin} disabled={esYo} />
+                    {esAdmin && !esYo ? <RevocarBtn email={a.email} /> : null}
+                  </div>
+                )}
+              </Fila>
+            )
+          })
         )}
       </Seccion>
 
-      {/* ── Aprobados desde el panel ── */}
-      <Seccion icon={<UserCheck size={16} />} titulo="Aprobados" n={(aprobados ?? []).length}>
-        {(aprobados ?? []).length === 0 ? (
-          <Vacio>Aún no has aprobado a nadie desde el panel.</Vacio>
-        ) : (
-          (aprobados ?? []).map(a => (
-            <Fila
-              key={a.email}
-              email={a.email}
-              sub={<>Aprobado por {a.aprobado_por ?? '—'} · {fmtFecha.format(new Date(a.created_at))}</>}
-            >
-              <RevocarBtn email={a.email} />
-            </Fila>
-          ))
-        )}
-      </Seccion>
-
-      {/* ── Superadmins (env) ── */}
+      {/* Superadmins (env) */}
       <Seccion icon={<ShieldCheck size={16} />} titulo="Superadmins (fijos)" n={supers.length}>
         {supers.map(e => (
-          <Fila key={e} email={e} sub="Definido en ADMIN_EMAILS · no se puede revocar aquí">
+          <Fila key={e} email={e} sub="Admin · definido en ADMIN_EMAILS · no se puede cambiar aquí">
             <span className="font-inter text-xs" style={{ color: 'var(--text-muted)' }}>Permanente</span>
           </Fila>
         ))}
@@ -92,7 +99,7 @@ function Seccion({ icon, titulo, n, children }: { icon: React.ReactNode; titulo:
       <h2 className="mb-3 flex items-center gap-2 font-plus-jakarta text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
         <span style={{ color: 'var(--orange)' }}>{icon}</span>
         {titulo}
-        <span className="rounded-full px-2 py-0.5 font-inter text-xs" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-dim)' }}>{n}</span>
+        <span className="rounded-full px-2 py-0.5 font-inter text-xs" style={{ background: 'var(--bg-alt)', border: '1px solid var(--border)', color: 'var(--text-dim)' }}>{n}</span>
       </h2>
       <ul className="flex flex-col gap-2">{children}</ul>
     </section>

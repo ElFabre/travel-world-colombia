@@ -5,7 +5,7 @@ import { crearResena, type ResenaState } from './actions'
 
 const initial: ResenaState = {}
 const input = 'w-full rounded-md px-3 py-2 font-inter text-sm outline-none'
-const inputStyle = { background: 'var(--navy)', border: '1px solid var(--border)', color: 'var(--text-primary)' } as const
+const inputStyle = { background: 'var(--bg-alt)', border: '1px solid var(--border)', color: 'var(--text-primary)' } as const
 
 export function ResenaForm() {
   const [state, action, pending] = useActionState(crearResena, initial)

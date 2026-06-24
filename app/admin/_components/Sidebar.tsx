@@ -81,7 +81,7 @@ export function Sidebar({ email }: { email: string }) {
     <>
       {/* Barra superior móvil */}
       <header
-        className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 md:hidden"
+        className="tema-oscuro sticky top-0 z-30 flex items-center justify-between px-4 py-3 md:hidden"
         style={{ background: 'rgba(6,14,26,0.95)', borderBottom: '1px solid var(--border)', backdropFilter: 'blur(8px)' }}
       >
         <Link href="/admin" className="flex items-center gap-2 font-plus-jakarta text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
@@ -101,7 +101,7 @@ export function Sidebar({ email }: { email: string }) {
 
       {/* Sidebar fijo (desktop) */}
       <aside
-        className="fixed inset-y-0 left-0 z-30 hidden w-60 md:block"
+        className="tema-oscuro fixed inset-y-0 left-0 z-30 hidden w-60 md:block"
         style={{ background: 'rgba(6,14,26,0.95)', borderRight: '1px solid var(--border)' }}
       >
         {Contenido}
@@ -112,7 +112,7 @@ export function Sidebar({ email }: { email: string }) {
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.6)' }} onClick={() => setOpen(false)} />
           <aside
-            className="absolute inset-y-0 left-0 w-64"
+            className="tema-oscuro absolute inset-y-0 left-0 w-64"
             style={{ background: 'var(--navy)', borderRight: '1px solid var(--border)' }}
           >
             <button

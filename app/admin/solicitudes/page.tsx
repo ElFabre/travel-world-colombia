@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { Mail, Phone, MessageCircle, MapPin, Users, Calendar, Wallet } from 'lucide-react'
-import { getAdminUser } from '@/lib/admin/guard'
+import { getAdminSession } from '@/lib/admin/guard'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { AtendidoBtn } from './LeadActions'
 
@@ -29,8 +29,9 @@ const fmtFecha = new Intl.DateTimeFormat('es-CO', {
 })
 
 export default async function SolicitudesPage() {
-  const user = await getAdminUser()
-  if (!user) redirect('/admin/login')
+  const session = await getAdminSession()
+  if (!session) redirect('/admin/login')
+  const { rol } = session
 
   const admin = createAdminClient()
   const { data, error } = await admin
@@ -113,7 +114,7 @@ export default async function SolicitudesPage() {
               </div>
 
               {l.mensaje && (
-                <p className="mt-3 rounded-md p-3 font-inter text-sm" style={{ background: 'var(--navy)', color: 'var(--text-dim)' }}>
+                <p className="mt-3 rounded-md p-3 font-inter text-sm" style={{ background: 'var(--bg-alt)', color: 'var(--text-dim)' }}>
                   {l.mensaje}
                 </p>
               )}
@@ -124,9 +125,11 @@ export default async function SolicitudesPage() {
                 </p>
               )}
 
-              <div className="mt-3 flex justify-end">
-                <AtendidoBtn id={l.id} atendido={atendido} />
-              </div>
+              {rol !== 'lector' && (
+                <div className="mt-3 flex justify-end">
+                  <AtendidoBtn id={l.id} atendido={atendido} />
+                </div>
+              )}
             </li>
           )
         })}

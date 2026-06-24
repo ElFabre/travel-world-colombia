@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { Star } from 'lucide-react'
-import { getAdminUser } from '@/lib/admin/guard'
+import { getAdminSession } from '@/lib/admin/guard'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { ResenaForm } from './ResenaForm'
 import { ResenaActions } from './ResenaActions'
@@ -18,8 +18,9 @@ interface Resena {
 }
 
 export default async function ResenasPage() {
-  const user = await getAdminUser()
-  if (!user) redirect('/admin/login')
+  const session = await getAdminSession()
+  if (!session) redirect('/admin/login')
+  const { rol } = session
 
   const admin = createAdminClient()
   const { data, error } = await admin
@@ -40,7 +41,7 @@ export default async function ResenasPage() {
         </p>
       </div>
 
-      <ResenaForm />
+      {rol !== 'lector' && <ResenaForm />}
 
       {error && (
         <p className="rounded-md p-4 font-inter text-sm" style={{ background: 'rgba(239,68,68,0.1)', color: '#fca5a5' }}>
@@ -72,7 +73,7 @@ export default async function ResenasPage() {
               </div>
               <p className="font-inter text-sm" style={{ color: 'var(--text-dim)' }}>{r.texto}</p>
             </div>
-            <ResenaActions id={r.id} nombre={r.nombre} activa={r.activa} />
+            <ResenaActions id={r.id} nombre={r.nombre} activa={r.activa} rol={rol} />
           </li>
         ))}
       </ul>
