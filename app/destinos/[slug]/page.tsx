@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { Clock, Users, Check, X, ArrowRight, Quote, Star } from 'lucide-react'
 import { getDestino, getResenaDestino } from '@/lib/destinos'
 import { SectionTag } from '@/components/ui/SectionTag'
+import { Icono } from '@/components/ui/Icono'
 import { Button } from '@/components/ui/Button'
 import { SITE, whatsappUrl } from '@/lib/site'
 
@@ -224,11 +225,13 @@ export default async function DestinoPage({ params }: Props) {
                     {h.imagen ? (
                       <Image src={h.imagen} alt={h.titulo} fill sizes="(max-width: 1024px) 100vw, 33vw" className="object-cover" />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center text-5xl">{h.icono}</div>
+                      <div className="flex h-full w-full items-center justify-center">
+                        <Icono nombre={h.icono} size={52} strokeWidth={1.3} style={{ color: 'rgba(255,255,255,0.6)' }} />
+                      </div>
                     )}
                     {h.imagen && h.icono && (
-                      <span className="absolute left-3 top-3 flex h-10 w-10 items-center justify-center rounded-full text-xl" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(4px)' }} aria-hidden>
-                        {h.icono}
+                      <span className="absolute left-3 top-3 flex h-10 w-10 items-center justify-center rounded-full" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(4px)' }}>
+                        <Icono nombre={h.icono} size={18} style={{ color: 'var(--navy)' }} />
                       </span>
                     )}
                   </div>
@@ -260,7 +263,7 @@ export default async function DestinoPage({ params }: Props) {
                   className="destino-reveal tema-oscuro flex flex-col gap-3 rounded-2xl p-6"
                   style={{ background: '#16315a', boxShadow: '0 24px 48px -28px rgba(10,22,40,0.6)' }}
                 >
-                  <span className="text-3xl" role="img" aria-hidden>{item.icono}</span>
+                  <Icono nombre={item.icono} size={30} strokeWidth={1.5} style={{ color: 'var(--orange)' }} />
                   <div>
                     <p className="font-cinzel text-[11px] font-semibold tracking-[0.22em] uppercase" style={{ color: 'var(--orange)' }}>
                       {item.label}
