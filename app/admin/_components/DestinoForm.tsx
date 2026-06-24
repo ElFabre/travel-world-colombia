@@ -6,6 +6,7 @@ import { ArrowLeft, HelpCircle, ExternalLink } from 'lucide-react'
 import type { Destino } from '@/types/destino'
 import type { FormState } from '../destinos/actions'
 import { RepetidorObjetos } from './RepetidorObjetos'
+import { HighlightsEditor } from './HighlightsEditor'
 import { GaleriaEditor } from './GaleriaEditor'
 import { PAISES } from '@/lib/paises'
 
@@ -242,19 +243,10 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
       </Seccion>
 
       <Seccion
-        titulo="Highlights (lo que te espera)"
-        ayuda="Tarjetas de experiencias del destino, cada una con un emoji, un título y una descripción. Aparecen en la sección 'lo que te espera'."
+        titulo="Experiencias únicas"
+        ayuda="Tarjetas de experiencias del destino, cada una con un emoji, un título, una descripción y una foto. Se muestran en 'Experiencias únicas'. Recomendado: 3."
       >
-        <RepetidorObjetos
-          name="highlights"
-          etiqueta="highlight"
-          inicial={d?.highlights as unknown as Record<string, string>[] | undefined}
-          campos={[
-            { key: 'icono', label: 'Emoji', ancho: 'corto' },
-            { key: 'titulo', label: 'Título' },
-            { key: 'descripcion', label: 'Descripción' },
-          ]}
-        />
+        <HighlightsEditor name="highlights" inicial={d?.highlights} />
       </Seccion>
 
       <Seccion

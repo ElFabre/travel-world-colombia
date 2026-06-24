@@ -7,6 +7,7 @@ export interface Highlight {
   icono: string
   titulo: string
   descripcion: string
+  imagen?: string
 }
 
 export interface InfoClave {

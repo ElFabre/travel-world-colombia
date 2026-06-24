@@ -17,6 +17,29 @@ export async function getDestinos(): Promise<Destino[]> {
   return (data ?? []) as Destino[]
 }
 
+export interface ResenaDestino {
+  nombre: string
+  texto: string
+  estrellas: number | null
+}
+
+/**
+ * Una reseña activa asociada a un destino (por nombre), para el testimonio de
+ * la página de detalle. Reusa la tabla `resenas` que se gestiona en el panel.
+ */
+export async function getResenaDestino(destino: string): Promise<ResenaDestino | null> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('resenas')
+    .select('nombre, texto, estrellas')
+    .eq('activa', true)
+    .ilike('destino', destino)
+    .order('orden', { ascending: true })
+    .limit(1)
+    .maybeSingle()
+  return (data as ResenaDestino) ?? null
+}
+
 /** Un destino activo por slug. Devuelve null si no existe. */
 export async function getDestino(slug: string): Promise<Destino | null> {
   const supabase = await createClient()

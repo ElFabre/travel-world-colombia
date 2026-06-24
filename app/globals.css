@@ -183,6 +183,42 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ── Página de detalle de destino — entrada del hero + revelado al scroll ── */
+@keyframes destino-hero-in {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.destino-hero-in { animation: destino-hero-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+@keyframes destino-reveal {
+  from { opacity: 0; transform: translateY(34px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+/* Por defecto visible (fallback sin soporte de scroll-timeline) */
+.destino-reveal { opacity: 1; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .destino-reveal {
+      opacity: 0;
+      animation: destino-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 32%;
+    }
+  }
+}
+
+/* Tarjetas de experiencia / galería — hover con elevación + zoom de imagen */
+.exp-card {
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.45s ease, border-color 0.45s ease;
+}
+.exp-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 28px 56px -24px rgba(10, 22, 40, 0.3);
+  border-color: var(--border-orange);
+}
+.exp-card img { transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+.exp-card:hover img { transform: scale(1.06); }
+
 .destinos-ver-todos {
   border-color: var(--border-orange);
   color: var(--text-primary);

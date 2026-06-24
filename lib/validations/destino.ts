@@ -28,7 +28,7 @@ export const destinoSchema = z.object({
   keywords: z.array(z.string()).optional(),
 
   stats: z.array(z.object({ num: z.string(), label: z.string() })).optional(),
-  highlights: z.array(z.object({ icono: z.string(), titulo: z.string(), descripcion: z.string() })).optional(),
+  highlights: z.array(z.object({ icono: z.string(), titulo: z.string(), descripcion: z.string(), imagen: z.string().optional() })).optional(),
   info_clave: z.array(z.object({ icono: z.string(), label: z.string(), valor: z.string(), sub: z.string().optional() })).optional(),
   galeria: z.array(z.string()).optional(),
 

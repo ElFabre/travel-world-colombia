@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { Clock, Users, Check, X } from 'lucide-react'
-import { getDestino } from '@/lib/destinos'
+import { Clock, Users, Check, X, ArrowRight, Quote, Star } from 'lucide-react'
+import { getDestino, getResenaDestino } from '@/lib/destinos'
 import { SectionTag } from '@/components/ui/SectionTag'
 import { Button } from '@/components/ui/Button'
 import { SITE, whatsappUrl } from '@/lib/site'
@@ -35,6 +35,12 @@ export default async function DestinoPage({ params }: Props) {
   if (!d) notFound()
 
   const waUrl = whatsappUrl(d.nombre)
+  const resena = await getResenaDestino(d.nombre)
+
+  // Información clave: máximo 4 datos, sin temperatura/clima.
+  const infoClave = (d.info_clave ?? [])
+    .filter(i => !/temperatura|clima|grados|°/i.test(`${i.label} ${i.valor} ${i.sub ?? ''}`))
+    .slice(0, 4)
 
   const schemaTouristDestination = {
     '@context': 'https://schema.org',
@@ -72,22 +78,12 @@ export default async function DestinoPage({ params }: Props) {
 
       {/* ── HERO ── */}
       <section className="tema-oscuro relative flex items-end overflow-hidden" style={{ minHeight: '90svh' }}>
-        {/* Imagen de fondo */}
         {d.imagen_hero ? (
-          <Image
-            src={d.imagen_hero}
-            alt={d.nombre}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-            style={{ zIndex: 0 }}
-          />
+          <Image src={d.imagen_hero} alt={d.nombre} fill priority sizes="100vw" className="object-cover" style={{ zIndex: 0 }} />
         ) : (
           <div className="absolute inset-0" style={{ background: 'var(--blue)', zIndex: 0 }} />
         )}
 
-        {/* Gradiente overlay */}
         <div
           className="absolute inset-0"
           style={{
@@ -97,85 +93,57 @@ export default async function DestinoPage({ params }: Props) {
           }}
         />
 
-        {/* Contenido hero */}
         <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-16 pt-32">
-          <SectionTag className="mb-4">{d.pais}</SectionTag>
-
-          <h1
-            className="font-plus-jakarta text-5xl font-extrabold leading-none sm:text-7xl lg:text-8xl"
-            style={{ color: 'var(--text-primary)' }}
-          >
-            {d.nombre}
-          </h1>
-
-          {d.frase_hero && (
-            <p
-              className="mt-5 max-w-xl font-inter text-base leading-relaxed sm:text-lg"
-              style={{ color: 'rgba(255,255,255,0.75)' }}
-            >
-              {d.frase_hero}
-            </p>
-          )}
-
-          {d.autor_frase && (
-            <p className="mt-3 font-cinzel text-[10px] tracking-[0.3em] uppercase" style={{ color: 'var(--text-muted)' }}>
-              — {d.autor_frase}{d.cargo_autor ? `, ${d.cargo_autor}` : ''}
-            </p>
-          )}
-
-          {/* Info rápida */}
-          <div className="mt-8 flex flex-wrap gap-4">
-            {d.duracion && (
-              <span
-                className="flex items-center gap-2 rounded-full px-4 py-2 font-inter text-sm backdrop-blur-sm"
-                style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid var(--border)', color: 'var(--text-dim)' }}
-              >
-                <Clock size={14} />
-                {d.duracion}
-              </span>
+          <div className="destino-hero-in">
+            <SectionTag className="mb-4">{d.pais}</SectionTag>
+            <h1 className="font-plus-jakarta text-5xl font-extrabold leading-none sm:text-7xl lg:text-8xl" style={{ color: 'var(--text-primary)' }}>
+              {d.nombre}
+            </h1>
+            {d.frase_hero && (
+              <p className="mt-5 max-w-xl font-inter text-base leading-relaxed sm:text-lg" style={{ color: 'rgba(255,255,255,0.78)' }}>
+                {d.frase_hero}
+              </p>
             )}
-            {d.cupos_disponibles !== undefined && d.cupos_disponibles > 0 && (
-              <span
-                className="flex items-center gap-2 rounded-full px-4 py-2 font-inter text-sm backdrop-blur-sm"
-                style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid var(--border)', color: 'var(--text-dim)' }}
-              >
-                <Users size={14} />
-                {d.cupos_disponibles} cupos disponibles
-              </span>
+            {d.autor_frase && (
+              <p className="mt-3 font-cinzel text-[11px] tracking-[0.3em] uppercase" style={{ color: 'var(--text-muted)' }}>
+                — {d.autor_frase}{d.cargo_autor ? `, ${d.cargo_autor}` : ''}
+              </p>
             )}
-            {d.precio_desde && (
-              <span
-                className="flex items-center gap-2 rounded-full px-4 py-2 font-plus-jakarta text-sm font-bold"
-                style={{ background: 'var(--orange)', color: '#fff', boxShadow: '0 4px 20px rgba(244,130,31,0.45)' }}
-              >
-                Desde {d.precio_desde}
-              </span>
-            )}
-          </div>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Button variant="whatsapp" href={waUrl}>Cotizar este viaje</Button>
-            <Button variant="outline" href="/destinos">Ver otros destinos</Button>
+            <div className="mt-8 flex flex-wrap gap-4">
+              {d.duracion && (
+                <span className="flex items-center gap-2 rounded-full px-4 py-2 font-inter text-sm backdrop-blur-sm" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid var(--border)', color: 'var(--text-dim)' }}>
+                  <Clock size={14} /> {d.duracion}
+                </span>
+              )}
+              {d.cupos_disponibles !== undefined && d.cupos_disponibles > 0 && (
+                <span className="flex items-center gap-2 rounded-full px-4 py-2 font-inter text-sm backdrop-blur-sm" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid var(--border)', color: 'var(--text-dim)' }}>
+                  <Users size={14} /> {d.cupos_disponibles} cupos disponibles
+                </span>
+              )}
+              {d.precio_desde && (
+                <span className="flex items-center gap-2 rounded-full px-4 py-2 font-plus-jakarta text-sm font-bold" style={{ background: 'var(--orange)', color: '#fff', boxShadow: '0 4px 20px rgba(244,130,31,0.45)' }}>
+                  Desde {d.precio_desde}
+                </span>
+              )}
+            </div>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button variant="whatsapp" href={waUrl}>Cotizar este viaje</Button>
+              <Button variant="outline" href="/destinos">Ver otros destinos</Button>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ── STATS ── */}
       {d.stats && d.stats.length > 0 && (
-        <section
-          className="border-y px-6 py-10"
-          style={{ borderColor: 'var(--border)', background: 'var(--bg-alt)' }}
-        >
-          <ul className="mx-auto grid max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="border-y px-6 py-12" style={{ borderColor: 'var(--border)', background: 'var(--bg-alt)' }}>
+          <ul className="mx-auto grid max-w-6xl gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
             {d.stats.map(s => (
-              <li key={s.label} className="text-center">
-                <p
-                  className="font-plus-jakarta text-3xl font-extrabold"
-                  style={{ color: 'var(--orange)' }}
-                >
-                  {s.num}
-                </p>
-                <p className="mt-1 font-cinzel text-[9px] tracking-[0.3em] uppercase" style={{ color: 'var(--text-muted)' }}>
+              <li key={s.label} className="destino-reveal text-center">
+                <p className="font-plus-jakarta text-4xl font-extrabold tracking-tight" style={{ color: 'var(--orange)' }}>{s.num}</p>
+                <p className="mt-2 font-cinzel text-xs font-semibold tracking-[0.22em] uppercase" style={{ color: 'var(--text-dim)' }}>
                   {s.label}
                 </p>
               </li>
@@ -184,105 +152,90 @@ export default async function DestinoPage({ params }: Props) {
         </section>
       )}
 
-      {/* ── DESCRIPCIÓN + IMAGEN ABOUT ── */}
+      {/* ── SOBRE EL DESTINO (texto + foto + testimonio) ── */}
       {(d.descripcion || d.imagen_about) && (
-        <section className="px-6 py-20">
-          <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">
-            <div>
+        <section className="px-6 py-24">
+          <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-2">
+            <div className="destino-reveal">
               <SectionTag className="mb-4">Sobre el destino</SectionTag>
-              <h2
-                className="font-plus-jakarta text-3xl font-bold leading-tight sm:text-4xl"
-                style={{ color: 'var(--text-primary)' }}
-              >
+              <h2 className="font-plus-jakarta text-3xl font-bold leading-[1.1] sm:text-4xl" style={{ color: 'var(--text-primary)' }}>
                 {d.subtitulo ?? `Por qué elegir ${d.nombre}`}
               </h2>
               {d.descripcion && (
-                <p
-                  className="mt-5 font-inter text-sm leading-relaxed sm:text-base"
-                  style={{ color: 'var(--text-dim)', lineHeight: '1.75' }}
-                >
+                <p className="mt-6 font-inter text-base" style={{ color: 'var(--text-dim)', lineHeight: '1.8' }}>
                   {d.descripcion}
                 </p>
               )}
+              <a href={waUrl} className="group mt-8 inline-flex items-center gap-2 font-plus-jakarta text-sm font-bold" style={{ color: 'var(--eyebrow)' }}>
+                Descubre más sobre este plan
+                <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1.5" />
+              </a>
             </div>
 
             {d.imagen_about && (
-              <div className="relative h-80 overflow-hidden rounded-lg lg:h-96"
-                style={{ border: '1px solid var(--border)' }}>
-                <Image
-                  src={d.imagen_about}
-                  alt={`${d.nombre} — imagen`}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover"
-                />
+              <div className="destino-reveal relative">
+                <div className="relative h-[26rem] overflow-hidden rounded-2xl lg:h-[32rem]" style={{ boxShadow: '0 40px 80px -32px rgba(10,22,40,0.45)' }}>
+                  <Image src={d.imagen_about} alt={`${d.nombre} — imagen`} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
+                </div>
+                {/* Acento decorativo */}
+                <div aria-hidden className="absolute -right-4 -top-4 -z-10 hidden h-40 w-40 rounded-2xl lg:block" style={{ background: 'rgba(244,130,31,0.12)' }} />
+
+                {resena && (
+                  <figure
+                    className="absolute -bottom-6 left-4 right-4 rounded-xl p-5 sm:left-6 sm:right-auto sm:max-w-xs"
+                    style={{ background: '#fff', border: '1px solid var(--border)', boxShadow: '0 24px 48px -20px rgba(10,22,40,0.35)' }}
+                  >
+                    <Quote size={20} style={{ color: 'var(--orange)' }} />
+                    <blockquote className="mt-2 font-inter text-sm italic leading-relaxed" style={{ color: 'var(--text-primary)' }}>
+                      “{resena.texto}”
+                    </blockquote>
+                    <figcaption className="mt-3 flex items-center justify-between">
+                      <span className="font-plus-jakarta text-xs font-bold" style={{ color: 'var(--text-primary)' }}>{resena.nombre}</span>
+                      <span className="flex gap-0.5">
+                        {Array.from({ length: resena.estrellas ?? 5 }).map((_, i) => <Star key={i} size={11} fill="var(--orange)" style={{ color: 'var(--orange)' }} />)}
+                      </span>
+                    </figcaption>
+                  </figure>
+                )}
               </div>
             )}
           </div>
         </section>
       )}
 
-      {/* ── HIGHLIGHTS ── */}
+      {/* ── EXPERIENCIAS ÚNICAS (3 cards con imagen) ── */}
       {d.highlights && d.highlights.length > 0 && (
-        <section
-          className="px-6 py-20"
-          style={{ background: 'var(--bg-alt)' }}
-        >
+        <section className="px-6 py-24" style={{ background: 'var(--bg-alt)' }}>
           <div className="mx-auto max-w-6xl">
-            <SectionTag className="mb-4">Lo que te espera</SectionTag>
-            <h2
-              className="mb-10 font-plus-jakarta text-3xl font-bold sm:text-4xl"
-              style={{ color: 'var(--text-primary)' }}
-            >
-              Experiencias únicas
-            </h2>
-            <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {d.highlights.map(h => (
+            <div className="destino-reveal mb-12 max-w-2xl">
+              <SectionTag className="mb-4">Lo que te espera</SectionTag>
+              <h2 className="font-plus-jakarta text-3xl font-bold sm:text-4xl" style={{ color: 'var(--text-primary)' }}>
+                Experiencias únicas
+              </h2>
+            </div>
+            <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {d.highlights.slice(0, 3).map(h => (
                 <li
                   key={h.titulo}
-                  className="flex gap-4 rounded-lg p-5"
-                  style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+                  className="exp-card destino-reveal flex flex-col overflow-hidden rounded-2xl"
+                  style={{ background: '#fff', border: '1px solid var(--border)' }}
                 >
-                  <span className="text-2xl shrink-0" role="img" aria-hidden>{h.icono}</span>
-                  <div>
-                    <p className="font-plus-jakarta text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
-                      {h.titulo}
-                    </p>
-                    <p className="mt-1 font-inter text-xs leading-relaxed" style={{ color: 'var(--text-dim)' }}>
-                      {h.descripcion}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      )}
-
-      {/* ── INFO CLAVE ── */}
-      {d.info_clave && d.info_clave.length > 0 && (
-        <section className="px-6 py-16">
-          <div className="mx-auto max-w-6xl">
-            <SectionTag className="mb-4">Información clave</SectionTag>
-            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {d.info_clave.map(item => (
-                <li
-                  key={item.label}
-                  className="flex items-start gap-3 rounded-lg p-4"
-                  style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
-                >
-                  <span className="text-xl shrink-0" role="img" aria-hidden>{item.icono}</span>
-                  <div>
-                    <p className="font-cinzel text-[9px] tracking-[0.3em] uppercase mb-1" style={{ color: 'var(--text-muted)' }}>
-                      {item.label}
-                    </p>
-                    <p className="font-plus-jakarta text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
-                      {item.valor}
-                    </p>
-                    {item.sub && (
-                      <p className="mt-0.5 font-inter text-[11px]" style={{ color: 'var(--text-dim)' }}>{item.sub}</p>
+                  <div className="relative aspect-[4/3] overflow-hidden" style={{ background: 'var(--blue)' }}>
+                    {h.imagen ? (
+                      <Image src={h.imagen} alt={h.titulo} fill sizes="(max-width: 1024px) 100vw, 33vw" className="object-cover" />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-5xl">{h.icono}</div>
+                    )}
+                    {h.imagen && h.icono && (
+                      <span className="absolute left-3 top-3 flex h-10 w-10 items-center justify-center rounded-full text-xl" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(4px)' }} aria-hidden>
+                        {h.icono}
+                      </span>
                     )}
                   </div>
+                  <div className="flex flex-col gap-2 p-6">
+                    <h3 className="font-plus-jakarta text-lg font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>{h.titulo}</h3>
+                    <p className="font-inter text-sm leading-relaxed" style={{ color: 'var(--text-dim)' }}>{h.descripcion}</p>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -290,33 +243,60 @@ export default async function DestinoPage({ params }: Props) {
         </section>
       )}
 
-      {/* ── INCLUYE / NO INCLUYE ── */}
-      {(d.incluye?.length || d.no_incluye?.length) ? (
-        <section
-          className="px-6 py-16"
-          style={{ background: 'var(--bg-alt)' }}
-        >
+      {/* ── INFORMACIÓN CLAVE (4 cards navy) ── */}
+      {infoClave.length > 0 && (
+        <section className="px-6 py-24">
           <div className="mx-auto max-w-6xl">
-            <SectionTag className="mb-4">El paquete</SectionTag>
-            <h2
-              className="mb-10 font-plus-jakarta text-3xl font-bold sm:text-4xl"
-              style={{ color: 'var(--text-primary)' }}
-            >
-              ¿Qué incluye?
-            </h2>
-            <div className="grid gap-8 sm:grid-cols-2">
+            <div className="destino-reveal mb-12 text-center">
+              <SectionTag className="mb-4">Información clave</SectionTag>
+              <h2 className="font-plus-jakarta text-3xl font-bold sm:text-4xl" style={{ color: 'var(--text-primary)' }}>
+                Lo que necesitas saber
+              </h2>
+            </div>
+            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {infoClave.map(item => (
+                <li
+                  key={item.label}
+                  className="destino-reveal tema-oscuro flex flex-col gap-3 rounded-2xl p-6"
+                  style={{ background: '#16315a', boxShadow: '0 24px 48px -28px rgba(10,22,40,0.6)' }}
+                >
+                  <span className="text-3xl" role="img" aria-hidden>{item.icono}</span>
+                  <div>
+                    <p className="font-cinzel text-[11px] font-semibold tracking-[0.22em] uppercase" style={{ color: 'var(--orange)' }}>
+                      {item.label}
+                    </p>
+                    <p className="mt-1 font-plus-jakarta text-xl font-bold" style={{ color: '#fff' }}>{item.valor}</p>
+                    {item.sub && <p className="mt-0.5 font-inter text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>{item.sub}</p>}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
+
+      {/* ── QUÉ INCLUYE (sección azul marino) ── */}
+      {(d.incluye?.length || d.no_incluye?.length) ? (
+        <section className="tema-oscuro relative overflow-hidden px-6 py-24" style={{ background: 'var(--navy)' }}>
+          {/* Atmósfera */}
+          <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(ellipse at top right, rgba(244,130,31,0.12), transparent 55%)' }} />
+          <div className="relative mx-auto max-w-6xl">
+            <div className="destino-reveal mb-12">
+              <SectionTag className="mb-4">El paquete</SectionTag>
+              <h2 className="font-plus-jakarta text-3xl font-bold sm:text-4xl" style={{ color: '#fff' }}>
+                ¿Qué incluye tu viaje?
+              </h2>
+            </div>
+            <div className="grid gap-10 sm:grid-cols-2">
               {d.incluye && d.incluye.length > 0 && (
-                <div>
-                  <p
-                    className="mb-4 font-plus-jakarta text-sm font-bold tracking-wide uppercase"
-                    style={{ color: 'var(--orange)' }}
-                  >
-                    Incluye
-                  </p>
-                  <ul className="space-y-3">
+                <div className="destino-reveal">
+                  <p className="mb-5 font-plus-jakarta text-sm font-bold tracking-wide uppercase" style={{ color: '#4ade80' }}>Incluye</p>
+                  <ul className="space-y-4">
                     {d.incluye.map(item => (
-                      <li key={item} className="flex items-start gap-3 font-inter text-sm" style={{ color: 'var(--text-dim)' }}>
-                        <Check size={15} className="mt-0.5 shrink-0" style={{ color: '#22c55e' }} />
+                      <li key={item} className="flex items-start gap-3 font-inter text-sm sm:text-base" style={{ color: 'rgba(255,255,255,0.85)' }}>
+                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full" style={{ background: 'rgba(74,222,128,0.15)' }}>
+                          <Check size={13} style={{ color: '#4ade80' }} />
+                        </span>
                         {item}
                       </li>
                     ))}
@@ -324,17 +304,14 @@ export default async function DestinoPage({ params }: Props) {
                 </div>
               )}
               {d.no_incluye && d.no_incluye.length > 0 && (
-                <div>
-                  <p
-                    className="mb-4 font-plus-jakarta text-sm font-bold tracking-wide uppercase"
-                    style={{ color: 'var(--text-muted)' }}
-                  >
-                    No incluye
-                  </p>
-                  <ul className="space-y-3">
+                <div className="destino-reveal">
+                  <p className="mb-5 font-plus-jakarta text-sm font-bold tracking-wide uppercase" style={{ color: '#f87171' }}>No incluye</p>
+                  <ul className="space-y-4">
                     {d.no_incluye.map(item => (
-                      <li key={item} className="flex items-start gap-3 font-inter text-sm" style={{ color: 'var(--text-muted)' }}>
-                        <X size={15} className="mt-0.5 shrink-0" style={{ color: '#ef4444' }} />
+                      <li key={item} className="flex items-start gap-3 font-inter text-sm sm:text-base" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full" style={{ background: 'rgba(248,113,113,0.15)' }}>
+                          <X size={13} style={{ color: '#f87171' }} />
+                        </span>
                         {item}
                       </li>
                     ))}
@@ -348,26 +325,18 @@ export default async function DestinoPage({ params }: Props) {
 
       {/* ── GALERÍA ── */}
       {d.galeria && d.galeria.length > 0 && (
-        <section className="px-6 py-16">
+        <section className="px-6 py-24">
           <div className="mx-auto max-w-6xl">
-            <SectionTag className="mb-4">Galería</SectionTag>
-            <h2
-              className="mb-8 font-plus-jakarta text-3xl font-bold sm:text-4xl"
-              style={{ color: 'var(--text-primary)' }}
-            >
-              Imágenes del destino
-            </h2>
-            <ul className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+            <div className="destino-reveal mb-10">
+              <SectionTag className="mb-4">Galería</SectionTag>
+              <h2 className="font-plus-jakarta text-3xl font-bold sm:text-4xl" style={{ color: 'var(--text-primary)' }}>
+                Imágenes del destino
+              </h2>
+            </div>
+            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {d.galeria.map((src, i) => (
-                <li key={i} className={`relative overflow-hidden rounded-lg ${i === 0 ? 'col-span-2 row-span-2' : ''}`}
-                  style={{ aspectRatio: i === 0 ? '4/3' : '1/1' }}>
-                  <Image
-                    src={src}
-                    alt={`${d.nombre} — foto ${i + 1}`}
-                    fill
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    className="object-cover transition-transform duration-300 hover:scale-105"
-                  />
+                <li key={i} className={`destino-reveal exp-card relative overflow-hidden rounded-xl ${i === 0 ? 'col-span-2 row-span-2' : ''}`} style={{ aspectRatio: i === 0 ? '4/3' : '1/1' }}>
+                  <Image src={src} alt={`${d.nombre} — foto ${i + 1}`} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" className="object-cover" />
                 </li>
               ))}
             </ul>
@@ -376,21 +345,11 @@ export default async function DestinoPage({ params }: Props) {
       )}
 
       {/* ── CTA FINAL ── */}
-      <section
-        className="tema-oscuro relative overflow-hidden px-6 py-20"
-        style={{ background: 'linear-gradient(135deg, rgba(244,130,31,0.15) 0%, rgba(10,22,40,0.9) 100%)' }}
-      >
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{ borderTop: '1px solid var(--border-orange)', borderBottom: '1px solid var(--border-orange)' }}
-        />
-        <div className="relative mx-auto max-w-3xl text-center">
+      <section className="tema-oscuro relative overflow-hidden px-6 py-24" style={{ background: 'linear-gradient(135deg, rgba(244,130,31,0.15) 0%, rgba(10,22,40,0.9) 100%)' }}>
+        <div aria-hidden className="pointer-events-none absolute inset-0" style={{ borderTop: '1px solid var(--border-orange)', borderBottom: '1px solid var(--border-orange)' }} />
+        <div className="destino-reveal relative mx-auto max-w-3xl text-center">
           <SectionTag className="mb-4">¿Listo para viajar?</SectionTag>
-          <h2
-            className="font-plus-jakarta text-3xl font-extrabold leading-tight sm:text-5xl"
-            style={{ color: 'var(--text-primary)' }}
-          >
+          <h2 className="font-plus-jakarta text-3xl font-extrabold leading-tight sm:text-5xl" style={{ color: 'var(--text-primary)' }}>
             {d.cta_titulo ?? `Viaja a ${d.nombre}`}
           </h2>
           {d.cta_subtitulo && (
@@ -399,9 +358,7 @@ export default async function DestinoPage({ params }: Props) {
             </p>
           )}
           {d.precio_desde && (
-            <p className="mt-3 font-plus-jakarta text-lg font-bold" style={{ color: 'var(--orange)' }}>
-              Desde {d.precio_desde}
-            </p>
+            <p className="mt-3 font-plus-jakarta text-lg font-bold" style={{ color: 'var(--orange)' }}>Desde {d.precio_desde}</p>
           )}
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Button variant="whatsapp" href={waUrl}>Cotizar por WhatsApp</Button>
