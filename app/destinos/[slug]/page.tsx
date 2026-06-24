@@ -37,6 +37,8 @@ export default async function DestinoPage({ params }: Props) {
 
   const waUrl = whatsappUrl(d.nombre)
   const resena = await getResenaDestino(d.nombre)
+  // Foto de "Sobre el destino": la dedicada, o la miniatura/hero como respaldo.
+  const aboutImg = d.imagen_about ?? d.imagen_thumb ?? d.imagen_hero
 
   // Información clave: máximo 4 datos, sin temperatura/clima.
   const infoClave = (d.info_clave ?? [])
@@ -154,7 +156,7 @@ export default async function DestinoPage({ params }: Props) {
       )}
 
       {/* ── SOBRE EL DESTINO (texto + foto + testimonio) ── */}
-      {(d.descripcion || d.imagen_about) && (
+      {(d.descripcion || aboutImg) && (
         <section className="px-6 py-24">
           <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-2">
             <div className="destino-reveal">
@@ -173,15 +175,20 @@ export default async function DestinoPage({ params }: Props) {
               </a>
             </div>
 
-            {d.imagen_about && (
-              <div className="destino-reveal relative">
-                <div className="relative h-[26rem] overflow-hidden rounded-2xl lg:h-[32rem]" style={{ boxShadow: '0 40px 80px -32px rgba(10,22,40,0.45)' }}>
-                  <Image src={d.imagen_about} alt={`${d.nombre} — imagen`} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
-                </div>
-                {/* Acento decorativo */}
-                <div aria-hidden className="absolute -right-4 -top-4 -z-10 hidden h-40 w-40 rounded-2xl lg:block" style={{ background: 'rgba(244,130,31,0.12)' }} />
+            <div className="destino-reveal relative">
+              <div className="relative h-[26rem] overflow-hidden rounded-2xl lg:h-[32rem]" style={{ boxShadow: '0 40px 80px -32px rgba(10,22,40,0.45)' }}>
+                {aboutImg ? (
+                  <Image src={aboutImg} alt={`${d.nombre} — imagen`} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center" style={{ background: 'linear-gradient(135deg, #16315a, #0a1628)' }}>
+                    <Icono nombre="image" size={64} strokeWidth={1.2} style={{ color: 'rgba(255,255,255,0.22)' }} />
+                  </div>
+                )}
+              </div>
+              {/* Acento decorativo */}
+              <div aria-hidden className="absolute -right-4 -top-4 -z-10 hidden h-40 w-40 rounded-2xl lg:block" style={{ background: 'rgba(244,130,31,0.12)' }} />
 
-                {resena && (
+              {resena && (
                   <figure
                     className="absolute -bottom-6 left-4 right-4 rounded-xl p-5 sm:left-6 sm:right-auto sm:max-w-xs"
                     style={{ background: '#fff', border: '1px solid var(--border)', boxShadow: '0 24px 48px -20px rgba(10,22,40,0.35)' }}
@@ -199,7 +206,6 @@ export default async function DestinoPage({ params }: Props) {
                   </figure>
                 )}
               </div>
-            )}
           </div>
         </section>
       )}
