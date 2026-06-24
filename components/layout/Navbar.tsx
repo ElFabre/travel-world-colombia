@@ -22,7 +22,7 @@ export function Navbar() {
     <header
       className="fixed inset-x-0 top-0 z-40 transition-all duration-300"
       style={{
-        background: scrolled || open ? 'var(--overlay)' : 'transparent',
+        background: scrolled || open ? 'rgba(22, 49, 90, 0.92)' : 'transparent',
         backdropFilter: scrolled || open ? 'blur(10px)' : 'none',
         borderBottom: scrolled || open ? '1px solid var(--border)' : '1px solid transparent',
       }}
