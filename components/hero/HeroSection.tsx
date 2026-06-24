@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { Destino } from '@/types/destino'
 import { BackgroundSlider } from './BackgroundSlider'
 import { HeroContent } from './HeroContent'
@@ -36,13 +36,28 @@ export function HeroSection({ destinos }: HeroSectionProps) {
     setActiveIndex(i)
   }
 
+  // Auto-loop: avanza al siguiente destino cada 4s (crossfade). Cada
+  // selección manual reinicia el temporizador (al depender de activeIndex).
+  useEffect(() => {
+    if (destinos.length <= 1) return
+    const id = setTimeout(() => {
+      const next = (activeIndex + 1) % destinos.length
+      const url = heroBg(destinos[next])
+      setLayers(prev =>
+        prev.showA ? { ...prev, b: url, showA: false } : { ...prev, a: url, showA: true }
+      )
+      setActiveIndex(next)
+    }, 4000)
+    return () => clearTimeout(id)
+  }, [activeIndex, destinos])
+
   const active = destinos[activeIndex]
   if (!active) return null
 
   return (
     <section
       aria-label={`Destino destacado: ${active.nombre}`}
-      className="relative flex w-full flex-col overflow-hidden"
+      className="tema-oscuro relative flex w-full flex-col overflow-hidden"
       style={{ height: '100svh' }}
     >
       <BackgroundSlider layerA={layers.a} layerB={layers.b} showA={layers.showA} />

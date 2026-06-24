@@ -32,13 +32,15 @@ export function BackgroundSlider({ layerA, layerB, showA }: BackgroundSliderProp
           transition: 'opacity 0.9s ease',
         }}
       />
-      {/* Overlay — doble gradiente (izq→der + abajo→arriba) */}
+      {/* Overlay — doble gradiente suave (izq→der + abajo→arriba).
+          Protege el texto a la izquierda y los thumbnails abajo, dejando
+          que la foto resalte en el centro y la derecha. */}
       <div
         aria-hidden
         className="absolute inset-0 z-[1]"
         style={{
           background:
-            'linear-gradient(to right, rgba(10,22,40,.95) 36%, rgba(10,22,40,.2) 100%), linear-gradient(to top, rgba(10,22,40,.98) 0%, transparent 52%)',
+            'linear-gradient(to right, rgba(10,22,40,.70) 0%, rgba(10,22,40,.30) 32%, rgba(10,22,40,0) 60%), linear-gradient(to top, rgba(10,22,40,.60) 0%, rgba(10,22,40,0) 38%)',
         }}
       />
     </>
