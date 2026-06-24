@@ -6,7 +6,7 @@ export function ResenasSection() {
     <section
       aria-labelledby="resenas-title"
       className="py-20 px-6"
-      style={{ background: 'rgba(6,14,26,0.6)' }}
+      style={{ background: 'var(--bg-alt)' }}
     >
       <div className="mx-auto max-w-6xl">
         <div className="mb-10 text-center">

@@ -22,8 +22,8 @@ const currentYear = new Date().getFullYear()
 const AÑOS = [currentYear, currentYear + 1, currentYear + 2].map(String)
 
 const inputBase =
-  'w-full rounded-md px-4 py-3 font-inter text-sm outline-none transition-all duration-200 bg-[rgba(255,255,255,0.06)] border text-white placeholder:text-[rgba(255,255,255,0.3)]'
-const inputNormal = 'border-[rgba(255,255,255,0.12)] focus:border-[#f4821f] focus:bg-[rgba(244,130,31,0.06)]'
+  'w-full rounded-md px-4 py-3 font-inter text-sm outline-none transition-all duration-200 bg-white border text-[#0a1628] placeholder:text-[rgba(10,22,40,0.4)]'
+const inputNormal = 'border-[rgba(10,22,40,0.15)] focus:border-[#f4821f] focus:bg-[rgba(244,130,31,0.05)]'
 const inputError  = 'border-red-500/60 focus:border-red-400'
 const labelBase   = 'block font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase mb-2'
 
@@ -64,7 +64,7 @@ export function FormularioCotizacion({ destinos }: Props) {
   if (status === 'success') {
     return (
       <div className="flex flex-col items-center gap-6 rounded-xl py-16 px-8 text-center"
-        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}>
+        style={{ background: 'var(--bg-alt)', border: '1px solid var(--border)' }}>
         <CheckCircle size={52} style={{ color: '#22c55e' }} strokeWidth={1.5} />
         <div>
           <h3 className="font-plus-jakarta text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
@@ -147,13 +147,13 @@ export function FormularioCotizacion({ destinos }: Props) {
             style={{ appearance: 'none' }}
             {...register('destino_interes')}
           >
-            <option value="" style={{ background: '#0a1628' }}>Selecciona un destino</option>
+            <option value="" style={{ background: '#ffffff' }}>Selecciona un destino</option>
             {destinos.map(d => (
-              <option key={d.id} value={d.nombre} style={{ background: '#0a1628' }}>
+              <option key={d.id} value={d.nombre} style={{ background: '#ffffff' }}>
                 {d.nombre} — {d.pais}
               </option>
             ))}
-            <option value="Otro destino" style={{ background: '#0a1628' }}>Otro destino</option>
+            <option value="Otro destino" style={{ background: '#ffffff' }}>Otro destino</option>
           </select>
           <FieldError msg={errors.destino_interes?.message} />
         </div>
@@ -169,7 +169,7 @@ export function FormularioCotizacion({ destinos }: Props) {
             {...register('num_viajeros', { valueAsNumber: true })}
           >
             {Array.from({ length: 20 }, (_, i) => i + 1).map(n => (
-              <option key={n} value={n} style={{ background: '#0a1628' }}>
+              <option key={n} value={n} style={{ background: '#ffffff' }}>
                 {n} {n === 1 ? 'viajero' : 'viajeros'}
               </option>
             ))}
@@ -192,9 +192,9 @@ export function FormularioCotizacion({ destinos }: Props) {
               style={{ appearance: 'none' }}
               {...register('fecha_mes')}
             >
-              <option value="" style={{ background: '#0a1628' }}>Mes</option>
+              <option value="" style={{ background: '#ffffff' }}>Mes</option>
               {MESES.map(m => (
-                <option key={m} value={m} style={{ background: '#0a1628' }}>{m}</option>
+                <option key={m} value={m} style={{ background: '#ffffff' }}>{m}</option>
               ))}
             </select>
             <FieldError msg={errors.fecha_mes?.message} />
@@ -207,9 +207,9 @@ export function FormularioCotizacion({ destinos }: Props) {
               style={{ appearance: 'none' }}
               {...register('fecha_año')}
             >
-              <option value="" style={{ background: '#0a1628' }}>Año</option>
+              <option value="" style={{ background: '#ffffff' }}>Año</option>
               {AÑOS.map(a => (
-                <option key={a} value={a} style={{ background: '#0a1628' }}>{a}</option>
+                <option key={a} value={a} style={{ background: '#ffffff' }}>{a}</option>
               ))}
             </select>
             <FieldError msg={errors.fecha_año?.message} />

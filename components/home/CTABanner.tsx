@@ -6,7 +6,7 @@ export function CTABanner() {
   return (
     <section
       aria-label="Llamado a la acción"
-      className="relative overflow-hidden py-20 px-6"
+      className="tema-oscuro relative overflow-hidden py-20 px-6"
     >
       {/* Fondo con gradiente y overlay */}
       <div

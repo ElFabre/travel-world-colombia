@@ -39,7 +39,7 @@ export function DestinosLista({ destinos }: DestinosListaProps) {
             style={
               filtro === pais
                 ? { background: 'var(--orange)', color: '#fff', boxShadow: '0 4px 16px rgba(244,130,31,0.4)' }
-                : { background: 'rgba(255,255,255,0.06)', color: 'var(--text-dim)', border: '1px solid var(--border)' }
+                : { background: 'var(--bg-alt)', color: 'var(--text-dim)', border: '1px solid var(--border)' }
             }
           >
             {pais}
@@ -66,7 +66,7 @@ export function DestinosLista({ destinos }: DestinosListaProps) {
               className="animate-fade-up"
               style={{ animationDelay: `${Math.min(i, 8) * 60}ms`, animationFillMode: 'both' }}
             >
-              <Link href={`/destinos/${d.slug}`} className="destino-card group flex flex-col overflow-hidden rounded-lg">
+              <Link href={`/destinos/${d.slug}`} className="destino-card tema-oscuro group flex flex-col overflow-hidden rounded-lg">
                 {/* Imagen — sincronizada con el hero (preview local) */}
                 <div className="relative h-56 overflow-hidden">
                   <Image
@@ -83,7 +83,7 @@ export function DestinosLista({ destinos }: DestinosListaProps) {
                   {/* País badge */}
                   <span
                     className="absolute left-3 top-3 flex items-center gap-1 rounded-full px-3 py-1 font-inter text-[11px] font-medium backdrop-blur-sm"
-                    style={{ background: 'rgba(6,14,26,0.7)', color: 'var(--text-dim)', border: '1px solid var(--border)' }}
+                    style={{ background: 'rgba(6,14,26,0.7)', color: 'rgba(255,255,255,0.9)', border: '1px solid rgba(255,255,255,0.15)' }}
                   >
                     <MapPin size={10} />
                     {d.pais}
@@ -101,7 +101,7 @@ export function DestinosLista({ destinos }: DestinosListaProps) {
                   {d.duracion && (
                     <span
                       className="absolute bottom-3 right-3 flex items-center gap-1 font-inter text-[11px] backdrop-blur-sm px-2 py-1 rounded"
-                      style={{ background: 'rgba(6,14,26,0.75)', color: 'var(--text-dim)' }}
+                      style={{ background: 'rgba(6,14,26,0.75)', color: 'rgba(255,255,255,0.9)' }}
                     >
                       <Clock size={10} />
                       {d.duracion}

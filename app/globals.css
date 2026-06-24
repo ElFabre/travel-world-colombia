@@ -26,6 +26,39 @@
   --card-bg:       rgba(26, 58, 107, 0.4);
   --card-hover:    rgba(244, 130, 31, 0.08);
   --overlay:       rgba(5, 5, 15, 0.92);
+
+  /* Fondos de sección (adaptativos por tema) — oscuro por defecto */
+  --bg:            #0a1628;
+  --bg-alt:        #060e1a;
+  --eyebrow:       #f4821f;
+}
+
+/* ── Tema claro — envolver una página/sección en .tema-claro ── */
+.tema-claro {
+  --bg:           #ffffff;
+  --bg-alt:       #f4f7fb;
+  --text-primary: #0a1628;
+  --text-dim:     rgba(10, 22, 40, 0.66);
+  --text-muted:   rgba(10, 22, 40, 0.45);
+  --border:       rgba(10, 22, 40, 0.10);
+  --card-bg:      #ffffff;
+  --card-hover:   rgba(244, 130, 31, 0.06);
+  --overlay:      rgba(255, 255, 255, 0.92);
+  --eyebrow:      #c25e10;
+  background-color: #ffffff;
+  color: #0a1628;
+}
+
+/* ── Isla oscura dentro de una página clara (hero, CTA, footer) ── */
+.tema-oscuro {
+  --bg:           #0a1628;
+  --bg-alt:       #060e1a;
+  --text-primary: #f0ece4;
+  --text-dim:     rgba(255, 255, 255, 0.6);
+  --text-muted:   rgba(255, 255, 255, 0.35);
+  --border:       rgba(255, 255, 255, 0.1);
+  --card-bg:      rgba(26, 58, 107, 0.4);
+  --overlay:      rgba(5, 5, 15, 0.92);
 }
 
 /* ── Tailwind v4 — Custom theme tokens ── */
@@ -109,7 +142,7 @@ body {
 
 /* ── Destinos grid — card hover ── */
 .destino-card {
-  background: var(--card-bg);
+  background: #16315a;
   border: 1px solid var(--border);
   cursor: pointer;
   transition: border-color 0.25s, box-shadow 0.25s;
@@ -299,11 +332,9 @@ body {
 
 /* ── Equipo Travel World — tarjetas y navegación ── */
 .equipo-card {
-  background: rgba(26, 58, 107, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #16315a;
+  border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: 8px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s ease, box-shadow 0.4s ease;
 }
 .equipo-card:hover {

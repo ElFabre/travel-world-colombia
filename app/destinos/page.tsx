@@ -16,9 +16,9 @@ export default async function DestinosPage() {
   const destinos = await getDestinos()
 
   return (
-    <>
+    <div className="tema-claro">
       {/* Hero */}
-      <section className="relative overflow-hidden pt-32 pb-16 px-6">
+      <section className="tema-oscuro relative overflow-hidden pt-32 pb-16 px-6">
         {/* Mapa de rutas de fondo */}
         <Image
           src="/img/paginas/mapa-rutas-destinos-travel-world-colombia.webp"
@@ -66,6 +66,6 @@ export default async function DestinosPage() {
           <DestinosLista destinos={destinos} />
         </div>
       </section>
-    </>
+    </div>
   )
 }

@@ -36,7 +36,7 @@ export function MapaContacto() {
     <section
       aria-labelledby="contacto-title"
       className="py-20 px-6"
-      style={{ background: 'rgba(10,22,40,0.7)' }}
+      style={{ background: 'var(--bg-alt)' }}
     >
       <div className="mx-auto max-w-6xl">
         <div className="mb-12 text-center">

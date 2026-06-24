@@ -64,14 +64,14 @@ export default async function DestinoPage({ params }: Props) {
   }
 
   return (
-    <>
+    <div className="tema-claro">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaTouristDestination) }}
       />
 
       {/* ── HERO ── */}
-      <section className="relative flex items-end overflow-hidden" style={{ minHeight: '90svh' }}>
+      <section className="tema-oscuro relative flex items-end overflow-hidden" style={{ minHeight: '90svh' }}>
         {/* Imagen de fondo */}
         {d.imagen_hero ? (
           <Image
@@ -164,7 +164,7 @@ export default async function DestinoPage({ params }: Props) {
       {d.stats && d.stats.length > 0 && (
         <section
           className="border-y px-6 py-10"
-          style={{ borderColor: 'var(--border)', background: 'rgba(6,14,26,0.8)' }}
+          style={{ borderColor: 'var(--border)', background: 'var(--bg-alt)' }}
         >
           <ul className="mx-auto grid max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {d.stats.map(s => (
@@ -226,7 +226,7 @@ export default async function DestinoPage({ params }: Props) {
       {d.highlights && d.highlights.length > 0 && (
         <section
           className="px-6 py-20"
-          style={{ background: 'rgba(10,22,40,0.5)' }}
+          style={{ background: 'var(--bg-alt)' }}
         >
           <div className="mx-auto max-w-6xl">
             <SectionTag className="mb-4">Lo que te espera</SectionTag>
@@ -294,7 +294,7 @@ export default async function DestinoPage({ params }: Props) {
       {(d.incluye?.length || d.no_incluye?.length) ? (
         <section
           className="px-6 py-16"
-          style={{ background: 'rgba(6,14,26,0.6)' }}
+          style={{ background: 'var(--bg-alt)' }}
         >
           <div className="mx-auto max-w-6xl">
             <SectionTag className="mb-4">El paquete</SectionTag>
@@ -377,7 +377,7 @@ export default async function DestinoPage({ params }: Props) {
 
       {/* ── CTA FINAL ── */}
       <section
-        className="relative overflow-hidden px-6 py-20"
+        className="tema-oscuro relative overflow-hidden px-6 py-20"
         style={{ background: 'linear-gradient(135deg, rgba(244,130,31,0.15) 0%, rgba(10,22,40,0.9) 100%)' }}
       >
         <div
@@ -409,6 +409,6 @@ export default async function DestinoPage({ params }: Props) {
           </div>
         </div>
       </section>
-    </>
+    </div>
   )
 }

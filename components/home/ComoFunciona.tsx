@@ -40,7 +40,7 @@ export function ComoFunciona() {
     <section
       aria-labelledby="como-funciona-title"
       className="relative overflow-hidden px-6 py-20 md:py-28"
-      style={{ background: 'var(--navy)' }}
+      style={{ background: 'var(--bg)' }}
     >
       {/* Textura de ruido sutil */}
       <div

@@ -9,7 +9,8 @@ interface SectionTagProps {
 export function SectionTag({ children, className = '' }: SectionTagProps) {
   return (
     <p
-      className={`font-cinzel text-[9px] tracking-[0.4em] uppercase text-orange ${className}`}
+      className={`font-cinzel text-[9px] tracking-[0.4em] uppercase ${className}`}
+      style={{ color: 'var(--eyebrow)' }}
     >
       {children}
     </p>

@@ -16,7 +16,7 @@ export default async function Home() {
   const destinos = await getDestinos()
 
   return (
-    <>
+    <div className="tema-claro">
       <HeroSection destinos={destinos} />
       <TrustBar />
       <DestinosGrid destinos={destinos} />
@@ -27,6 +27,6 @@ export default async function Home() {
       <ResenasSection />
       <CTABanner />
       <MapaContacto />
-    </>
+    </div>
   )
 }

@@ -44,10 +44,10 @@ export default async function ContactoPage() {
   const destinos = await getDestinos()
 
   return (
-    <>
+    <div className="tema-claro">
       {/* ── Hero strip ── */}
       <section
-        className="relative overflow-hidden pt-32 pb-16 px-6"
+        className="tema-oscuro relative overflow-hidden pt-32 pb-16 px-6"
         style={{ background: 'linear-gradient(to bottom, rgba(10,22,40,0.98), var(--navy))' }}
       >
         <div
@@ -94,7 +94,7 @@ export default async function ContactoPage() {
             {/* Info de contacto */}
             <div
               className="rounded-xl p-6"
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)' }}
+              style={{ background: 'var(--bg-alt)', border: '1px solid var(--border)' }}
             >
               <h3
                 className="mb-5 font-plus-jakarta text-sm font-bold"
@@ -159,6 +159,6 @@ export default async function ContactoPage() {
           </aside>
         </div>
       </section>
-    </>
+    </div>
   )
 }

@@ -57,7 +57,7 @@ export function AlianzasPremium() {
     <section
       aria-labelledby="alianzas-title"
       className="overflow-hidden px-6 py-16"
-      style={{ background: 'rgba(6,14,26,0.55)' }}
+      style={{ background: 'var(--bg-alt)' }}
     >
       <div className="mx-auto max-w-6xl">
         <div className="mb-10 text-center">

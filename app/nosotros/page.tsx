@@ -108,14 +108,14 @@ function LogoCard({ alianza }: { alianza: Alianza }) {
 
 export default function NosotrosPage() {
   return (
-    <>
+    <div className="tema-claro">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaFAQ) }}
       />
 
       {/* ── HERO ── */}
-      <section className="relative overflow-hidden pt-36 pb-24 px-6 text-center">
+      <section className="tema-oscuro relative overflow-hidden pt-36 pb-24 px-6 text-center">
         {/* Imagen de fondo — paisaje andino del Sumapaz */}
         <Image
           src="/img/paginas/paisaje-andino-sumapaz-fusagasuga.webp"
@@ -157,7 +157,7 @@ export default function NosotrosPage() {
       {/* ── STATS ── */}
       <section
         className="border-y px-6 py-12"
-        style={{ borderColor: 'var(--border)', background: 'rgba(6,14,26,0.85)' }}
+        style={{ borderColor: 'var(--border)', background: 'var(--bg-alt)' }}
       >
         <ul className="mx-auto grid max-w-4xl gap-8 grid-cols-2 lg:grid-cols-4">
           {STATS.map(({ icon: Icon, num, label }) => (
@@ -274,7 +274,7 @@ export default function NosotrosPage() {
       {/* ── AEROLÍNEAS ── */}
       <section
         className="px-6 py-16"
-        style={{ background: 'rgba(6,14,26,0.7)' }}
+        style={{ background: 'var(--bg-alt)' }}
       >
         <div className="mx-auto max-w-6xl">
           <div className="mb-10 text-center">
@@ -357,7 +357,7 @@ export default function NosotrosPage() {
       <section
         aria-labelledby="resenas-nosotros-title"
         className="px-6 py-20"
-        style={{ background: 'rgba(6,14,26,0.6)' }}
+        style={{ background: 'var(--bg-alt)' }}
       >
         <div className="mx-auto max-w-6xl">
           <div className="mb-10 text-center">
@@ -387,7 +387,7 @@ export default function NosotrosPage() {
 
       {/* ── CTA FINAL ── */}
       <section
-        className="relative overflow-hidden px-6 py-20"
+        className="tema-oscuro relative overflow-hidden px-6 py-20"
         style={{
           background:
             'linear-gradient(135deg, rgba(244,130,31,0.18) 0%, rgba(10,22,40,0.95) 100%)',
@@ -434,6 +434,6 @@ export default function NosotrosPage() {
           </div>
         </div>
       </section>
-    </>
+    </div>
   )
 }

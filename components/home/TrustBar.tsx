@@ -29,7 +29,7 @@ export function TrustBar() {
     <section
       aria-label="Credenciales de confianza"
       className="relative z-10 border-y"
-      style={{ borderColor: 'var(--border)', background: 'rgba(6,14,26,0.85)' }}
+      style={{ borderColor: 'var(--border)', background: 'var(--bg-alt)' }}
     >
       <div className="mx-auto max-w-6xl px-6 py-8">
         <ul className="grid grid-cols-2 gap-6 sm:grid-cols-4">

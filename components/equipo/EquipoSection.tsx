@@ -17,7 +17,7 @@ export function EquipoSection() {
     <section
       aria-labelledby="equipo-title"
       className="relative overflow-hidden px-6 py-20 md:py-28"
-      style={{ background: 'var(--navy)' }}
+      style={{ background: 'var(--bg)' }}
     >
       {/* Glow de fondo */}
       <div
@@ -67,7 +67,7 @@ export function EquipoSection() {
                 aria-hidden={isClone || undefined}
                 onMouseEnter={() => setPaused(true)}
                 onMouseLeave={() => setPaused(false)}
-                className="equipo-card relative mr-6 flex shrink-0 flex-col items-center overflow-hidden p-8 text-center"
+                className="equipo-card tema-oscuro relative mr-6 flex shrink-0 flex-col items-center overflow-hidden p-8 text-center"
                 style={{ width: 'min(85vw, 320px)' }}
               >
                 {/* Avatar */}
