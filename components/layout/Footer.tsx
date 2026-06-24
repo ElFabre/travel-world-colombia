@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { MapPin, Phone, Mail, Clock } from 'lucide-react'
+import { MapPin, Phone, Mail, Clock, Lock } from 'lucide-react'
 import { SITE, SOCIALS, WHATSAPP, NAV_LINKS } from '@/lib/site'
 
 type IconProps = { size?: number }
@@ -136,9 +136,16 @@ export function Footer() {
       <div className="border-t" style={{ borderColor: 'var(--border)' }}>
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-6 py-5 font-inter text-[12px] md:flex-row">
           <p>© {new Date().getFullYear()} {SITE.nombre}. Todos los derechos reservados.</p>
-          <p style={{ color: 'var(--text-muted)' }}>
-            Registro Nacional de Turismo · RNT {SITE.rnt}
-          </p>
+          <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-5" style={{ color: 'var(--text-muted)' }}>
+            <p>Registro Nacional de Turismo · RNT {SITE.rnt}</p>
+            <Link
+              href="/admin/login"
+              className="flex items-center gap-1.5 transition-colors hover:text-orange"
+            >
+              <Lock size={12} />
+              Iniciar sesión (personal)
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

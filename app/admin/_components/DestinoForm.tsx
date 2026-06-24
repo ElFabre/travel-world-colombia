@@ -2,11 +2,12 @@
 
 import Link from 'next/link'
 import { useActionState } from 'react'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, HelpCircle } from 'lucide-react'
 import type { Destino } from '@/types/destino'
 import type { FormState } from '../destinos/actions'
 import { RepetidorObjetos } from './RepetidorObjetos'
 import { GaleriaEditor } from './GaleriaEditor'
+import { PAISES } from '@/lib/paises'
 
 type Action = (prev: FormState, fd: FormData) => Promise<FormState>
 
@@ -15,12 +16,26 @@ const inputStyle = { background: 'var(--navy)', border: '1px solid var(--border)
 const labelCls = 'mb-1 block font-inter text-xs'
 const labelStyle = { color: 'var(--text-dim)' } as const
 
-function Seccion({ titulo, children }: { titulo: string; children: React.ReactNode }) {
+function Seccion({ titulo, ayuda, children }: { titulo: string; ayuda?: string; children: React.ReactNode }) {
   return (
     <section>
-      <p className="mb-2 px-1 font-cinzel text-[11px] tracking-[0.2em] uppercase" style={{ color: 'var(--orange)' }}>
-        {titulo}
-      </p>
+      <div className="mb-2 flex items-center gap-1.5 px-1">
+        <p className="font-cinzel text-[11px] tracking-[0.2em] uppercase" style={{ color: 'var(--orange)' }}>
+          {titulo}
+        </p>
+        {ayuda && (
+          <span className="group relative inline-flex items-center">
+            <HelpCircle size={13} style={{ color: 'var(--text-muted)', cursor: 'help' }} aria-label={ayuda} />
+            <span
+              role="tooltip"
+              className="pointer-events-none absolute left-5 top-1/2 z-30 hidden w-64 -translate-y-1/2 rounded-md p-2.5 font-inter text-[11px] normal-case leading-relaxed tracking-normal group-hover:block"
+              style={{ background: 'var(--dark)', border: '1px solid var(--border)', color: 'var(--text-dim)', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}
+            >
+              {ayuda}
+            </span>
+          </span>
+        )}
+      </div>
       <div className="rounded-lg p-5" style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
         <div className="grid gap-4 sm:grid-cols-2">{children}</div>
       </div>
@@ -46,6 +61,33 @@ function Campo({
         className={inputCls}
         style={inputStyle}
       />
+      {hint && <p className="mt-1 font-inter text-[11px]" style={{ color: 'var(--text-muted)' }}>{hint}</p>}
+    </div>
+  )
+}
+
+function CampoSelect({
+  label, name, defaultValue, required, opciones, hint,
+}: {
+  label: string; name: string; defaultValue?: string; required?: boolean; opciones: string[]; hint?: string
+}) {
+  // Si el valor actual no está en la lista, lo agregamos para no perderlo al editar.
+  const ops = defaultValue && !opciones.includes(defaultValue) ? [defaultValue, ...opciones] : opciones
+  return (
+    <div>
+      <label className={labelCls} style={labelStyle}>{label}{required && ' *'}</label>
+      <select
+        name={name}
+        defaultValue={defaultValue ?? ''}
+        required={required}
+        className={inputCls}
+        style={inputStyle}
+      >
+        <option value="" disabled style={{ background: 'var(--navy)' }}>Selecciona…</option>
+        {ops.map(o => (
+          <option key={o} value={o} style={{ background: 'var(--navy)' }}>{o}</option>
+        ))}
+      </select>
       {hint && <p className="mt-1 font-inter text-[11px]" style={{ color: 'var(--text-muted)' }}>{hint}</p>}
     </div>
   )
@@ -110,10 +152,38 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
         </div>
       </div>
 
-      <Seccion titulo="Básico">
+      <Seccion
+        titulo="Imágenes"
+        ayuda="Las 3 fotos del destino: el fondo grande del hero, la miniatura de la tarjeta y la imagen de 'sobre el destino'. Se suben a Supabase y aparecen solas en la web."
+      >
+        <ImagenCampo label="Imagen hero (fondo grande)" name="imagen_hero" urlActual={d?.imagen_hero} />
+        <ImagenCampo label="Imagen thumbnail (tarjeta)" name="imagen_thumb" urlActual={d?.imagen_thumb} />
+        <ImagenCampo label="Imagen 'sobre el destino'" name="imagen_about" urlActual={d?.imagen_about} />
+      </Seccion>
+
+      <Seccion
+        titulo="Galería"
+        ayuda="Fotos adicionales del destino que se muestran en una cuadrícula en su página. Sube varias; cada una se guarda al elegirla."
+      >
+        <GaleriaEditor name="galeria" inicial={d?.galeria} />
+      </Seccion>
+
+      <Seccion
+        titulo="Hero"
+        ayuda="Portada del destino: la frase inspiradora que aparece sobre la imagen grande del hero, con su autor opcional. La imagen de fondo se sube en la sección Imágenes."
+      >
+        <Campo label="Frase del hero" name="frase_hero" defaultValue={d?.frase_hero} full placeholder="El Caribe que siempre soñaste, todo incluido." />
+        <Campo label="Autor de la frase" name="autor_frase" defaultValue={d?.autor_frase} />
+        <Campo label="Cargo del autor" name="cargo_autor" defaultValue={d?.cargo_autor} />
+      </Seccion>
+
+      <Seccion
+        titulo="Básico"
+        ayuda="Datos principales: nombre, slug (la URL), país (define el filtro de /destinos), precio, duración, cupos y orden. 'Activo' lo muestra en la web; 'Destacado' lo lleva al home."
+      >
         <Campo label="Nombre" name="nombre" defaultValue={d?.nombre} required placeholder="Punta Cana" />
         <Campo label="Slug (URL)" name="slug" defaultValue={d?.slug} required placeholder="punta-cana" hint="Solo minúsculas, números y guiones." />
-        <Campo label="País" name="pais" defaultValue={d?.pais} required placeholder="República Dominicana" />
+        <CampoSelect label="País" name="pais" defaultValue={d?.pais} required opciones={PAISES} hint="Define el filtro en /destinos." />
         <Campo label="Región" name="region" defaultValue={d?.region} placeholder="Caribe" />
         <Campo label="Precio desde" name="precio_desde" defaultValue={d?.precio_desde} placeholder="Desde $899 USD" />
         <Campo label="Duración" name="duracion" defaultValue={d?.duracion} placeholder="8 días / 7 noches" />
@@ -127,29 +197,26 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
         </label>
       </Seccion>
 
-      <Seccion titulo="Hero">
-        <Campo label="Frase del hero" name="frase_hero" defaultValue={d?.frase_hero} full placeholder="El Caribe que siempre soñaste, todo incluido." />
-        <Campo label="Autor de la frase" name="autor_frase" defaultValue={d?.autor_frase} />
-        <Campo label="Cargo del autor" name="cargo_autor" defaultValue={d?.cargo_autor} />
-      </Seccion>
-
-      <Seccion titulo="Imágenes">
-        <ImagenCampo label="Imagen hero (fondo grande)" name="imagen_hero" urlActual={d?.imagen_hero} />
-        <ImagenCampo label="Imagen thumbnail (tarjeta)" name="imagen_thumb" urlActual={d?.imagen_thumb} />
-        <ImagenCampo label="Imagen 'sobre el destino'" name="imagen_about" urlActual={d?.imagen_about} />
-      </Seccion>
-
-      <Seccion titulo="Contenido">
+      <Seccion
+        titulo="Contenido"
+        ayuda="Subtítulo y descripción larga del destino. Aparecen en la sección 'sobre el destino' de su página."
+      >
         <Campo label="Subtítulo" name="subtitulo" defaultValue={d?.subtitulo} full />
         <Area label="Descripción" name="descripcion" defaultValue={d?.descripcion} rows={5} />
       </Seccion>
 
-      <Seccion titulo="Qué incluye">
+      <Seccion
+        titulo="Qué incluye"
+        ayuda="Lo que incluye y lo que NO incluye el paquete, una característica por línea. Se muestran como listas con check (verde) y equis (rojo)."
+      >
         <Area label="Incluye (uno por línea)" name="incluye" defaultValue={d?.incluye?.join('\n')} hint="Una característica por línea." />
         <Area label="No incluye (uno por línea)" name="no_incluye" defaultValue={d?.no_incluye?.join('\n')} hint="Una por línea." />
       </Seccion>
 
-      <Seccion titulo="Stats (barra de cifras)">
+      <Seccion
+        titulo="Stats (barra de cifras)"
+        ayuda="Cifras destacadas del destino que aparecen en una barra (ej. '500+ familias'). Cada fila: número + etiqueta."
+      >
         <RepetidorObjetos
           name="stats"
           etiqueta="cifra"
@@ -161,7 +228,10 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
         />
       </Seccion>
 
-      <Seccion titulo="Highlights (lo que te espera)">
+      <Seccion
+        titulo="Highlights (lo que te espera)"
+        ayuda="Tarjetas de experiencias del destino, cada una con un emoji, un título y una descripción. Aparecen en la sección 'lo que te espera'."
+      >
         <RepetidorObjetos
           name="highlights"
           etiqueta="highlight"
@@ -174,7 +244,10 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
         />
       </Seccion>
 
-      <Seccion titulo="Información clave">
+      <Seccion
+        titulo="Información clave"
+        ayuda="Datos prácticos del viaje (ej. moneda, idioma, mejor época para viajar). Cada fila: emoji + etiqueta + valor + un sub-texto opcional."
+      >
         <RepetidorObjetos
           name="info_clave"
           etiqueta="dato"
@@ -188,11 +261,10 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
         />
       </Seccion>
 
-      <Seccion titulo="Galería">
-        <GaleriaEditor name="galeria" inicial={d?.galeria} />
-      </Seccion>
-
-      <Seccion titulo="SEO & CTA">
+      <Seccion
+        titulo="SEO & CTA"
+        ayuda="Llamado a la acción final del destino + datos para buscadores (meta título, meta descripción y keywords). Mejoran el posicionamiento en Google."
+      >
         <Campo label="Título del CTA final" name="cta_titulo" defaultValue={d?.cta_titulo} full />
         <Area label="Subtítulo del CTA" name="cta_subtitulo" defaultValue={d?.cta_subtitulo} rows={2} />
         <Campo label="Meta título (SEO)" name="meta_title" defaultValue={d?.meta_title} full />
