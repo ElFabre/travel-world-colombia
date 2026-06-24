@@ -266,10 +266,10 @@ export default async function DestinoPage({ params }: Props) {
               {infoClave.map(item => (
                 <li
                   key={item.label}
-                  className="destino-reveal tema-oscuro flex flex-col gap-3 rounded-2xl p-6"
+                  className="destino-reveal tema-oscuro flex flex-col items-center gap-4 rounded-2xl p-6 text-center"
                   style={{ background: '#16315a', boxShadow: '0 24px 48px -28px rgba(10,22,40,0.6)' }}
                 >
-                  <Icono nombre={item.icono} size={30} strokeWidth={1.5} style={{ color: 'var(--orange)' }} />
+                  <Icono nombre={item.icono} size={44} strokeWidth={1.5} style={{ color: 'var(--orange)' }} />
                   <div>
                     <p className="font-cinzel text-[11px] font-semibold tracking-[0.22em] uppercase" style={{ color: 'var(--orange)' }}>
                       {item.label}
