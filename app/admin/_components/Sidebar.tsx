@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import {
@@ -29,11 +30,19 @@ export function Sidebar({ email }: { email: string }) {
       <Link
         href="/admin"
         onClick={() => setOpen(false)}
-        className="flex items-center gap-2 px-5 py-4 font-plus-jakarta font-bold"
-        style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--border)' }}
+        className="flex items-center justify-center px-5 py-4"
+        style={{ borderBottom: '1px solid var(--border)' }}
       >
-        <LayoutDashboard size={18} style={{ color: 'var(--orange)' }} />
-        Travel World
+        <span className="rounded-md bg-white px-3 py-2">
+          <Image
+            src="/images/travel-world-colombia-logo.png"
+            alt="Travel World Colombia"
+            width={160}
+            height={40}
+            priority
+            className="h-8 w-auto"
+          />
+        </span>
       </Link>
 
       <nav className="flex-1 overflow-y-auto px-3 py-4">
@@ -84,9 +93,16 @@ export function Sidebar({ email }: { email: string }) {
         className="tema-oscuro sticky top-0 z-30 flex items-center justify-between px-4 py-3 md:hidden"
         style={{ background: 'rgba(6,14,26,0.95)', borderBottom: '1px solid var(--border)', backdropFilter: 'blur(8px)' }}
       >
-        <Link href="/admin" className="flex items-center gap-2 font-plus-jakarta text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
-          <LayoutDashboard size={16} style={{ color: 'var(--orange)' }} />
-          Travel World
+        <Link href="/admin" className="flex items-center">
+          <span className="rounded-md bg-white px-2.5 py-1.5">
+            <Image
+              src="/images/travel-world-colombia-logo.png"
+              alt="Travel World Colombia"
+              width={140}
+              height={35}
+              className="h-6 w-auto"
+            />
+          </span>
         </Link>
         <button
           type="button"
