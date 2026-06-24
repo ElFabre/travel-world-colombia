@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useActionState } from 'react'
-import { ArrowLeft, HelpCircle } from 'lucide-react'
+import { ArrowLeft, HelpCircle, ExternalLink } from 'lucide-react'
 import type { Destino } from '@/types/destino'
 import type { FormState } from '../destinos/actions'
 import { RepetidorObjetos } from './RepetidorObjetos'
@@ -145,11 +145,24 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
     <form action={formAction} className="flex flex-col gap-5">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Link href="/admin" className="flex h-9 w-9 items-center justify-center rounded-md" style={{ border: '1px solid var(--border)', color: 'var(--text-dim)' }}>
+          <Link href="/admin/viajes" className="flex h-9 w-9 items-center justify-center rounded-md" style={{ border: '1px solid var(--border)', color: 'var(--text-dim)' }}>
             <ArrowLeft size={16} />
           </Link>
           <h1 className="font-plus-jakarta text-xl font-extrabold" style={{ color: 'var(--text-primary)' }}>{titulo}</h1>
         </div>
+        {d?.slug && (
+          <a
+            href={`/destinos/${d.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Abre la página pública del viaje en una pestaña nueva"
+            className="flex shrink-0 items-center gap-2 rounded-md px-3 py-2 font-inter text-sm"
+            style={{ border: '1px solid var(--border)', color: 'var(--text-dim)' }}
+          >
+            <ExternalLink size={15} />
+            <span className="hidden sm:inline">Ver viaje</span>
+          </a>
+        )}
       </div>
 
       <Seccion

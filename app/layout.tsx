@@ -4,6 +4,7 @@ import './globals.css'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
+import { PublicOnly } from '@/components/layout/PublicOnly'
 import { Analytics, AnalyticsNoScript } from '@/components/analytics/Analytics'
 import { SITE, WHATSAPP, SOCIALS } from '@/lib/site'
 
@@ -148,10 +149,10 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaOrg) }}
         />
-        <Navbar />
+        <PublicOnly><Navbar /></PublicOnly>
         {children}
-        <Footer />
-        <WhatsAppButton />
+        <PublicOnly><Footer /></PublicOnly>
+        <PublicOnly><WhatsAppButton /></PublicOnly>
       </body>
     </html>
   )
