@@ -1,5 +1,3 @@
-import { NextRequest } from 'next/server'
-
 // NOTA: store en memoria — válido para un solo proceso. En serverless con
 // múltiples instancias no es 100% fiable; para producción de alto tráfico,
 // migrar a un store distribuido (Upstash Redis / Vercel KV).
@@ -39,13 +37,4 @@ export function rateLimitByIp(
 
   record.count++
   return { success: true, remaining: options.limit - record.count, retryAfter: 0 }
-}
-
-/** Wrapper para middleware / API routes a partir de un NextRequest. */
-export function rateLimit(req: NextRequest, options?: RateLimitOptions) {
-  const ip =
-    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
-    req.headers.get('x-real-ip') ??
-    'unknown'
-  return rateLimitByIp(ip, options)
 }

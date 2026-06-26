@@ -4,8 +4,10 @@
 export const SITE = {
   nombre: 'Travel World Colombia',
   rnt: '27287',
-  // TEMP: dominio en Vercel hasta conectar travelworldcolombia.com (al final).
-  url: 'https://travel-world-colombia.vercel.app',
+  // Fuente única de la URL del sitio. En local/preview cae al dominio de
+  // Vercel; al conectar el dominio propio basta con definir NEXT_PUBLIC_SITE_URL
+  // en Vercel (Production) — no hay que tocar código.
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://travel-world-colombia.vercel.app',
   email: 'info@travelworldcolombia.com',
 
   // NAP — Name, Address, Phone (no modificar el formato sin actualizar GBP/Schema)

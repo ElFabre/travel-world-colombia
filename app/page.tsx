@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { getDestinos } from '@/lib/destinos'
 import { HeroSection } from '@/components/hero/HeroSection'
 import { TrustBar } from '@/components/home/TrustBar'
@@ -11,6 +12,10 @@ import { CTABanner } from '@/components/home/CTABanner'
 import { MapaContacto } from '@/components/home/MapaContacto'
 
 export const revalidate = 1800 // home: revalidar cada 30 min
+
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+}
 
 export default async function Home() {
   const destinos = await getDestinos()

@@ -15,9 +15,17 @@ if (!connectionString) {
   process.exit(1)
 }
 
+// Bootstrap de una base LOCAL desde cero. En producción las migraciones se
+// aplican por el SQL Editor de Supabase (ver supabase/README.md).
 const files = [
   'supabase/migrations/001_schema.sql',
   'supabase/migrations/002_rls.sql',
+  'supabase/migrations/003_storage.sql',
+  'supabase/migrations/004_audit.sql',
+  'supabase/migrations/005_usuarios.sql',
+  'supabase/migrations/006_leads_status.sql',
+  'supabase/migrations/007_faqs.sql',
+  'supabase/migrations/008_allowlist_rls.sql',
   'supabase/seed.sql',
 ]
 

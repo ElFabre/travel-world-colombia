@@ -5,14 +5,13 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import {
-  LayoutDashboard, Plane, Inbox, Star, HelpCircle, Users, Activity, LogOut, Menu, X,
+  LayoutDashboard, Plane, Star, HelpCircle, Users, Activity, LogOut, Menu, X,
 } from 'lucide-react'
 import { signOut } from '../actions'
 
 const NAV = [
   { href: '/admin',             label: 'Dashboard',    Icon: LayoutDashboard, exact: true },
   { href: '/admin/viajes',      label: 'Viajes',       Icon: Plane },
-  { href: '/admin/solicitudes', label: 'Solicitudes',  Icon: Inbox },
   { href: '/admin/resenas',     label: 'Reseñas',      Icon: Star },
   { href: '/admin/faqs',        label: 'Preguntas',    Icon: HelpCircle },
   { href: '/admin/usuarios',    label: 'Usuarios',     Icon: Users },

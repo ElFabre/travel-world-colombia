@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: 'Destinos de Viaje',
   description:
     'Explora todos nuestros destinos nacionales e internacionales. Paquetes todo incluido desde Fusagasugá. Cotiza gratis.',
+  alternates: { canonical: '/destinos' },
 }
 
 export default async function DestinosPage() {

@@ -89,7 +89,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://travel-world-colombia.vercel.app'),
+  metadataBase: new URL(SITE.url),
   title: {
     default: 'Agencia de Viajes Fusagasugá | Travel World Colombia',
     template: '%s | Travel World Colombia',

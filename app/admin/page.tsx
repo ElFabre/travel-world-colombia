@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Plane, Inbox, Star, Users, ArrowRight } from 'lucide-react'
+import { Plane, Star, HelpCircle, Users, ArrowRight } from 'lucide-react'
 import { getAdminUser } from '@/lib/admin/guard'
 import { superadmins } from '@/lib/admin/allowlist'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -14,29 +14,27 @@ export default async function Dashboard() {
   if (!user) redirect('/admin/login')
 
   const admin = createAdminClient()
-  const hace7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
   const cnt = (q: { count: number | null }) => q.count ?? 0
 
   const [
-    viajesTot, viajesAct, leadsTot, leadsNuevas, resenasTot, resenasAct, allowlist,
-    recientesLeads, recienteAct,
+    viajesTot, viajesAct, resenasTot, resenasAct, faqsTot, faqsAct, allowlist,
+    recienteAct,
   ] = await Promise.all([
     admin.from('destinos').select('*', { count: 'exact', head: true }),
     admin.from('destinos').select('*', { count: 'exact', head: true }).eq('activo', true),
-    admin.from('leads').select('*', { count: 'exact', head: true }),
-    admin.from('leads').select('*', { count: 'exact', head: true }).gte('created_at', hace7d),
     admin.from('resenas').select('*', { count: 'exact', head: true }),
     admin.from('resenas').select('*', { count: 'exact', head: true }).eq('activa', true),
+    admin.from('faqs').select('*', { count: 'exact', head: true }),
+    admin.from('faqs').select('*', { count: 'exact', head: true }).eq('activa', true),
     admin.from('admin_allowlist').select('*', { count: 'exact', head: true }),
-    admin.from('leads').select('nombre, destino_interes, created_at').order('created_at', { ascending: false }).limit(5),
     admin.from('audit_log').select('user_email, accion, destino_nombre, created_at').order('created_at', { ascending: false }).limit(5),
   ])
 
   const cards = [
-    { href: '/admin/viajes',      Icon: Plane, label: 'Viajes',      valor: cnt(viajesTot), sub: `${cnt(viajesAct)} activos` },
-    { href: '/admin/solicitudes', Icon: Inbox, label: 'Solicitudes', valor: cnt(leadsTot),  sub: `${cnt(leadsNuevas)} en 7 días` },
-    { href: '/admin/resenas',     Icon: Star,  label: 'Reseñas',     valor: cnt(resenasTot), sub: `${cnt(resenasAct)} activas` },
-    { href: '/admin/usuarios',    Icon: Users, label: 'Usuarios',    valor: cnt(allowlist) + superadmins().length, sub: 'con acceso' },
+    { href: '/admin/viajes',   Icon: Plane,      label: 'Viajes',     valor: cnt(viajesTot),  sub: `${cnt(viajesAct)} activos` },
+    { href: '/admin/resenas',  Icon: Star,       label: 'Reseñas',    valor: cnt(resenasTot), sub: `${cnt(resenasAct)} activas` },
+    { href: '/admin/faqs',     Icon: HelpCircle, label: 'Preguntas',  valor: cnt(faqsTot),    sub: `${cnt(faqsAct)} activas` },
+    { href: '/admin/usuarios', Icon: Users,      label: 'Usuarios',   valor: cnt(allowlist) + superadmins().length, sub: 'con acceso' },
   ]
 
   return (
@@ -66,32 +64,20 @@ export default async function Dashboard() {
         ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Panel titulo="Últimas solicitudes" href="/admin/solicitudes">
-          {(recientesLeads.data ?? []).length === 0 ? (
-            <Vacio>Sin solicitudes todavía.</Vacio>
-          ) : (
-            (recientesLeads.data ?? []).map((l, i) => (
-              <Item key={i} principal={l.nombre} secundario={l.destino_interes ?? 'Sin destino'} fecha={l.created_at} />
-            ))
-          )}
-        </Panel>
-
-        <Panel titulo="Actividad reciente" href="/admin/actividad">
-          {(recienteAct.data ?? []).length === 0 ? (
-            <Vacio>Sin actividad registrada.</Vacio>
-          ) : (
-            (recienteAct.data ?? []).map((a, i) => (
-              <Item
-                key={i}
-                principal={`${a.accion}${a.destino_nombre ? ` · ${a.destino_nombre}` : ''}`}
-                secundario={a.user_email}
-                fecha={a.created_at}
-              />
-            ))
-          )}
-        </Panel>
-      </div>
+      <Panel titulo="Actividad reciente" href="/admin/actividad">
+        {(recienteAct.data ?? []).length === 0 ? (
+          <Vacio>Sin actividad registrada.</Vacio>
+        ) : (
+          (recienteAct.data ?? []).map((a, i) => (
+            <Item
+              key={i}
+              principal={`${a.accion}${a.destino_nombre ? ` · ${a.destino_nombre}` : ''}`}
+              secundario={a.user_email}
+              fecha={a.created_at}
+            />
+          ))
+        )}
+      </Panel>
     </>
   )
 }
