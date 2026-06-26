@@ -16,7 +16,7 @@ export default function GlobalError({
   }, [error])
 
   return (
-    <main
+    <div
       className="flex min-h-screen flex-col items-center justify-center px-6 text-center"
       style={{ background: 'var(--navy)' }}
     >
@@ -56,6 +56,6 @@ export default function GlobalError({
           </div>
         </div>
       </div>
-    </main>
+    </div>
   )
 }

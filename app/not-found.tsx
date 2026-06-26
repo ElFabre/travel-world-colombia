@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/Button'
 
 export default function NotFound() {
   return (
-    <main
+    <div
       className="flex min-h-screen flex-col items-center justify-center px-6 text-center"
       style={{ background: 'var(--navy)' }}
     >
@@ -44,6 +44,6 @@ export default function NotFound() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   )
 }

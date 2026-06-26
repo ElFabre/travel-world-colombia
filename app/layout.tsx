@@ -139,6 +139,14 @@ export default function RootLayout({
       className={`${plusJakarta.variable} ${cinzel.variable} ${inter.variable}`}
     >
       <body className="min-h-screen antialiased">
+        {/* Saltar al contenido — primer elemento focuseable, visible solo al tabular */}
+        <a
+          href="#contenido"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:px-4 focus:py-2 focus:font-plus-jakarta focus:text-sm focus:font-bold focus:text-white focus:outline-2"
+          style={{ background: '#0a1628', outlineColor: '#f4821f' }}
+        >
+          Saltar al contenido
+        </a>
         <Analytics />
         <AnalyticsNoScript />
         <script
@@ -146,7 +154,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaOrg) }}
         />
         <PublicOnly><Navbar /></PublicOnly>
-        {children}
+        <main id="contenido">{children}</main>
         <PublicOnly><Footer /></PublicOnly>
         <PublicOnly><WhatsAppButton /></PublicOnly>
       </body>
