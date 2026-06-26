@@ -40,6 +40,21 @@ export async function getResenaDestino(destino: string): Promise<ResenaDestino |
   return (data as ResenaDestino) ?? null
 }
 
+/**
+ * Reseñas activas (de la tabla gestionada en el panel) para el markup JSON-LD
+ * de reseñas. Reusa el cliente público → RLS solo expone las activas.
+ */
+export async function getResenas(limite = 8): Promise<ResenaDestino[]> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('resenas')
+    .select('nombre, texto, estrellas')
+    .eq('activa', true)
+    .order('orden', { ascending: true })
+    .limit(limite)
+  return (data as ResenaDestino[]) ?? []
+}
+
 /** Un destino activo por slug. Devuelve null si no existe. */
 export async function getDestino(slug: string): Promise<Destino | null> {
   const supabase = await createClient()

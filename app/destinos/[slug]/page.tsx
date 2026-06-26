@@ -14,6 +14,19 @@ interface Props {
   params: Promise<{ slug: string }>
 }
 
+/**
+ * Convierte el precio libre ("desde $899 USD", "$2.000.000 COP") en una oferta
+ * para JSON-LD. Quita todo lo que no sean dígitos (los precios no usan
+ * decimales), así "2.000.000" → "2000000". Devuelve null si no hay número.
+ */
+function precioToOffer(precio?: string): { lowPrice: string; priceCurrency: string } | null {
+  if (!precio) return null
+  const lowPrice = precio.replace(/[^\d]/g, '')
+  if (!lowPrice) return null
+  const priceCurrency = /usd|d[oó]lar/i.test(precio) ? 'USD' : 'COP'
+  return { lowPrice, priceCurrency }
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const d = await getDestino(slug)
@@ -46,6 +59,8 @@ export default async function DestinoPage({ params }: Props) {
     .filter(i => !/temperatura|clima|grados|°/i.test(`${i.label} ${i.valor} ${i.sub ?? ''}`))
     .slice(0, 4)
 
+  const offer = precioToOffer(d.precio_desde)
+
   const schemaTouristDestination = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -61,6 +76,24 @@ export default async function DestinoPage({ params }: Props) {
           name: h.titulo,
           description: h.descripcion,
         })),
+      },
+      {
+        '@type': 'TouristTrip',
+        name: `Viaje a ${d.nombre}`,
+        description: d.descripcion ?? undefined,
+        url: `${SITE.url}/destinos/${d.slug}`,
+        provider: { '@id': `${SITE.url}/#organization` },
+        ...(offer
+          ? {
+              offers: {
+                '@type': 'AggregateOffer',
+                lowPrice: offer.lowPrice,
+                priceCurrency: offer.priceCurrency,
+                availability: 'https://schema.org/InStock',
+                url: `${SITE.url}/destinos/${d.slug}`,
+              },
+            }
+          : {}),
       },
       {
         '@type': 'BreadcrumbList',

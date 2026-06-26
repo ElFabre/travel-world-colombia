@@ -10,6 +10,7 @@ import { AlianzasPremium } from '@/components/home/AlianzasPremium'
 import { ResenasSection } from '@/components/home/ResenasSection'
 import { CTABanner } from '@/components/home/CTABanner'
 import { MapaContacto } from '@/components/home/MapaContacto'
+import { OrganizationReviews } from '@/components/seo/OrganizationReviews'
 
 export const revalidate = 1800 // home: revalidar cada 30 min
 
@@ -30,6 +31,7 @@ export default async function Home() {
       <PorQueElegirnos />
       <AlianzasPremium />
       <ResenasSection />
+      <OrganizationReviews />
       <CTABanner />
       <MapaContacto />
     </div>

@@ -11,6 +11,7 @@ import { SITE, WHATSAPP, SOCIALS } from '@/lib/site'
 const schemaOrg = {
   '@context': 'https://schema.org',
   '@type': 'TravelAgency',
+  '@id': `${SITE.url}/#organization`,
   name: SITE.nombre,
   url: SITE.url,
   logo: `${SITE.url}/images/travel-world-colombia-logo.png`,
@@ -51,13 +52,8 @@ const schemaOrg = {
     SOCIALS.youtube,
     SOCIALS.tiktok,
   ],
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '5',
-    reviewCount: String(SITE.reseñas),
-    bestRating: '5',
-    worstRating: '1',
-  },
+  // aggregateRating + review se emiten aparte (OrganizationReviews), respaldados
+  // con reseñas reales de la BD — evita un rating "auto-servido" sin reseñas.
   currenciesAccepted: 'COP, USD',
   paymentAccepted: 'Cash, Credit Card, Bank Transfer',
   priceRange: '$$',
