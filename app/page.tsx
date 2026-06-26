@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
+import { preload } from 'react-dom'
 import { getDestinos } from '@/lib/destinos'
+import { heroBg } from '@/lib/hero'
 import { HeroSection } from '@/components/hero/HeroSection'
 import { TrustBar } from '@/components/home/TrustBar'
 import { DestinosGrid } from '@/components/home/DestinosGrid'
@@ -20,6 +22,14 @@ export const metadata: Metadata = {
 
 export default async function Home() {
   const destinos = await getDestinos()
+
+  // Precarga la imagen LCP del hero (mismo destino que elige HeroSection por
+  // defecto: primer destacado, o el primero). El hero es un background-image de
+  // CSS, que el navegador descubre tarde; el preload adelanta su descarga.
+  const heroPrincipal = destinos.find(d => d.destacado) ?? destinos[0]
+  if (heroPrincipal) {
+    preload(heroBg(heroPrincipal), { as: 'image', fetchPriority: 'high' })
+  }
 
   return (
     <div className="tema-claro">

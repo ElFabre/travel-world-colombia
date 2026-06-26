@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'reputationhub.site' },
     ],
     formats: ['image/avif', 'image/webp'],
+    // Cachea las imágenes ya optimizadas 30 días (menos recomputación en Vercel).
+    minimumCacheTTL: 2_592_000,
   },
   async headers() {
     return [
