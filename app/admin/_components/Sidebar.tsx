@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import {
-  LayoutDashboard, Plane, Star, HelpCircle, Users, Activity, LogOut, Menu, X,
+  LayoutDashboard, Plane, Star, HelpCircle, Users, Activity, Globe, LogOut, Menu, X,
 } from 'lucide-react'
 import { signOut } from '../actions'
 
@@ -72,6 +72,15 @@ export function Sidebar({ email }: { email: string }) {
 
       <div className="px-4 py-4" style={{ borderTop: '1px solid var(--border)' }}>
         <p className="mb-2 truncate font-inter text-xs" style={{ color: 'var(--text-muted)' }}>{email}</p>
+        <Link
+          href="/"
+          onClick={() => setOpen(false)}
+          className="mb-2 flex w-full items-center gap-2 rounded-md px-3 py-2 font-inter text-xs transition-colors"
+          style={{ color: 'var(--orange)', border: '1px solid var(--border-orange)' }}
+        >
+          <Globe size={14} />
+          Ir al sitio web
+        </Link>
         <form action={signOut}>
           <button
             type="submit"
