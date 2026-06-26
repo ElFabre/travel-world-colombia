@@ -1,6 +1,12 @@
 import type { Lead } from '@/types/lead'
 
 export async function enviarLeadAGHL(lead: Lead): Promise<boolean> {
+  const url = process.env.GHL_WEBHOOK_URL
+  if (!url) {
+    console.error('[ghl] Falta GHL_WEBHOOK_URL — no se envió el lead.')
+    return false
+  }
+
   const payload = {
     firstName: lead.nombre,
     email: lead.email,
@@ -20,11 +26,19 @@ export async function enviarLeadAGHL(lead: Lead): Promise<boolean> {
     },
   }
 
-  const res = await fetch(process.env.GHL_WEBHOOK_URL!, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  })
-
-  return res.ok
+  try {
+    // Timeout de 8s: GHL es el único destino del lead; si su endpoint se cuelga
+    // no debe bloquear la server action indefinidamente.
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(8_000),
+    })
+    if (!res.ok) console.error('[ghl] respuesta no OK:', res.status)
+    return res.ok
+  } catch (e) {
+    console.error('[ghl] envío falló:', e)
+    return false
+  }
 }

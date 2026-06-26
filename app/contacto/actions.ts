@@ -3,7 +3,7 @@
 import { headers } from 'next/headers'
 import { cotizacionSchema } from '@/lib/validations/cotizacion'
 import { enviarLeadAGHL } from '@/lib/ghl/webhook'
-import { rateLimitByIp } from '@/lib/security/rateLimit'
+import { checkRateLimit } from '@/lib/security/rateLimit'
 
 export type ActionResult =
   | { ok: true }
@@ -16,7 +16,7 @@ export async function submitCotizacion(raw: unknown): Promise<ActionResult> {
     h.get('x-forwarded-for')?.split(',')[0]?.trim() ??
     h.get('x-real-ip') ??
     'unknown'
-  const rl = rateLimitByIp(ip, { limit: 5, windowMs: 60_000 })
+  const rl = await checkRateLimit(ip, { limit: 5, windowMs: 60_000 })
   if (!rl.success) {
     return {
       ok: false,
