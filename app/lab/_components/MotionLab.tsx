@@ -150,7 +150,13 @@ function ComoFuncionaDemo() {
           className="cf-route-path"
         />
         <g className="cf-plane">
-          <path d="M-9 0 L9 -6 L4 0 L9 6 Z" fill="var(--orange)" />
+          {/* Avión (vista superior). Pre-rotado 90° para que apunte a +x; rotate="auto" lo alinea con la ruta. */}
+          <g transform="rotate(90) scale(0.9) translate(-12 -12)">
+            <path
+              d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"
+              fill="var(--orange)"
+            />
+          </g>
           <animateMotion dur="5s" repeatCount="indefinite" rotate="auto" calcMode="linear">
             <mpath href="#cf-route" />
           </animateMotion>
@@ -311,8 +317,12 @@ export function MotionLab() {
             />
             {/* avión recorriendo la ruta */}
             <g className="lab-plane">
-              <g transform="translate(-10,-10)">
-                <path d="M2 10 L18 3 L13 10 L18 17 Z" fill="#fff" />
+              {/* Avión (vista superior), pre-rotado para apuntar a +x; rotate="auto" lo alinea con la ruta. */}
+              <g transform="rotate(90) scale(0.85) translate(-12 -12)">
+                <path
+                  d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"
+                  fill="#fff"
+                />
               </g>
               <animateMotion dur="4s" repeatCount="indefinite" rotate="auto" keyPoints="0;1" keyTimes="0;1" calcMode="linear">
                 <mpath href="#lab-route" />
