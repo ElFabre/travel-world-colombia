@@ -9,7 +9,7 @@ const base =
 
 const variants: Record<Variant, string> = {
   primary:
-    'bg-gradient-orange text-white shadow-orange hover:shadow-orange-lg hover:-translate-y-0.5',
+    'u-shine bg-gradient-orange text-white shadow-orange hover:shadow-orange-lg hover:-translate-y-0.5',
   outline:
     'border border-orange/50 hover:border-orange hover:bg-orange/10',
   whatsapp:

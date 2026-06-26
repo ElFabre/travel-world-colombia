@@ -366,6 +366,37 @@ body {
   .como-flujo-avion { animation: none !important; left: 82%; opacity: 1; }
 }
 
+/* ── Motion: reveals al scroll, lift, subrayado, brillo, ruta de vuelo ── */
+[data-reveal] { opacity: 0; transition: opacity .7s ease, transform .7s ease; will-change: opacity, transform; }
+[data-reveal="up"]    { transform: translateY(26px); }
+[data-reveal="left"]  { transform: translateX(-30px); }
+[data-reveal="right"] { transform: translateX(30px); }
+[data-reveal="zoom"]  { transform: scale(.95); }
+[data-reveal][data-shown="true"] { opacity: 1; transform: none; }
+
+.u-lift { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+.u-lift:hover { transform: translateY(-6px); box-shadow: 0 14px 30px rgba(10, 22, 40, .12); }
+
+.u-underline { position: relative; }
+.u-underline::after { content: ""; position: absolute; left: 0; bottom: -4px; height: 2px; width: 100%; background: var(--orange); transform: scaleX(0); transform-origin: left; transition: transform .3s ease; }
+.u-underline:hover::after { transform: scaleX(1); }
+
+.u-shine { position: relative; overflow: hidden; }
+.u-shine::after { content: ""; position: absolute; inset: 0; transform: translateX(-130%); background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.35) 50%, transparent 70%); transition: transform .6s ease; pointer-events: none; }
+.u-shine:hover::after { transform: translateX(130%); }
+
+/* Ruta de vuelo de "Cómo funciona": los puntos "marchan" y el avión la recorre (SMIL). */
+@keyframes cf-march { to { stroke-dashoffset: -14; } }
+.cf-route-path { animation: cf-march 1.2s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] { opacity: 1 !important; transform: none !important; }
+  .u-lift { transition: none; }
+  .u-shine::after { display: none; }
+  .cf-route-path { animation: none !important; }
+  .cf-plane { display: none; }
+}
+
 /* ── Equipo Travel World — tarjetas y navegación ── */
 .equipo-card {
   background: #16315a;

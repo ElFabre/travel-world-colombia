@@ -2,6 +2,7 @@ import Image from 'next/image'
 import type { LucideIcon } from 'lucide-react'
 import { Compass, ShieldCheck, Headset, Star, ArrowRight } from 'lucide-react'
 import { SectionTag } from '@/components/ui/SectionTag'
+import { Reveal } from '@/components/ui/Reveal'
 import { SITE, SOCIALS } from '@/lib/site'
 
 /* ─────────── Logo de Google (marca, SVG inline) ─────────── */
@@ -131,8 +132,8 @@ export function PorQueElegirnos() {
             const borderAvatar = featured ? 'var(--orange)' : 'var(--blue)'
 
             return (
+              <Reveal key={card.titulo} delay={i * 120} className="h-full">
               <article
-                key={card.titulo}
                 className="porque-card flex h-full flex-col rounded-lg p-8"
                 style={
                   featured
@@ -202,6 +203,7 @@ export function PorQueElegirnos() {
                   </div>
                 </div>
               </article>
+              </Reveal>
             )
           })}
         </div>

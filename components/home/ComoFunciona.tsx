@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { LucideIcon } from 'lucide-react'
-import { MessageCircle, Headset, Map, PlayCircle, ArrowRight, Plane } from 'lucide-react'
+import { MessageCircle, Headset, Map, PlayCircle, ArrowRight } from 'lucide-react'
 import { SectionTag } from '@/components/ui/SectionTag'
 import { SOCIALS } from '@/lib/site'
 
@@ -84,25 +84,36 @@ export function ComoFunciona() {
 
         {/* Pasos */}
         <div className="relative mb-16">
-          {/* Línea punteada conectora con flujo izquierda → derecha (solo desktop) */}
-          <div
+          {/* Ruta de vuelo: conecta los 3 pasos (solo desktop), detrás del contenido.
+              Los puntos "marchan" y el avión recorre la curva (SMIL). */}
+          <svg
             aria-hidden
-            className="como-flujo-linea absolute left-[16%] right-[16%] top-12 hidden h-0.5 lg:block"
-          />
-
-          {/* Avión que recorre la línea indicando el flujo del proceso */}
-          <div
-            aria-hidden
-            className="como-flujo-avion absolute top-12 hidden -translate-y-1/2 lg:flex"
-            style={{ zIndex: 5 }}
+            viewBox="0 0 1000 130"
+            preserveAspectRatio="none"
+            className="pointer-events-none absolute inset-x-0 top-6 hidden h-28 w-full lg:block"
+            style={{ zIndex: 0 }}
           >
-            <span
-              className="flex h-14 w-14 items-center justify-center rounded-full"
-              style={{ background: 'var(--navy)', border: '1px solid var(--border-orange)' }}
-            >
-              <Plane size={26} style={{ color: 'var(--orange)', transform: 'rotate(45deg)' }} />
-            </span>
-          </div>
+            <path
+              id="cf-route"
+              d="M165,70 Q332,10 500,70 T835,70"
+              fill="none"
+              stroke="rgba(244,130,31,0.5)"
+              strokeWidth="2.5"
+              strokeDasharray="6 8"
+              className="cf-route-path"
+            />
+            <g className="cf-plane">
+              <g transform="rotate(90) scale(0.9) translate(-12 -12)">
+                <path
+                  d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"
+                  fill="var(--orange)"
+                />
+              </g>
+              <animateMotion dur="6s" repeatCount="indefinite" rotate="auto" calcMode="linear">
+                <mpath href="#cf-route" />
+              </animateMotion>
+            </g>
+          </svg>
 
           <div className="relative z-10 grid grid-cols-1 gap-16 lg:grid-cols-3 lg:gap-8">
             {PASOS.map(paso => {

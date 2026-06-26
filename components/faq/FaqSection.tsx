@@ -1,6 +1,7 @@
 import { ChevronDown } from 'lucide-react'
 import { getFaqs } from '@/lib/faqs'
 import { SectionTag } from '@/components/ui/SectionTag'
+import { Reveal } from '@/components/ui/Reveal'
 
 /**
  * Sección de preguntas frecuentes — acordeón visible + JSON-LD (FAQPage).
@@ -41,8 +42,9 @@ export async function FaqSection() {
         </div>
 
         <ul className="flex flex-col gap-3">
-          {faqs.map(f => (
+          {faqs.map((f, i) => (
             <li key={f.id}>
+              <Reveal delay={i * 70}>
               <details
                 className="group rounded-xl"
                 style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
@@ -65,6 +67,7 @@ export async function FaqSection() {
                   {f.respuesta}
                 </p>
               </details>
+              </Reveal>
             </li>
           ))}
         </ul>

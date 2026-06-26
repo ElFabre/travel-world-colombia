@@ -6,6 +6,7 @@ import { SectionTag } from '@/components/ui/SectionTag'
 import { Button } from '@/components/ui/Button'
 import { EquipoSection } from '@/components/equipo/EquipoSection'
 import { FaqSection } from '@/components/faq/FaqSection'
+import { CountUp } from '@/components/ui/CountUp'
 import { SITE, whatsappUrl } from '@/lib/site'
 import { HOTELES_CRUCEROS, AEROLINEAS, type Alianza } from '@/lib/alianzas'
 
@@ -21,10 +22,10 @@ export const metadata: Metadata = {
 /* ─────────── DATOS ESTÁTICOS ─────────── */
 
 const STATS = [
-  { icon: Star,  num: '126',  label: 'reseñas 5 estrellas' },
-  { icon: Globe, num: '8+',   label: 'destinos disponibles' },
-  { icon: Users, num: '+5',   label: 'años de experiencia' },
-  { icon: MapPin,num: '3',    label: 'centros de operación' },
+  { icon: Star,   to: 126, prefix: '',  suffix: '',  label: 'reseñas 5 estrellas' },
+  { icon: Globe,  to: 8,   prefix: '',  suffix: '+', label: 'destinos disponibles' },
+  { icon: Users,  to: 5,   prefix: '+', suffix: '',  label: 'años de experiencia' },
+  { icon: MapPin, to: 3,   prefix: '',  suffix: '',  label: 'centros de operación' },
 ]
 
 /* ─────────── COMPONENTES INTERNOS ─────────── */
@@ -110,7 +111,7 @@ export default function NosotrosPage() {
         style={{ borderColor: 'var(--border)', background: 'var(--bg-alt)' }}
       >
         <ul className="mx-auto grid max-w-4xl gap-8 grid-cols-2 lg:grid-cols-4">
-          {STATS.map(({ icon: Icon, num, label }) => (
+          {STATS.map(({ icon: Icon, to, prefix, suffix, label }) => (
             <li key={label} className="flex flex-col items-center gap-2 text-center">
               <div
                 className="flex h-11 w-11 items-center justify-center rounded-full"
@@ -119,7 +120,7 @@ export default function NosotrosPage() {
                 <Icon size={20} strokeWidth={1.5} />
               </div>
               <p className="font-plus-jakarta text-3xl font-extrabold" style={{ color: 'var(--orange)' }}>
-                {num}
+                <CountUp to={to} prefix={prefix} suffix={suffix} />
               </p>
               <p className="font-cinzel text-[9px] tracking-[0.3em] uppercase text-center" style={{ color: 'var(--text-muted)' }}>
                 {label}

@@ -66,7 +66,7 @@ export function DestinosLista({ destinos }: DestinosListaProps) {
               className="animate-fade-up"
               style={{ animationDelay: `${Math.min(i, 8) * 60}ms`, animationFillMode: 'both' }}
             >
-              <Link href={`/destinos/${d.slug}`} className="destino-card tema-oscuro group flex flex-col overflow-hidden rounded-lg">
+              <Link href={`/destinos/${d.slug}`} className="destino-card u-lift tema-oscuro group flex flex-col overflow-hidden rounded-lg">
                 {/* Imagen — sincronizada con el hero (preview local) */}
                 <div className="relative h-56 overflow-hidden">
                   <Image
@@ -120,7 +120,7 @@ export function DestinosLista({ destinos }: DestinosListaProps) {
 
                   {d.descripcion && (
                     <p
-                      className="line-clamp-2 font-inter text-xs leading-relaxed"
+                      className="line-clamp-2 font-inter text-base leading-relaxed"
                       style={{ color: 'var(--text-muted)' }}
                     >
                       {d.descripcion}

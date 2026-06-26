@@ -48,7 +48,7 @@ export function Navbar() {
             <li key={link.href}>
               <Link
                 href={link.href}
-                className="font-plus-jakarta text-[11px] font-bold tracking-[0.15em] uppercase transition-colors hover:text-orange"
+                className="u-underline font-plus-jakarta text-[11px] font-bold tracking-[0.15em] uppercase transition-colors hover:text-orange"
                 style={{ color: 'var(--text-primary)' }}
               >
                 {link.label}

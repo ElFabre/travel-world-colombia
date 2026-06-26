@@ -48,7 +48,7 @@ export function DestinosGrid({ destinos }: DestinosGridProps) {
             <li key={d.id} className={i >= INICIAL ? 'destino-fade-in' : undefined}>
               <Link
                 href={`/destinos/${d.slug}`}
-                className="destino-card tema-oscuro group relative flex flex-col overflow-hidden rounded-lg"
+                className="destino-card u-lift tema-oscuro group relative flex flex-col overflow-hidden rounded-lg"
               >
                 {/* Imagen — sincronizada con el hero (preview local) */}
                 <div className="relative h-52 overflow-hidden">
@@ -107,7 +107,7 @@ export function DestinosGrid({ destinos }: DestinosGridProps) {
 
                   {d.descripcion && (
                     <p
-                      className="line-clamp-2 font-inter text-xs leading-relaxed"
+                      className="line-clamp-2 font-inter text-base leading-relaxed"
                       style={{ color: 'var(--text-muted)' }}
                     >
                       {d.descripcion}
