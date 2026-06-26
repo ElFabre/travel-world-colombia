@@ -122,7 +122,7 @@ export default function NosotrosPage() {
               <p className="font-plus-jakarta text-3xl font-extrabold" style={{ color: 'var(--orange)' }}>
                 <CountUp to={to} prefix={prefix} suffix={suffix} />
               </p>
-              <p className="font-cinzel text-[9px] tracking-[0.3em] uppercase text-center" style={{ color: 'var(--text-muted)' }}>
+              <p className="font-cinzel text-xs tracking-[0.15em] uppercase text-center sm:text-sm" style={{ color: 'var(--text-dim)' }}>
                 {label}
               </p>
             </li>
@@ -159,7 +159,7 @@ export default function NosotrosPage() {
                 <h3 className="font-plus-jakarta text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>
                   Misión
                 </h3>
-                <p className="font-inter text-sm leading-relaxed" style={{ color: 'var(--text-dim)', lineHeight: '1.8' }}>
+                <p className="font-inter text-base leading-relaxed" style={{ color: 'rgba(10,22,40,0.82)', lineHeight: '1.8' }}>
                   Conectar a familias y viajeros colombianos con experiencias de viaje
                   excepcionales, ofreciendo asesoría personalizada, precios transparentes
                   y acompañamiento antes, durante y después de cada viaje. Somos el aliado
@@ -186,7 +186,7 @@ export default function NosotrosPage() {
                 <h3 className="font-plus-jakarta text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>
                   Visión
                 </h3>
-                <p className="font-inter text-sm leading-relaxed" style={{ color: 'var(--text-dim)', lineHeight: '1.8' }}>
+                <p className="font-inter text-base leading-relaxed" style={{ color: 'rgba(10,22,40,0.82)', lineHeight: '1.8' }}>
                   Ser la agencia de viajes de referencia en el Sumapaz y Cundinamarca,
                   reconocida a nivel nacional por la calidad de nuestro servicio, la
                   satisfacción de nuestros viajeros y nuestra capacidad de abrir el mundo
@@ -212,7 +212,7 @@ export default function NosotrosPage() {
             >
               Cadenas hoteleras
             </h2>
-            <p className="mt-3 font-inter text-sm" style={{ color: 'var(--text-dim)' }}>
+            <p className="mt-3 font-inter text-base" style={{ color: 'rgba(10,22,40,0.82)' }}>
               Trabajamos directamente con las mejores cadenas del Caribe y Colombia
             </p>
           </div>
@@ -236,7 +236,7 @@ export default function NosotrosPage() {
             >
               Aerolíneas aliadas
             </h2>
-            <p className="mt-3 font-inter text-sm" style={{ color: 'var(--text-dim)' }}>
+            <p className="mt-3 font-inter text-base" style={{ color: 'rgba(10,22,40,0.82)' }}>
               Acceso a tarifas especiales con las principales aerolíneas
             </p>
           </div>
@@ -270,8 +270,8 @@ export default function NosotrosPage() {
                 RNT {SITE.rnt}
               </h2>
               <p
-                className="mt-3 max-w-lg font-inter text-sm leading-relaxed"
-                style={{ color: 'var(--text-dim)', lineHeight: '1.75' }}
+                className="mt-3 max-w-lg font-inter text-base leading-relaxed"
+                style={{ color: 'rgba(10,22,40,0.82)', lineHeight: '1.75' }}
               >
                 Travel World Colombia está registrada ante el{' '}
                 <strong style={{ color: 'var(--text-primary)' }}>
@@ -296,7 +296,7 @@ export default function NosotrosPage() {
                   ✓ Certificado vigente
                 </span>
               </div>
-              <p className="mt-4 font-inter text-[11px]" style={{ color: 'var(--text-muted)' }}>
+              <p className="mt-4 font-inter text-xs" style={{ color: 'var(--text-dim)' }}>
                 📎 Imagen del certificado — próximamente
               </p>
             </div>
