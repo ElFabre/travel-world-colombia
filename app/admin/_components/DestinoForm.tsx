@@ -12,16 +12,16 @@ import { PAISES } from '@/lib/paises'
 
 type Action = (prev: FormState, fd: FormData) => Promise<FormState>
 
-const inputCls = 'w-full rounded-md px-3 py-2 font-inter text-sm outline-none'
+const inputCls = 'w-full rounded-md px-3 py-2.5 font-inter text-base outline-none'
 const inputStyle = { background: 'var(--bg-alt)', border: '1px solid var(--border)', color: 'var(--text-primary)' } as const
-const labelCls = 'mb-1 block font-inter text-xs'
+const labelCls = 'mb-1.5 block font-inter text-sm'
 const labelStyle = { color: 'var(--text-dim)' } as const
 
 function Seccion({ titulo, ayuda, children }: { titulo: string; ayuda?: string; children: React.ReactNode }) {
   return (
     <section>
       <div className="mb-2 flex items-center gap-1.5 px-1">
-        <p className="font-cinzel text-[11px] tracking-[0.2em] uppercase" style={{ color: 'var(--orange)' }}>
+        <p className="font-cinzel text-[13px] tracking-[0.2em] uppercase" style={{ color: 'var(--orange)' }}>
           {titulo}
         </p>
         {ayuda && (
@@ -29,8 +29,8 @@ function Seccion({ titulo, ayuda, children }: { titulo: string; ayuda?: string; 
             <HelpCircle size={13} style={{ color: 'var(--text-muted)', cursor: 'help' }} aria-label={ayuda} />
             <span
               role="tooltip"
-              className="pointer-events-none absolute left-5 top-1/2 z-30 hidden w-64 -translate-y-1/2 rounded-md p-2.5 font-inter text-[11px] normal-case leading-relaxed tracking-normal group-hover:block"
-              style={{ background: 'var(--dark)', border: '1px solid var(--border)', color: 'var(--text-dim)', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}
+              className="pointer-events-none absolute left-5 top-1/2 z-30 hidden w-72 -translate-y-1/2 rounded-md p-3 font-inter text-[13px] normal-case leading-relaxed tracking-normal group-hover:block"
+              style={{ background: '#0f1f3d', border: '1px solid rgba(255,255,255,0.18)', color: 'rgba(255,255,255,0.92)', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}
             >
               {ayuda}
             </span>
@@ -62,7 +62,7 @@ function Campo({
         className={inputCls}
         style={inputStyle}
       />
-      {hint && <p className="mt-1 font-inter text-[11px]" style={{ color: 'var(--text-muted)' }}>{hint}</p>}
+      {hint && <p className="mt-1 font-inter text-xs" style={{ color: 'var(--text-muted)' }}>{hint}</p>}
     </div>
   )
 }
@@ -89,7 +89,7 @@ function CampoSelect({
           <option key={o} value={o} style={{ background: 'var(--bg-alt)' }}>{o}</option>
         ))}
       </select>
-      {hint && <p className="mt-1 font-inter text-[11px]" style={{ color: 'var(--text-muted)' }}>{hint}</p>}
+      {hint && <p className="mt-1 font-inter text-xs" style={{ color: 'var(--text-muted)' }}>{hint}</p>}
     </div>
   )
 }
@@ -110,12 +110,12 @@ function Area({
         className={inputCls}
         style={inputStyle}
       />
-      {hint && <p className="mt-1 font-inter text-[11px]" style={{ color: 'var(--text-muted)' }}>{hint}</p>}
+      {hint && <p className="mt-1 font-inter text-xs" style={{ color: 'var(--text-muted)' }}>{hint}</p>}
     </div>
   )
 }
 
-function ImagenCampo({ label, name, urlActual }: { label: string; name: string; urlActual?: string }) {
+function ImagenCampo({ label, name, urlActual, reco }: { label: string; name: string; urlActual?: string; reco?: string }) {
   return (
     <div>
       <label className={labelCls} style={labelStyle}>{label}</label>
@@ -128,10 +128,15 @@ function ImagenCampo({ label, name, urlActual }: { label: string; name: string; 
         type="file"
         name={`${name}_file`}
         accept="image/*"
-        className="w-full font-inter text-xs"
+        className="w-full font-inter text-sm"
         style={{ color: 'var(--text-dim)' }}
       />
-      <p className="mt-1 font-inter text-[11px]" style={{ color: 'var(--text-muted)' }}>
+      {reco && (
+        <p className="mt-1 font-inter text-xs" style={{ color: 'var(--orange)' }}>
+          Recomendado: {reco}
+        </p>
+      )}
+      <p className="mt-0.5 font-inter text-xs" style={{ color: 'var(--text-muted)' }}>
         {urlActual ? 'Sube una nueva para reemplazar, o deja vacío para conservar.' : 'Opcional.'}
       </p>
     </div>
@@ -168,11 +173,26 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
 
       <Seccion
         titulo="Imágenes"
-        ayuda="Las 3 fotos del destino: el fondo grande del hero, la miniatura de la tarjeta y la imagen de 'sobre el destino'. Se suben a Supabase y aparecen solas en la web."
+        ayuda="Las 3 fotos del destino: el fondo grande del hero, la miniatura de la tarjeta y la imagen de 'sobre el destino'. Se suben a Supabase y aparecen solas en la web. Usa JPG o WebP (evita PNG pesados); cada campo muestra el tamaño recomendado debajo."
       >
-        <ImagenCampo label="Imagen hero (fondo grande)" name="imagen_hero" urlActual={d?.imagen_hero} />
-        <ImagenCampo label="Imagen thumbnail (tarjeta)" name="imagen_thumb" urlActual={d?.imagen_thumb} />
-        <ImagenCampo label="Imagen 'sobre el destino'" name="imagen_about" urlActual={d?.imagen_about} />
+        <ImagenCampo
+          label="Imagen hero (fondo grande)"
+          name="imagen_hero"
+          urlActual={d?.imagen_hero}
+          reco="horizontal 16:9, 1920×1080 px · JPG o WebP · máx ~500 KB"
+        />
+        <ImagenCampo
+          label="Imagen thumbnail (tarjeta)"
+          name="imagen_thumb"
+          urlActual={d?.imagen_thumb}
+          reco="cuadrada 1:1, 600×600 px · JPG o WebP · máx ~200 KB"
+        />
+        <ImagenCampo
+          label="Imagen 'sobre el destino'"
+          name="imagen_about"
+          urlActual={d?.imagen_about}
+          reco="horizontal 3:2, 1200×800 px · JPG o WebP · máx ~300 KB"
+        />
       </Seccion>
 
       <Seccion
@@ -251,14 +271,14 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
 
       <Seccion
         titulo="Información clave"
-        ayuda="Datos prácticos del viaje (ej. moneda, idioma, mejor época para viajar). Cada fila: emoji + etiqueta + valor + un sub-texto opcional."
+        ayuda="Datos prácticos del viaje (ej. moneda, idioma, mejor época para viajar). Cada fila: icono + etiqueta + valor + un sub-texto opcional. Elige el icono con el selector visual."
       >
         <RepetidorObjetos
           name="info_clave"
           etiqueta="dato"
           inicial={d?.info_clave as unknown as Record<string, string>[] | undefined}
           campos={[
-            { key: 'icono', label: 'Emoji', ancho: 'corto' },
+            { key: 'icono', label: 'Icono', tipo: 'icono' },
             { key: 'label', label: 'Etiqueta' },
             { key: 'valor', label: 'Valor' },
             { key: 'sub', label: 'Sub (opcional)' },

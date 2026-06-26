@@ -2,11 +2,13 @@
 
 import { useState } from 'react'
 import { Plus, X } from 'lucide-react'
+import { IconPicker } from './IconPicker'
 
 interface CampoDef {
   key: string
   label: string
   ancho?: 'corto' | 'largo'
+  tipo?: 'texto' | 'icono'
 }
 
 type Fila = Record<string, string>
@@ -44,16 +46,24 @@ export function RepetidorObjetos({
             className="flex flex-wrap items-center gap-2 rounded-md p-2"
             style={{ background: 'var(--bg-alt)', border: '1px solid var(--border)' }}
           >
-            {campos.map(c => (
-              <input
-                key={c.key}
-                value={f[c.key] ?? ''}
-                onChange={e => set(i, c.key, e.target.value)}
-                placeholder={c.label}
-                className={`${c.ancho === 'corto' ? 'w-20' : 'min-w-[8rem] flex-1'} rounded px-2 py-1.5 font-inter text-sm outline-none`}
-                style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
-              />
-            ))}
+            {campos.map(c =>
+              c.tipo === 'icono' ? (
+                <IconPicker
+                  key={c.key}
+                  value={f[c.key] ?? ''}
+                  onChange={val => set(i, c.key, val)}
+                />
+              ) : (
+                <input
+                  key={c.key}
+                  value={f[c.key] ?? ''}
+                  onChange={e => set(i, c.key, e.target.value)}
+                  placeholder={c.label}
+                  className={`${c.ancho === 'corto' ? 'w-20' : 'min-w-[8rem] flex-1'} rounded px-2 py-2 font-inter text-base outline-none`}
+                  style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                />
+              )
+            )}
             <button
               type="button"
               onClick={() => quitar(i)}
@@ -70,7 +80,7 @@ export function RepetidorObjetos({
       <button
         type="button"
         onClick={agregar}
-        className="mt-2 flex items-center gap-1.5 rounded-md px-3 py-1.5 font-inter text-xs"
+        className="mt-2 flex items-center gap-1.5 rounded-md px-3 py-2 font-inter text-sm"
         style={{ color: 'var(--orange)', border: '1px solid var(--border-orange)' }}
       >
         <Plus size={13} />
