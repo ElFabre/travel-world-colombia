@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Plane, Sparkles, MapPin, Star, ArrowRight, Zap } from 'lucide-react'
+import { Plane, Sparkles, MapPin, Star, ArrowRight, Zap, MessageCircle, Headset, Map } from 'lucide-react'
 
 /* ─────────────────────────────────────────────────────────────
    Laboratorio de motion — variantes "rendimiento primero".
@@ -108,6 +108,71 @@ function Seccion({
         {children}
       </div>
     </section>
+  )
+}
+
+/** Demo realista: la sección "Cómo funciona" con la ruta de vuelo conectando los pasos. */
+function ComoFuncionaDemo() {
+  const ref = useRef<HTMLDivElement>(null)
+  const [go, setGo] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { setGo(true); return }
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setGo(true); io.disconnect() } }, { threshold: 0.3 })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+
+  const pasos = [
+    { Icon: MessageCircle, pre: 'Cuéntanos tu ', hi: 'viaje soñado' },
+    { Icon: Headset, pre: 'Conoce a tu ', hi: 'asesor experto' },
+    { Icon: Map, pre: 'Crea ', hi: 'tu itinerario único' },
+  ]
+
+  return (
+    <div ref={ref} data-go={go} className="cf-demo relative pt-8">
+      {/* Ruta de vuelo (solo desktop), detrás de los íconos */}
+      <svg
+        viewBox="0 0 1000 160"
+        preserveAspectRatio="none"
+        className="pointer-events-none absolute inset-x-0 top-2 hidden h-36 w-full lg:block"
+        aria-hidden
+      >
+        <path
+          id="cf-route"
+          d="M165,80 Q332,10 500,80 T835,80"
+          fill="none"
+          stroke="rgba(244,130,31,0.5)"
+          strokeWidth="2.5"
+          strokeDasharray="6 8"
+          className="cf-route-path"
+        />
+        <g className="cf-plane">
+          <path d="M-9 0 L9 -6 L4 0 L9 6 Z" fill="var(--orange)" />
+          <animateMotion dur="5s" repeatCount="indefinite" rotate="auto" calcMode="linear">
+            <mpath href="#cf-route" />
+          </animateMotion>
+        </g>
+      </svg>
+
+      <div className="relative z-10 grid grid-cols-1 gap-12 lg:grid-cols-3 lg:gap-8">
+        {pasos.map(p => (
+          <div key={p.hi} className="flex flex-col items-center text-center">
+            <div
+              className="mb-6 flex h-20 w-20 items-center justify-center rounded-full"
+              style={{ background: 'var(--orange)', boxShadow: '0 0 30px rgba(244,130,31,0.25)' }}
+            >
+              <p.Icon size={34} color="#fff" strokeWidth={1.75} />
+            </div>
+            <h3 className="font-plus-jakarta text-xl font-extrabold leading-tight" style={{ color: 'var(--text-primary)' }}>
+              {p.pre}<span style={{ color: 'var(--orange)' }}>{p.hi}</span>
+            </h3>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -260,6 +325,26 @@ export function MotionLab() {
         </p>
       </Seccion>
 
+      {/* 4b ── Motion graphic aplicado a "Cómo funciona" ── */}
+      <Seccion n={4} titulo="…aplicado: 'Cómo funciona' con ruta de vuelo" costo="Sin librerías">
+        <p className="mb-2 font-inter text-sm" style={{ color: 'var(--text-dim)' }}>
+          Así se vería la opción (a): la ruta conecta los 3 pasos y el avión la recorre. Hoy tu sección
+          tiene una línea recta estática; esto la vuelve una ruta curva con el avión en movimiento.
+        </p>
+        <p className="mb-2 font-inter text-xs" style={{ color: 'var(--text-muted)' }}>
+          (La ruta se ve en pantallas grandes; en móvil los pasos se apilan, sin ruta.)
+        </p>
+        <div className="rounded-xl p-6 sm:p-10" style={{ background: 'var(--bg-alt)', border: '1px solid var(--border)' }}>
+          <div className="mb-8 text-center">
+            <p className="mb-2 font-cinzel text-xs tracking-[0.3em] uppercase" style={{ color: 'var(--orange)' }}>El proceso</p>
+            <h3 className="font-plus-jakarta text-3xl font-extrabold sm:text-4xl" style={{ color: 'var(--text-primary)' }}>
+              Cómo <span style={{ color: 'var(--orange)' }}>¡Funciona!</span>
+            </h3>
+          </div>
+          <ComoFuncionaDemo />
+        </div>
+      </Seccion>
+
       {/* 5 ── Lottie (requiere librería) ── */}
       <Seccion n={5} titulo="Lottie (animación de diseñador)" costo="Requiere librería">
         <div className="rounded-xl p-6" style={{ background: 'rgba(244,130,31,0.05)', border: '1px solid var(--border-orange)' }}>
@@ -321,10 +406,18 @@ const css = `
 @keyframes labDraw { to { stroke-dashoffset: 0; } }
 .lab-route-draw { stroke-dashoffset: 600; animation: labDraw 3s ease forwards; }
 
+@keyframes cfMarch { to { stroke-dashoffset: -14; } }
+.cf-route-path { stroke-dashoffset: 0; }
+.cf-demo[data-go="true"] .cf-route-path { animation: cfMarch 1.2s linear infinite; }
+.cf-plane { opacity: 0; }
+.cf-demo[data-go="true"] .cf-plane { opacity: 1; transition: opacity .5s ease .3s; }
+
 @media (prefers-reduced-motion: reduce) {
   .lab-route-draw { stroke-dashoffset: 0; animation: none; }
   .lab-pulse { animation: none; }
   .lab-plane { display: none; }
+  .cf-route-path { animation: none !important; }
+  .cf-plane { display: none; }
   [data-reveal] { opacity: 1 !important; transform: none !important; }
 }
 `
