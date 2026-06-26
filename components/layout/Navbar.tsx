@@ -33,10 +33,10 @@ export function Navbar() {
       >
         <Link href="/" aria-label={`${SITE.nombre} — Inicio`} className="relative z-50">
           <Image
-            src="/images/travel-world-colombia-logo.png"
+            src="/images/travel-world-colombia-logo-blanco.png"
             alt={SITE.nombre}
-            width={160}
-            height={40}
+            width={192}
+            height={50}
             priority
             className="h-9 w-auto"
           />

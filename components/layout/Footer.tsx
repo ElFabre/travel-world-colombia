@@ -54,9 +54,9 @@ export function Footer() {
         {/* Marca + redes */}
         <div className="md:col-span-2">
           <Image
-            src="/images/travel-world-colombia-logo.png"
+            src="/images/travel-world-colombia-logo-blanco.png"
             alt={SITE.nombre}
-            width={200}
+            width={192}
             height={50}
             className="h-10 w-auto"
           />
