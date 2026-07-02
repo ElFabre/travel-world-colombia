@@ -162,7 +162,7 @@ export function PorQueElegirnos() {
                 </h3>
                 <p
                   className="mb-8 flex-grow font-inter text-sm leading-relaxed"
-                  style={{ color: featured ? 'rgba(255,255,255,0.9)' : 'var(--text-dim)' }}
+                  style={{ color: 'rgba(255,255,255,0.92)' }}
                 >
                   {card.descripcion}
                 </p>
@@ -193,7 +193,7 @@ export function PorQueElegirnos() {
                     </div>
                     <p
                       className="font-inter text-sm italic leading-relaxed"
-                      style={{ color: featured ? 'rgba(255,255,255,0.9)' : 'var(--text-dim)' }}
+                      style={{ color: 'rgba(255,255,255,0.92)' }}
                     >
                       &ldquo;{card.quote}&rdquo;
                     </p>

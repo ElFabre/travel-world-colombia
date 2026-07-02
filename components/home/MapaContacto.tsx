@@ -64,7 +64,7 @@ export function MapaContacto() {
           >
             <iframe
               title="Ubicación Travel World Colombia — C.C. Manila, Fusagasugá"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3977.9814498956!2d-74.3677!3d4.3376!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNMKwMjAnMTUuNCJOIDc0wrAyMicwMy43Ilc!5e0!3m2!1ses!2sco!4v1680000000000!5m2!1ses!2sco"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3978.0148!2d-74.3703131!3d4.3329312!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f048d63482781%3A0x8529c56d8ed0e7f9!2sTRAVEL%20WORLD%20COLOMBIA%20Agencia%20de%20Viajes!5e0!3m2!1ses!2sco!4v1720000000000!5m2!1ses!2sco"
               width="100%"
               height="100%"
               style={{ border: 0, minHeight: '360px', filter: 'invert(0.85) hue-rotate(180deg)' }}

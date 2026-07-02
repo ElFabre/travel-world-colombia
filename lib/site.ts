@@ -41,7 +41,7 @@ export const SOCIALS = {
   instagram: 'https://www.instagram.com/travelworldcolombiaoficial',
   youtube: 'https://www.youtube.com/channel/UCKqasbJnPkIhquMuC3o4_ew',
   tiktok: 'https://www.tiktok.com/@travelworldcolombia',
-  maps: 'https://maps.app.goo.gl/xittCk9VGQbGCK988',
+  maps: 'https://maps.app.goo.gl/sSk1CrrgasCvVvEL8',
 } as const
 
 export const NAV_LINKS = [
