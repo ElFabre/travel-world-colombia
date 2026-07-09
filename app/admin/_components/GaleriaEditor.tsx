@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { Plus, X, Loader2 } from 'lucide-react'
-import { subirArchivo } from '../destinos/actions'
+import { BUCKET_DESTINOS, subirAStorage, validarImagen, slugDelFormulario } from '@/lib/supabase/upload-cliente'
 
 export function GaleriaEditor({ name, inicial }: { name: string; inicial?: string[] }) {
   const [urls, setUrls] = useState<string[]>(inicial ?? [])
@@ -13,16 +13,17 @@ export function GaleriaEditor({ name, inicial }: { name: string; inicial?: strin
     const file = e.target.files?.[0]
     e.target.value = ''
     if (!file) return
+    const problema = validarImagen(file)
+    if (problema) return setError(problema)
     setError('')
-    const slug =
-      (document.querySelector('input[name="slug"]') as HTMLInputElement | null)?.value?.trim() || 'galeria'
-    const fd = new FormData()
-    fd.append('file', file)
-    fd.append('slug', slug)
+    const slug = slugDelFormulario('galeria')
     start(async () => {
-      const res = await subirArchivo(fd)
-      if (res.error) setError(res.error)
-      else if (res.url) setUrls(u => [...u, res.url!])
+      try {
+        const url = await subirAStorage(BUCKET_DESTINOS, slug, `galeria-${Math.random().toString(36).slice(2, 8)}`, file)
+        setUrls(u => [...u, url])
+      } catch (err) {
+        setError((err as Error).message)
+      }
     })
   }
 
@@ -59,8 +60,8 @@ export function GaleriaEditor({ name, inicial }: { name: string; inicial?: strin
         </label>
       </div>
 
-      {error && <p className="mt-2 font-inter text-[11px]" style={{ color: '#fca5a5' }}>{error}</p>}
-      <p className="mt-2 font-inter text-[11px]" style={{ color: 'var(--text-muted)' }}>
+      {error && <p className="mt-2 font-inter text-xs" style={{ color: '#fca5a5' }}>{error}</p>}
+      <p className="mt-2 font-inter text-xs" style={{ color: 'var(--text-muted)' }}>
         Las imágenes se suben al elegirlas. Define primero el slug arriba.
       </p>
     </div>

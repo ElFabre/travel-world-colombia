@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { Plus, X, ImagePlus, Loader2 } from 'lucide-react'
-import { subirArchivo } from '../destinos/actions'
+import { BUCKET_DESTINOS, subirAStorage, validarImagen, slugDelFormulario } from '@/lib/supabase/upload-cliente'
 
 interface Highlight { icono: string; titulo: string; descripcion: string; imagen?: string }
 
@@ -25,15 +25,17 @@ export function HighlightsEditor({ name, inicial }: { name: string; inicial?: Hi
     const file = e.target.files?.[0]
     e.target.value = ''
     if (!file) return
+    const problema = validarImagen(file)
+    if (problema) return setError(problema)
     setError('')
-    const slug = (document.querySelector('input[name="slug"]') as HTMLInputElement | null)?.value?.trim() || 'highlight'
-    const fd = new FormData()
-    fd.append('file', file)
-    fd.append('slug', slug)
+    const slug = slugDelFormulario('highlight')
     start(async () => {
-      const res = await subirArchivo(fd)
-      if (res.error) setError(res.error)
-      else if (res.url) set(i, 'imagen', res.url)
+      try {
+        const url = await subirAStorage(BUCKET_DESTINOS, slug, `highlight-${Math.random().toString(36).slice(2, 8)}`, file)
+        set(i, 'imagen', url)
+      } catch (err) {
+        setError((err as Error).message)
+      }
     })
   }
 
@@ -66,10 +68,10 @@ export function HighlightsEditor({ name, inicial }: { name: string; inicial?: Hi
             {/* Campos */}
             <div className="flex min-w-[12rem] flex-1 flex-col gap-2">
               <div className="flex gap-2">
-                <input value={f.icono} onChange={e => set(i, 'icono', e.target.value)} placeholder="🏖️" className="w-16 rounded px-2 py-1.5 text-center font-inter text-sm outline-none" style={inputStyle} />
-                <input value={f.titulo} onChange={e => set(i, 'titulo', e.target.value)} placeholder="Título" className="min-w-0 flex-1 rounded px-2 py-1.5 font-inter text-sm outline-none" style={inputStyle} />
+                <input value={f.icono} onChange={e => set(i, 'icono', e.target.value)} placeholder="🏖️" className="w-16 rounded px-2 py-2 text-center font-inter text-base outline-none" style={inputStyle} />
+                <input value={f.titulo} onChange={e => set(i, 'titulo', e.target.value)} placeholder="Título" className="min-w-0 flex-1 rounded px-2 py-2 font-inter text-base outline-none" style={inputStyle} />
               </div>
-              <textarea value={f.descripcion} onChange={e => set(i, 'descripcion', e.target.value)} placeholder="Descripción" rows={2} className="w-full rounded px-2 py-1.5 font-inter text-sm outline-none" style={inputStyle} />
+              <textarea value={f.descripcion} onChange={e => set(i, 'descripcion', e.target.value)} placeholder="Descripción" rows={2} className="w-full rounded px-2 py-2 font-inter text-base outline-none" style={inputStyle} />
             </div>
 
             <button type="button" onClick={() => quitar(i)} className="flex h-7 w-7 shrink-0 items-center justify-center rounded" style={{ color: '#ef4444', border: '1px solid var(--border)' }} aria-label="Quitar">
@@ -79,12 +81,12 @@ export function HighlightsEditor({ name, inicial }: { name: string; inicial?: Hi
         ))}
       </div>
 
-      {error && <p className="mt-2 font-inter text-[11px]" style={{ color: '#ef4444' }}>{error}</p>}
+      {error && <p className="mt-2 font-inter text-xs" style={{ color: '#ef4444' }}>{error}</p>}
 
-      <button type="button" onClick={agregar} className="mt-2 flex items-center gap-1.5 rounded-md px-3 py-1.5 font-inter text-xs" style={{ color: 'var(--orange)', border: '1px solid var(--border-orange)' }}>
+      <button type="button" onClick={agregar} className="mt-2 flex items-center gap-1.5 rounded-md px-3 py-2 font-inter text-sm" style={{ color: 'var(--orange)', border: '1px solid var(--border-orange)' }}>
         <Plus size={13} /> Agregar experiencia
       </button>
-      <p className="mt-2 font-inter text-[11px]" style={{ color: 'var(--text-muted)' }}>
+      <p className="mt-2 font-inter text-xs" style={{ color: 'var(--text-muted)' }}>
         Define el slug arriba antes de subir fotos. Recomendado: 3 experiencias.
       </p>
     </div>

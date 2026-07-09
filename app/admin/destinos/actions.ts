@@ -2,15 +2,12 @@
 
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import type { SupabaseClient } from '@supabase/supabase-js'
 import { requireEditor } from '@/lib/admin/guard'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { registrarActividad } from '@/lib/admin/audit'
 import { destinoSchema } from '@/lib/validations/destino'
 
 export type FormState = { error?: string }
-
-const BUCKET = 'destinos'
 
 /** Texto multilínea → array de líneas no vacías. */
 function lineas(v: FormDataEntryValue | null): string[] {
@@ -43,26 +40,12 @@ function jsonArray(v: FormDataEntryValue | null): unknown[] {
   }
 }
 
-/** Sube un archivo al bucket si viene uno nuevo; si no, conserva la URL actual. */
-async function subirImagen(
-  admin: SupabaseClient,
-  slug: string,
-  campo: string,
-  file: File | null,
-  urlActual?: string
-): Promise<string | undefined> {
-  if (!file || file.size === 0) return urlActual
-  const ext = (file.name.split('.').pop() || 'webp').toLowerCase()
-  const path = `${slug}/${campo}-${Date.now()}.${ext}`
-  const { error } = await admin.storage
-    .from(BUCKET)
-    .upload(path, file, { upsert: true, contentType: file.type || 'image/webp' })
-  if (error) throw new Error(`No se pudo subir la imagen (${campo}): ${error.message}`)
-  return admin.storage.from(BUCKET).getPublicUrl(path).data.publicUrl
-}
-
-/** Construye el payload validado + URLs de imágenes a partir del FormData. */
-async function construirPayload(formData: FormData, admin: SupabaseClient) {
+/**
+ * Construye el payload validado a partir del FormData.
+ * Las imágenes se suben directo del navegador a Supabase Storage (ver
+ * lib/supabase/upload-cliente.ts); aquí solo llegan sus URLs en campos ocultos.
+ */
+function construirPayload(formData: FormData) {
   const slug = String(formData.get('slug') ?? '').trim()
 
   const base = {
@@ -99,27 +82,11 @@ async function construirPayload(formData: FormData, admin: SupabaseClient) {
     throw new Error(parsed.error.issues[0]?.message ?? 'Datos inválidos.')
   }
 
-  const imagen_hero = await subirImagen(admin, slug, 'hero', formData.get('imagen_hero_file') as File, texto(formData.get('imagen_hero')))
-  const imagen_thumb = await subirImagen(admin, slug, 'thumb', formData.get('imagen_thumb_file') as File, texto(formData.get('imagen_thumb')))
-  const imagen_about = await subirImagen(admin, slug, 'about', formData.get('imagen_about_file') as File, texto(formData.get('imagen_about')))
+  const imagen_hero = texto(formData.get('imagen_hero'))
+  const imagen_thumb = texto(formData.get('imagen_thumb'))
+  const imagen_about = texto(formData.get('imagen_about'))
 
   return { ...parsed.data, imagen_hero, imagen_thumb, imagen_about }
-}
-
-/** Sube un archivo individual (galería) y devuelve su URL pública. */
-export async function subirArchivo(formData: FormData): Promise<{ url?: string; error?: string }> {
-  await requireEditor()
-  const admin = createAdminClient()
-  const file = formData.get('file') as File | null
-  const slug = String(formData.get('slug') ?? '').trim() || 'galeria'
-  if (!file || file.size === 0) return { error: 'No se seleccionó archivo.' }
-  try {
-    const rand = Math.random().toString(36).slice(2, 8)
-    const url = await subirImagen(admin, slug, `galeria-${rand}`, file)
-    return { url }
-  } catch (e) {
-    return { error: (e as Error).message }
-  }
 }
 
 function revalidar(slug?: string) {
@@ -138,7 +105,7 @@ export async function crearDestino(_prev: FormState, formData: FormData): Promis
 
   let payload
   try {
-    payload = await construirPayload(formData, admin)
+    payload = construirPayload(formData)
   } catch (e) {
     return { error: (e as Error).message }
   }
@@ -166,7 +133,7 @@ export async function actualizarDestino(id: string, _prev: FormState, formData: 
 
   let payload
   try {
-    payload = await construirPayload(formData, admin)
+    payload = construirPayload(formData)
   } catch (e) {
     return { error: (e as Error).message }
   }

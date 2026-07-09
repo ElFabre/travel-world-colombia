@@ -1,13 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import { useActionState } from 'react'
-import { ArrowLeft, HelpCircle, ExternalLink } from 'lucide-react'
+import { useActionState, useState, useTransition } from 'react'
+import { ArrowLeft, HelpCircle, ExternalLink, Loader2, ImagePlus } from 'lucide-react'
 import type { Destino } from '@/types/destino'
 import type { FormState } from '../destinos/actions'
 import { RepetidorObjetos } from './RepetidorObjetos'
 import { HighlightsEditor } from './HighlightsEditor'
 import { GaleriaEditor } from './GaleriaEditor'
+import { BUCKET_DESTINOS, subirAStorage, validarImagen, slugDelFormulario } from '@/lib/supabase/upload-cliente'
 import { PAISES } from '@/lib/paises'
 
 type Action = (prev: FormState, fd: FormData) => Promise<FormState>
@@ -116,28 +117,53 @@ function Area({
 }
 
 function ImagenCampo({ label, name, urlActual, reco }: { label: string; name: string; urlActual?: string; reco?: string }) {
+  // La imagen se sube directo a Supabase Storage al elegirla (evita los topes
+  // de body de Next/Vercel); en el formulario solo viaja la URL resultante.
+  const [url, setUrl] = useState(urlActual ?? '')
+  const [pending, start] = useTransition()
+  const [error, setError] = useState('')
+
+  const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    const problema = validarImagen(file)
+    if (problema) return setError(problema)
+    setError('')
+    const slug = slugDelFormulario('destino')
+    start(async () => {
+      try {
+        setUrl(await subirAStorage(BUCKET_DESTINOS, slug, name, file))
+      } catch (err) {
+        setError((err as Error).message)
+      }
+    })
+  }
+
   return (
     <div>
       <label className={labelCls} style={labelStyle}>{label}</label>
-      {urlActual && (
+      {url && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={urlActual} alt="" className="mb-2 h-20 w-full rounded-md object-cover" style={{ border: '1px solid var(--border)' }} />
+        <img src={url} alt="" className="mb-2 h-20 w-full rounded-md object-cover" style={{ border: '1px solid var(--border)' }} />
       )}
-      <input type="hidden" name={name} defaultValue={urlActual ?? ''} />
-      <input
-        type="file"
-        name={`${name}_file`}
-        accept="image/*"
-        className="w-full font-inter text-sm"
-        style={{ color: 'var(--text-dim)' }}
-      />
+      <input type="hidden" name={name} value={url} readOnly />
+      <label
+        className="flex cursor-pointer items-center justify-center gap-2 rounded-md px-3 py-2 font-inter text-sm"
+        style={{ border: '1px dashed var(--border-orange)', color: 'var(--orange)' }}
+      >
+        {pending ? <Loader2 size={15} className="animate-spin" /> : <ImagePlus size={15} />}
+        {pending ? 'Subiendo…' : url ? 'Reemplazar imagen' : 'Elegir imagen'}
+        <input type="file" accept="image/*" onChange={onFile} disabled={pending} className="hidden" />
+      </label>
+      {error && <p className="mt-1 font-inter text-xs" style={{ color: '#fca5a5' }}>{error}</p>}
       {reco && (
         <p className="mt-1 font-inter text-xs" style={{ color: 'var(--orange)' }}>
           Recomendado: {reco}
         </p>
       )}
       <p className="mt-0.5 font-inter text-xs" style={{ color: 'var(--text-muted)' }}>
-        {urlActual ? 'Sube una nueva para reemplazar, o deja vacío para conservar.' : 'Opcional.'}
+        {url ? 'Sube una nueva para reemplazar, o déjala para conservar.' : 'Opcional.'}
       </p>
     </div>
   )
