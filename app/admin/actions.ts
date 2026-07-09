@@ -19,7 +19,14 @@ export async function signIn(_prev: LoginState, formData: FormData): Promise<Log
 
   const supabase = await createClient()
   const { error } = await supabase.auth.signInWithPassword({ email, password })
-  if (error) return { error: 'Credenciales inválidas.' }
+  if (error) {
+    // Distinguimos "correo sin confirmar" de credenciales realmente erróneas:
+    // antes ambos casos se mostraban como "Credenciales inválidas".
+    if (/not confirmed|no confirmado/i.test(error.message)) {
+      return { error: 'Tu correo aún no está confirmado. Revisa tu bandeja de entrada y haz clic en el enlace que te enviamos.' }
+    }
+    return { error: 'Credenciales inválidas.' }
+  }
 
   // Aprobado (env o allowlist) → su panel/backend. Pendiente → pantalla de
   // "pendiente de aprobación". (El proxy refuerza el mismo gate.)
@@ -42,7 +49,7 @@ export async function signUp(_prev: RegisterState, formData: FormData): Promise<
   if (password !== confirm) return { error: 'Las contraseñas no coinciden.' }
 
   const supabase = await createClient()
-  const { error } = await supabase.auth.signUp({ email, password })
+  const { data, error } = await supabase.auth.signUp({ email, password })
   if (error) {
     const msg = /already registered|already exists/i.test(error.message)
       ? 'Ya existe una cuenta con ese correo. Inicia sesión.'
@@ -50,8 +57,20 @@ export async function signUp(_prev: RegisterState, formData: FormData): Promise<
     return { error: msg }
   }
 
-  // Auto-aprobación: el nuevo usuario entra como 'editor' de inmediato.
-  // (Los superadmins de ADMIN_EMAILS ya son admin y no necesitan fila.)
+  // Con la confirmación de correo activada, registrar un correo ya existente
+  // devuelve "ok" pero sin identidades nuevas (Supabase evita filtrar quién
+  // tiene cuenta). Lo tratamos como cuenta existente.
+  if (data.user && data.user.identities && data.user.identities.length === 0) {
+    return { error: 'Ya existe una cuenta con ese correo. Inicia sesión.' }
+  }
+
+  // Ruta B: NO auto-confirmamos. Supabase envía su correo de confirmación
+  // nativo y el usuario debe hacer clic en el enlace (lo procesa /auth/confirm)
+  // antes de poder iniciar sesión.
+
+  // Pre-aprobación: dejamos el correo en la allowlist como 'editor' para que,
+  // apenas confirme, ya tenga acceso al panel. (Los superadmins de ADMIN_EMAILS
+  // ya son admin y no necesitan fila.)
   if (!isSuperadmin(email)) {
     const admin = createAdminClient()
     await admin
@@ -60,7 +79,7 @@ export async function signUp(_prev: RegisterState, formData: FormData): Promise<
   }
 
   return {
-    ok: 'Cuenta creada. Ya tienes acceso como editor. Si Supabase pide confirmar tu correo, revísalo; luego inicia sesión.',
+    ok: 'Cuenta creada. Te enviamos un correo de confirmación: ábrelo y haz clic en el enlace para activar tu cuenta.',
   }
 }
 

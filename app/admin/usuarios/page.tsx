@@ -28,6 +28,9 @@ export default async function UsuariosPage() {
   const filas = (aprobados ?? []) as AllowRow[]
   const aprobadosEmails = new Set(filas.map(a => a.email.toLowerCase()))
   const registrados = usersData?.users ?? []
+  // Estado de verificación por correo: nos dice si la persona ya confirmó su
+  // correo (email_confirmed_at) o si ni siquiera ha creado la cuenta todavía.
+  const authByEmail = new Map(registrados.map(u => [(u.email ?? '').toLowerCase(), u]))
 
   const pendientes = registrados.filter(u => {
     const e = (u.email ?? '').toLowerCase()
@@ -63,10 +66,12 @@ export default async function UsuariosPage() {
         ) : (
           filas.map(a => {
             const esYo = a.email.toLowerCase() === (user.email ?? '').toLowerCase()
+            const authUser = authByEmail.get(a.email.toLowerCase())
             return (
               <Fila
                 key={a.email}
                 email={a.email}
+                badge={<EstadoBadge authExiste={Boolean(authUser)} confirmado={Boolean(authUser?.email_confirmed_at)} />}
                 sub={<>Rol: {ROLE_LABEL[(a.rol ?? 'lector') as Role]} · alta {fmtFecha.format(new Date(a.created_at))}{a.aprobado_por ? ` · por ${a.aprobado_por}` : ''}{esYo ? ' · (tú)' : ''}</>}
               >
                 {puedeModificar && (
@@ -106,19 +111,52 @@ function Seccion({ icon, titulo, n, children }: { icon: React.ReactNode; titulo:
   )
 }
 
-function Fila({ email, sub, children }: { email: string; sub: React.ReactNode; children: React.ReactNode }) {
+function Fila({ email, sub, badge, children }: { email: string; sub: React.ReactNode; badge?: React.ReactNode; children: React.ReactNode }) {
   return (
     <li
       className="flex items-center gap-4 rounded-lg p-3"
       style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
     >
       <div className="min-w-0 flex-1">
-        <p className="truncate font-inter text-sm" style={{ color: 'var(--text-primary)' }}>{email}</p>
+        <div className="flex items-center gap-2">
+          <p className="truncate font-inter text-sm" style={{ color: 'var(--text-primary)' }}>{email}</p>
+          {badge}
+        </div>
         <p className="truncate font-inter text-xs" style={{ color: 'var(--text-muted)' }}>{sub}</p>
       </div>
       <div className="shrink-0">{children}</div>
     </li>
   )
+}
+
+/**
+ * Estado de verificación de correo del usuario:
+ *  - Sin cuenta: aprobado en la allowlist pero aún no se ha registrado.
+ *  - Sin confirmar: se registró pero no ha hecho clic en el enlace del correo.
+ *  - (Confirmado): no muestra nada, es el estado normal.
+ */
+function EstadoBadge({ authExiste, confirmado }: { authExiste: boolean; confirmado: boolean }) {
+  if (!authExiste) {
+    return (
+      <span
+        className="shrink-0 rounded-full px-2 py-0.5 font-inter text-[10px] font-semibold uppercase tracking-wide"
+        style={{ background: 'var(--bg-alt)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}
+      >
+        Sin cuenta
+      </span>
+    )
+  }
+  if (!confirmado) {
+    return (
+      <span
+        className="shrink-0 rounded-full px-2 py-0.5 font-inter text-[10px] font-semibold uppercase tracking-wide"
+        style={{ background: 'rgba(249,115,22,0.12)', border: '1px solid rgba(249,115,22,0.35)', color: 'var(--orange)' }}
+      >
+        Sin confirmar
+      </span>
+    )
+  }
+  return null
 }
 
 function Vacio({ children }: { children: React.ReactNode }) {
