@@ -36,7 +36,7 @@ export function FaqForm() {
         type="submit"
         disabled={pending}
         className="mt-4 rounded-md px-4 py-2 font-plus-jakarta text-sm font-bold"
-        style={{ background: 'var(--orange)', color: '#fff', opacity: pending ? 0.6 : 1 }}
+        style={{ background: 'var(--orange)', color: 'var(--orange-contrast)', opacity: pending ? 0.6 : 1 }}
       >
         {pending ? 'Guardando…' : 'Agregar pregunta'}
       </button>

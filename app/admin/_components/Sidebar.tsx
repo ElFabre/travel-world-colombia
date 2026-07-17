@@ -57,7 +57,7 @@ export function Sidebar({ email }: { email: string }) {
                   className="flex items-center gap-3 rounded-md px-3 py-2.5 font-inter text-sm transition-colors"
                   style={{
                     background: activa ? 'var(--orange)' : 'transparent',
-                    color: activa ? '#fff' : 'var(--text-dim)',
+                    color: activa ? 'var(--orange-contrast)' : 'var(--text-dim)',
                     fontWeight: activa ? 600 : 400,
                   }}
                 >
@@ -100,7 +100,7 @@ export function Sidebar({ email }: { email: string }) {
       {/* Barra superior móvil */}
       <header
         className="tema-oscuro sticky top-0 z-30 flex items-center justify-between px-4 py-3 md:hidden"
-        style={{ background: 'rgba(6,14,26,0.95)', borderBottom: '1px solid var(--border)', backdropFilter: 'blur(8px)' }}
+        style={{ background: 'rgba(8, 18, 38,0.95)', borderBottom: '1px solid var(--border)', backdropFilter: 'blur(8px)' }}
       >
         <Link href="/admin" className="flex items-center">
           <span className="rounded-md bg-white px-2.5 py-1.5">
@@ -127,7 +127,7 @@ export function Sidebar({ email }: { email: string }) {
       {/* Sidebar fijo (desktop) */}
       <aside
         className="tema-oscuro fixed inset-y-0 left-0 z-30 hidden w-60 md:block"
-        style={{ background: 'rgba(6,14,26,0.95)', borderRight: '1px solid var(--border)' }}
+        style={{ background: 'rgba(8, 18, 38,0.95)', borderRight: '1px solid var(--border)' }}
       >
         {Contenido}
       </aside>

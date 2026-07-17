@@ -37,14 +37,14 @@ export function TrustBar() {
             <li key={value} className="flex flex-col items-center gap-2 text-center">
               <div
                 className="flex h-10 w-10 items-center justify-center rounded-full"
-                style={{ background: 'rgba(244,130,31,0.12)', color: 'var(--orange)' }}
+                style={{ background: 'color-mix(in srgb, var(--orange) 12%, transparent)', color: 'var(--orange)' }}
               >
                 <Icon size={20} strokeWidth={1.5} />
               </div>
               <p className="font-plus-jakarta text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
                 {value}
               </p>
-              <p className="font-inter text-[11px] leading-snug" style={{ color: 'var(--text-dim)' }}>
+              <p className="font-inter text-base leading-snug" style={{ color: 'var(--text-dim)' }}>
                 {label}
               </p>
             </li>

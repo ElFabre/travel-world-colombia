@@ -17,6 +17,14 @@ export interface InfoClave {
   sub?: string
 }
 
+/** Un día del itinerario. El número de día sale de la posición en el array. */
+export interface ItinerarioDia {
+  titulo: string
+  /** Etiqueta corta opcional, ej. "Cena incluida". */
+  badge?: string
+  descripcion?: string
+}
+
 export interface Destino {
   id: string
   slug: string
@@ -41,6 +49,7 @@ export interface Destino {
   highlights?: Highlight[]
   galeria?: string[]
   info_clave?: InfoClave[]
+  itinerario?: ItinerarioDia[]
 
   precio_desde?: string
   incluye?: string[]

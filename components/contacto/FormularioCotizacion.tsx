@@ -22,8 +22,8 @@ const currentYear = new Date().getFullYear()
 const AÑOS = [currentYear, currentYear + 1, currentYear + 2].map(String)
 
 const inputBase =
-  'w-full rounded-md px-4 py-3 font-inter text-sm outline-none transition-all duration-200 bg-white border text-[#0a1628] placeholder:text-[rgba(10,22,40,0.4)]'
-const inputNormal = 'border-[rgba(10,22,40,0.15)] focus:border-[#f4821f] focus:bg-[rgba(244,130,31,0.05)]'
+  'w-full rounded-md px-4 py-3 font-inter text-sm outline-none transition-all duration-200 bg-white border text-[#0d1e3c] placeholder:text-[rgba(13,30,60,0.4)]'
+const inputNormal = 'border-[rgba(13,30,60,0.15)] focus:border-[#2957A4] focus:bg-[rgba(41,87,164,0.05)]'
 const inputError  = 'border-red-500/60 focus:border-red-400'
 const labelBase   = 'block font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase mb-2'
 
@@ -278,7 +278,7 @@ export function FormularioCotizacion({ destinos }: Props) {
         type="submit"
         disabled={status === 'loading'}
         className="flex items-center justify-center gap-2 rounded-md px-8 py-4 font-plus-jakarta text-[11px] font-bold tracking-[0.15em] uppercase text-white transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed hover:-translate-y-0.5"
-        style={{ background: 'linear-gradient(135deg, #f4821f, #e06b10)', boxShadow: '0 8px 24px rgba(244,130,31,0.4)' }}
+        style={{ background: 'linear-gradient(135deg, var(--orange), var(--orange-dark))', color: 'var(--orange-contrast)', boxShadow: '0 8px 24px color-mix(in srgb, var(--orange) 40%, transparent)' }}
       >
         {status === 'loading' ? (
           <>

@@ -38,7 +38,7 @@ export default async function ViajesPage() {
           <Link
             href="/admin/destinos/nuevo"
             className="flex items-center gap-2 rounded-md px-4 py-2.5 font-plus-jakarta text-sm font-bold"
-            style={{ background: 'var(--orange)', color: '#fff' }}
+            style={{ background: 'var(--orange)', color: 'var(--orange-contrast)' }}
           >
             <Plus size={16} />
             Nuevo viaje

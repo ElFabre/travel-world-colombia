@@ -42,7 +42,7 @@ export function GaleriaEditor({ name, inicial }: { name: string; inicial?: strin
               type="button"
               onClick={() => quitar(i)}
               className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full"
-              style={{ background: 'rgba(6,14,26,0.85)', color: '#fca5a5' }}
+              style={{ background: 'rgba(8, 18, 38,0.85)', color: '#fca5a5' }}
               aria-label="Quitar imagen"
             >
               <X size={12} />

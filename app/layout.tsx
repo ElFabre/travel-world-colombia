@@ -143,7 +143,7 @@ export default function RootLayout({
         <a
           href="#contenido"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:px-4 focus:py-2 focus:font-plus-jakarta focus:text-sm focus:font-bold focus:text-white focus:outline-2"
-          style={{ background: '#0a1628', outlineColor: '#f4821f' }}
+          style={{ background: '#0d1e3c', outlineColor: '#FFCC29' }}
         >
           Saltar al contenido
         </a>

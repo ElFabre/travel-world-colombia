@@ -40,7 +40,7 @@ export function BackgroundSlider({ layerA, layerB, showA }: BackgroundSliderProp
         className="absolute inset-0 z-[1]"
         style={{
           background:
-            'linear-gradient(to right, rgba(10,22,40,.70) 0%, rgba(10,22,40,.30) 32%, rgba(10,22,40,0) 60%), linear-gradient(to top, rgba(10,22,40,.60) 0%, rgba(10,22,40,0) 38%)',
+            'linear-gradient(to right, rgba(13, 30, 60,.70) 0%, rgba(13, 30, 60,.30) 32%, rgba(13, 30, 60,0) 60%), linear-gradient(to top, rgba(13, 30, 60,.60) 0%, rgba(13, 30, 60,0) 38%)',
         }}
       />
     </>

@@ -58,7 +58,7 @@ function cfStyle(diff: number): CSSProperties {
         filter:     'brightness(1)',
         zIndex:     10,
         border:     '2.5px solid var(--orange)',
-        boxShadow:  '0 0 24px rgba(244,130,31,0.65)',
+        boxShadow:  '0 0 24px color-mix(in srgb, var(--orange) 65%, transparent)',
         cursor:     'default',
       }
     case -1:
@@ -112,7 +112,7 @@ const ARROW_STYLE: CSSProperties = {
   width:        '30px',
   height:       '30px',
   borderRadius: '50%',
-  border:       '1.5px solid rgba(244,130,31,0.4)',
+  border:       '1.5px solid color-mix(in srgb, var(--orange) 40%, transparent)',
   background:   'none',
   color:        'rgba(255,255,255,0.6)',
   cursor:       'pointer',
@@ -198,11 +198,11 @@ export function ThumbnailBar({ destinos, activeIndex, onSelect }: ThumbnailBarPr
               const el = e.currentTarget
               el.style.borderColor = 'var(--orange)'
               el.style.color       = 'var(--orange)'
-              el.style.background  = 'rgba(244,130,31,0.1)'
+              el.style.background  = 'color-mix(in srgb, var(--orange) 10%, transparent)'
             }}
             onMouseLeave={e => {
               const el = e.currentTarget
-              el.style.borderColor = 'rgba(244,130,31,0.4)'
+              el.style.borderColor = 'color-mix(in srgb, var(--orange) 40%, transparent)'
               el.style.color       = 'rgba(255,255,255,0.6)'
               el.style.background  = 'none'
             }}
@@ -255,11 +255,11 @@ export function ThumbnailBar({ destinos, activeIndex, onSelect }: ThumbnailBarPr
               const el = e.currentTarget
               el.style.borderColor = 'var(--orange)'
               el.style.color       = 'var(--orange)'
-              el.style.background  = 'rgba(244,130,31,0.1)'
+              el.style.background  = 'color-mix(in srgb, var(--orange) 10%, transparent)'
             }}
             onMouseLeave={e => {
               const el = e.currentTarget
-              el.style.borderColor = 'rgba(244,130,31,0.4)'
+              el.style.borderColor = 'color-mix(in srgb, var(--orange) 40%, transparent)'
               el.style.color       = 'rgba(255,255,255,0.6)'
               el.style.background  = 'none'
             }}
@@ -287,7 +287,7 @@ export function ThumbnailBar({ destinos, activeIndex, onSelect }: ThumbnailBarPr
           }}
           onMouseLeave={e => {
             const el = e.currentTarget
-            el.style.borderColor = 'rgba(244,130,31,0.4)'
+            el.style.borderColor = 'color-mix(in srgb, var(--orange) 40%, transparent)'
             el.style.color       = 'rgba(255,255,255,0.6)'
           }}
         >
@@ -315,7 +315,7 @@ export function ThumbnailBar({ destinos, activeIndex, onSelect }: ThumbnailBarPr
                   background:   'none',
                   border:       isActive ? '2.5px solid var(--orange)' : '2.5px solid transparent',
                   transform:    isActive ? 'scale(1.18)' : 'scale(1)',
-                  boxShadow:    isActive ? '0 0 14px rgba(244,130,31,0.5)' : 'none',
+                  boxShadow:    isActive ? '0 0 14px color-mix(in srgb, var(--orange) 50%, transparent)' : 'none',
                   transition:   'transform 0.3s, border-color 0.3s, box-shadow 0.3s',
                   cursor:       isActive ? 'default' : 'pointer',
                 }}
@@ -356,7 +356,7 @@ export function ThumbnailBar({ destinos, activeIndex, onSelect }: ThumbnailBarPr
           }}
           onMouseLeave={e => {
             const el = e.currentTarget
-            el.style.borderColor = 'rgba(244,130,31,0.4)'
+            el.style.borderColor = 'color-mix(in srgb, var(--orange) 40%, transparent)'
             el.style.color       = 'rgba(255,255,255,0.6)'
           }}
         >

@@ -1,8 +1,11 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { Clock, Users, Check, X, ArrowRight, Quote, Star } from 'lucide-react'
+import { Clock, Users, ArrowRight, Quote, Star } from 'lucide-react'
 import { getDestino, getResenaDestino } from '@/lib/destinos'
+import { InfoClaveCarousel } from '@/components/destinos/InfoClaveCarousel'
+import { ItinerarioTimeline } from '@/components/destinos/ItinerarioTimeline'
+import { IncluyeTabs } from '@/components/destinos/IncluyeTabs'
 import { SectionTag } from '@/components/ui/SectionTag'
 import { Icono } from '@/components/ui/Icono'
 import { Button } from '@/components/ui/Button'
@@ -25,6 +28,16 @@ function precioToOffer(precio?: string): { lowPrice: string; priceCurrency: stri
   if (!lowPrice) return null
   const priceCurrency = /usd|d[oó]lar/i.test(precio) ? 'USD' : 'COP'
   return { lowPrice, priceCurrency }
+}
+
+/**
+ * Antepone "Desde" solo si el precio guardado no lo trae ya (el panel sugiere
+ * escribir "Desde $899 USD", lo que duplicaba la palabra en la web).
+ */
+function conDesde(precio: string): string {
+  const p = precio.trim()
+  if (!/^desde\b/i.test(p)) return `Desde ${p}`
+  return p.charAt(0).toUpperCase() + p.slice(1)
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -54,10 +67,9 @@ export default async function DestinoPage({ params }: Props) {
   // Foto de "Sobre el destino": la dedicada, o la miniatura/hero como respaldo.
   const aboutImg = d.imagen_about ?? d.imagen_thumb ?? d.imagen_hero
 
-  // Información clave: máximo 4 datos, sin temperatura/clima.
-  const infoClave = (d.info_clave ?? [])
-    .filter(i => !/temperatura|clima|grados|°/i.test(`${i.label} ${i.valor} ${i.sub ?? ''}`))
-    .slice(0, 4)
+  // Información clave: todos los datos cargados en el panel (con más de 4 se
+  // muestran en carrusel).
+  const infoClave = d.info_clave ?? []
 
   const offer = precioToOffer(d.precio_desde)
 
@@ -125,7 +137,7 @@ export default async function DestinoPage({ params }: Props) {
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(to top, rgba(6,14,26,0.97) 0%, rgba(6,14,26,0.55) 50%, rgba(6,14,26,0.2) 100%)',
+              'linear-gradient(to top, rgba(8, 18, 38,0.97) 0%, rgba(8, 18, 38,0.55) 50%, rgba(8, 18, 38,0.2) 100%)',
             zIndex: 1,
           }}
         />
@@ -159,8 +171,8 @@ export default async function DestinoPage({ params }: Props) {
                 </span>
               )}
               {d.precio_desde && (
-                <span className="flex items-center gap-2 rounded-full px-4 py-2 font-plus-jakarta text-sm font-bold" style={{ background: 'var(--orange)', color: '#fff', boxShadow: '0 4px 20px rgba(244,130,31,0.45)' }}>
-                  Desde {d.precio_desde}
+                <span className="flex items-center gap-2 rounded-full px-4 py-2 font-plus-jakarta text-sm font-bold" style={{ background: 'var(--orange)', color: 'var(--orange-contrast)', boxShadow: '0 4px 20px color-mix(in srgb, var(--orange) 45%, transparent)' }}>
+                  {conDesde(d.precio_desde)}
                 </span>
               )}
             </div>
@@ -176,9 +188,10 @@ export default async function DestinoPage({ params }: Props) {
       {/* ── STATS ── */}
       {d.stats && d.stats.length > 0 && (
         <section className="border-y px-6 py-12" style={{ borderColor: 'var(--border)', background: 'var(--bg-alt)' }}>
-          <ul className="mx-auto grid max-w-6xl gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Flex centrado (no grid): con 3, 5 o 6 cifras ninguna queda huérfana a la izquierda. */}
+          <ul className="mx-auto flex max-w-6xl flex-wrap justify-center gap-x-6 gap-y-8">
             {d.stats.map(s => (
-              <li key={s.label} className="destino-reveal text-center">
+              <li key={s.label} className="destino-reveal w-[calc(50%-0.75rem)] text-center md:w-52">
                 <p className="font-plus-jakarta text-4xl font-extrabold tracking-tight" style={{ color: 'var(--orange)' }}>{s.num}</p>
                 <p className="mt-2 font-cinzel text-xs font-semibold tracking-[0.22em] uppercase" style={{ color: 'var(--text-dim)' }}>
                   {s.label}
@@ -210,22 +223,22 @@ export default async function DestinoPage({ params }: Props) {
             </div>
 
             <div className="destino-reveal relative">
-              <div className="relative h-[26rem] overflow-hidden rounded-2xl lg:h-[32rem]" style={{ boxShadow: '0 40px 80px -32px rgba(10,22,40,0.45)' }}>
+              <div className="relative h-[26rem] overflow-hidden rounded-2xl lg:h-[32rem]" style={{ boxShadow: '0 40px 80px -32px rgba(13, 30, 60,0.45)' }}>
                 {aboutImg ? (
                   <Image src={aboutImg} alt={`${d.nombre} — imagen`} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center" style={{ background: 'linear-gradient(135deg, #16315a, #0a1628)' }}>
+                  <div className="flex h-full w-full items-center justify-center" style={{ background: 'linear-gradient(135deg, #16315f, #0d1e3c)' }}>
                     <Icono nombre="image" size={64} strokeWidth={1.2} style={{ color: 'rgba(255,255,255,0.22)' }} />
                   </div>
                 )}
               </div>
               {/* Acento decorativo */}
-              <div aria-hidden className="absolute -right-4 -top-4 -z-10 hidden h-40 w-40 rounded-2xl lg:block" style={{ background: 'rgba(244,130,31,0.12)' }} />
+              <div aria-hidden className="absolute -right-4 -top-4 -z-10 hidden h-40 w-40 rounded-2xl lg:block" style={{ background: 'color-mix(in srgb, var(--orange) 12%, transparent)' }} />
 
               {resena && (
                   <figure
                     className="absolute -bottom-6 left-4 right-4 rounded-xl p-5 sm:left-6 sm:right-auto sm:max-w-xs"
-                    style={{ background: '#fff', border: '1px solid var(--border)', boxShadow: '0 24px 48px -20px rgba(10,22,40,0.35)' }}
+                    style={{ background: '#fff', border: '1px solid var(--border)', boxShadow: '0 24px 48px -20px rgba(13, 30, 60,0.35)' }}
                   >
                     <Quote size={20} style={{ color: 'var(--orange)' }} />
                     <blockquote className="mt-2 font-inter text-sm italic leading-relaxed" style={{ color: 'var(--text-primary)' }}>
@@ -243,6 +256,26 @@ export default async function DestinoPage({ params }: Props) {
           </div>
         </section>
       )}
+
+      {/* ── QUÉ INCLUYE (sección azul marino) ── */}
+      {(d.incluye?.length || d.no_incluye?.length) ? (
+        <section className="tema-oscuro relative overflow-hidden px-6 py-24" style={{ background: 'var(--navy)' }}>
+          {/* Atmósfera */}
+          <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(ellipse at top right, color-mix(in srgb, var(--orange) 12%, transparent), transparent 55%)' }} />
+          <div className="relative mx-auto max-w-5xl">
+            <div className="destino-reveal mb-10 text-center">
+              <SectionTag className="mb-4">El paquete</SectionTag>
+              <h2 className="font-plus-jakarta text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl" style={{ color: '#fff' }}>
+                ¿Qué incluye tu viaje?
+              </h2>
+              <div aria-hidden className="mx-auto mt-5 h-1 w-12 rounded" style={{ background: 'var(--orange)' }} />
+            </div>
+            <div className="destino-reveal">
+              <IncluyeTabs incluye={d.incluye} noIncluye={d.no_incluye} />
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {/* ── EXPERIENCIAS ÚNICAS (3 cards con imagen) ── */}
       {d.highlights && d.highlights.length > 0 && (
@@ -296,75 +329,25 @@ export default async function DestinoPage({ params }: Props) {
                 Lo que necesitas saber
               </h2>
             </div>
-            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {infoClave.map(item => (
-                <li
-                  key={item.label}
-                  className="destino-reveal tema-oscuro flex flex-col items-center gap-4 rounded-2xl p-6 text-center"
-                  style={{ background: '#16315a', boxShadow: '0 24px 48px -28px rgba(10,22,40,0.6)' }}
-                >
-                  <Icono nombre={item.icono} size={44} strokeWidth={1.5} style={{ color: 'var(--orange)' }} />
-                  <div>
-                    <p className="font-cinzel text-[11px] font-semibold tracking-[0.22em] uppercase" style={{ color: 'var(--orange)' }}>
-                      {item.label}
-                    </p>
-                    <p className="mt-1 font-plus-jakarta text-xl font-bold" style={{ color: '#fff' }}>{item.valor}</p>
-                    {item.sub && <p className="mt-0.5 font-inter text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>{item.sub}</p>}
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <InfoClaveCarousel items={infoClave} />
           </div>
         </section>
       )}
 
-      {/* ── QUÉ INCLUYE (sección azul marino) ── */}
-      {(d.incluye?.length || d.no_incluye?.length) ? (
-        <section className="tema-oscuro relative overflow-hidden px-6 py-24" style={{ background: 'var(--navy)' }}>
-          {/* Atmósfera */}
-          <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(ellipse at top right, rgba(244,130,31,0.12), transparent 55%)' }} />
-          <div className="relative mx-auto max-w-6xl">
-            <div className="destino-reveal mb-12">
-              <SectionTag className="mb-4">El paquete</SectionTag>
-              <h2 className="font-plus-jakarta text-3xl font-bold sm:text-4xl" style={{ color: '#fff' }}>
-                ¿Qué incluye tu viaje?
+      {/* ── ITINERARIO DÍA A DÍA ── */}
+      {d.itinerario && d.itinerario.length > 0 && (
+        <section className="px-6 py-24">
+          <div className="mx-auto max-w-4xl">
+            <div className="destino-reveal mb-16 text-center">
+              <SectionTag className="mb-4">El plan</SectionTag>
+              <h2 className="font-plus-jakarta text-3xl font-bold sm:text-4xl" style={{ color: 'var(--text-primary)' }}>
+                Itinerario día a día
               </h2>
             </div>
-            <div className="grid gap-10 sm:grid-cols-2">
-              {d.incluye && d.incluye.length > 0 && (
-                <div className="destino-reveal">
-                  <p className="mb-5 font-plus-jakarta text-sm font-bold tracking-wide uppercase" style={{ color: '#4ade80' }}>Incluye</p>
-                  <ul className="space-y-4">
-                    {d.incluye.map(item => (
-                      <li key={item} className="flex items-start gap-3 font-inter text-sm sm:text-base" style={{ color: 'rgba(255,255,255,0.85)' }}>
-                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full" style={{ background: 'rgba(74,222,128,0.15)' }}>
-                          <Check size={13} style={{ color: '#4ade80' }} />
-                        </span>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {d.no_incluye && d.no_incluye.length > 0 && (
-                <div className="destino-reveal">
-                  <p className="mb-5 font-plus-jakarta text-sm font-bold tracking-wide uppercase" style={{ color: '#f87171' }}>No incluye</p>
-                  <ul className="space-y-4">
-                    {d.no_incluye.map(item => (
-                      <li key={item} className="flex items-start gap-3 font-inter text-sm sm:text-base" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full" style={{ background: 'rgba(248,113,113,0.15)' }}>
-                          <X size={13} style={{ color: '#f87171' }} />
-                        </span>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
+            <ItinerarioTimeline dias={d.itinerario} />
           </div>
         </section>
-      ) : null}
+      )}
 
       {/* ── GALERÍA ── */}
       {d.galeria && d.galeria.length > 0 && (
@@ -388,7 +371,7 @@ export default async function DestinoPage({ params }: Props) {
       )}
 
       {/* ── CTA FINAL ── */}
-      <section className="tema-oscuro relative overflow-hidden px-6 py-24" style={{ background: 'linear-gradient(135deg, rgba(244,130,31,0.15) 0%, rgba(10,22,40,0.9) 100%)' }}>
+      <section className="tema-oscuro relative overflow-hidden px-6 py-24" style={{ background: 'linear-gradient(135deg, color-mix(in srgb, var(--orange) 15%, transparent) 0%, rgba(13, 30, 60,0.9) 100%)' }}>
         <div aria-hidden className="pointer-events-none absolute inset-0" style={{ borderTop: '1px solid var(--border-orange)', borderBottom: '1px solid var(--border-orange)' }} />
         <div className="destino-reveal relative mx-auto max-w-3xl text-center">
           <SectionTag className="mb-4">¿Listo para viajar?</SectionTag>
@@ -401,7 +384,7 @@ export default async function DestinoPage({ params }: Props) {
             </p>
           )}
           {d.precio_desde && (
-            <p className="mt-3 font-plus-jakarta text-lg font-bold" style={{ color: 'var(--orange)' }}>Desde {d.precio_desde}</p>
+            <p className="mt-3 font-plus-jakarta text-lg font-bold" style={{ color: 'var(--orange)' }}>{conDesde(d.precio_desde)}</p>
           )}
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Button variant="whatsapp" href={waUrl}>Cotizar por WhatsApp</Button>

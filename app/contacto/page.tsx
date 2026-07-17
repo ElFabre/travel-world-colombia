@@ -49,7 +49,7 @@ export default async function ContactoPage() {
       {/* ── Hero strip ── */}
       <section
         className="tema-oscuro relative overflow-hidden pt-32 pb-16 px-6"
-        style={{ background: 'linear-gradient(to bottom, rgba(10,22,40,0.98), var(--navy))' }}
+        style={{ background: 'linear-gradient(to bottom, rgba(13, 30, 60,0.98), var(--navy))' }}
       >
         <div
           aria-hidden
@@ -108,7 +108,7 @@ export default async function ContactoPage() {
                   <li key={label} className="flex items-start gap-3">
                     <div
                       className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
-                      style={{ background: 'rgba(244,130,31,0.12)', color: 'var(--orange)' }}
+                      style={{ background: 'color-mix(in srgb, var(--orange) 12%, transparent)', color: 'var(--orange)' }}
                     >
                       <Icon size={14} strokeWidth={1.5} />
                     </div>
@@ -134,7 +134,7 @@ export default async function ContactoPage() {
             {/* Por qué elegirnos */}
             <div
               className="rounded-xl p-6"
-              style={{ background: 'rgba(244,130,31,0.06)', border: '1px solid var(--border-orange)' }}
+              style={{ background: 'color-mix(in srgb, var(--orange) 6%, transparent)', border: '1px solid var(--border-orange)' }}
             >
               <h3
                 className="mb-4 font-plus-jakarta text-sm font-bold"

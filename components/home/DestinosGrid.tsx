@@ -62,7 +62,7 @@ export function DestinosGrid({ destinos }: DestinosGridProps) {
                   <div
                     className="absolute inset-0"
                     style={{
-                      background: 'linear-gradient(to top, rgba(6,14,26,0.8) 0%, transparent 60%)',
+                      background: 'linear-gradient(to top, rgba(8, 18, 38,0.8) 0%, transparent 60%)',
                     }}
                   />
                   {d.precio_desde && (

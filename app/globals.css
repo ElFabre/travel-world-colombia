@@ -1,18 +1,24 @@
 @import "tailwindcss";
 
-/* ── Variables CSS — Travel World Colombia ── */
+/* ── Variables CSS — Travel World Colombia ──
+   Paleta del manual de marca: azul #2957A4 · amarillo #FFCC29 · rojo #ED3237.
+   Regla: el acento (--orange, nombre histórico) es AMARILLO sobre fondos
+   oscuros y AZUL de marca sobre fondos claros; --orange-contrast es el color
+   del texto que va encima del acento (navy sobre amarillo, blanco sobre azul). */
 :root {
-  /* Fondos */
-  --navy:          #0a1628;
-  --blue:          #1a3a6b;
-  --dark:          #060e1a;
+  /* Fondos (navy derivado del azul de marca) */
+  --navy:          #0d1e3c;
+  --blue:          #2957A4;
+  --dark:          #081226;
 
   /* Marca */
-  --orange:        #f4821f;
-  --orange-dark:   #e06b10;
-  --orange-glow:   rgba(244, 130, 31, 0.35);
-  --gold:          #e6a817;
-  --gold-light:    rgba(230, 168, 23, 0.15);
+  --orange:          #FFCC29;
+  --orange-dark:     #e6b31e;
+  --orange-contrast: #0d1e3c;
+  --orange-glow:     rgba(255, 204, 41, 0.35);
+  --gold:            #FFCC29;
+  --gold-light:      rgba(255, 204, 41, 0.15);
+  --rojo:            #ED3237;
 
   /* Texto */
   --white:         #ffffff;
@@ -22,53 +28,66 @@
 
   /* UI */
   --border:        rgba(255, 255, 255, 0.1);
-  --border-orange: rgba(244, 130, 31, 0.3);
-  --card-bg:       rgba(26, 58, 107, 0.4);
-  --card-hover:    rgba(244, 130, 31, 0.08);
-  --overlay:       rgba(5, 5, 15, 0.92);
+  --border-orange: rgba(255, 204, 41, 0.3);
+  --card-bg:       rgba(41, 87, 164, 0.35);
+  --card-hover:    rgba(255, 204, 41, 0.08);
+  --overlay:       rgba(5, 8, 18, 0.92);
 
   /* Fondos de sección (adaptativos por tema) — oscuro por defecto */
-  --bg:            #0a1628;
-  --bg-alt:        #060e1a;
-  --eyebrow:       #f4821f;
+  --bg:            #0d1e3c;
+  --bg-alt:        #081226;
+  --eyebrow:       #FFCC29;
 }
 
 /* ── Tema claro — envolver una página/sección en .tema-claro ── */
 .tema-claro {
   --bg:           #ffffff;
   --bg-alt:       #f4f7fb;
-  --text-primary: #0a1628;
-  --text-dim:     rgba(10, 22, 40, 0.66);
-  --text-muted:   rgba(10, 22, 40, 0.45);
-  --border:       rgba(10, 22, 40, 0.10);
+  --text-primary: #0d1e3c;
+  --text-dim:     rgba(13, 30, 60, 0.66);
+  --text-muted:   rgba(13, 30, 60, 0.45);
+  --border:       rgba(13, 30, 60, 0.10);
   --card-bg:      #ffffff;
-  --card-hover:   rgba(244, 130, 31, 0.06);
+  --card-hover:   rgba(41, 87, 164, 0.06);
   --overlay:      rgba(255, 255, 255, 0.92);
-  --eyebrow:      #c25e10;
+  --eyebrow:      #2957A4;
+  /* Acento en claro: azul de marca (el amarillo no contrasta sobre blanco) */
+  --orange:          #2957A4;
+  --orange-dark:     #1e4180;
+  --orange-contrast: #ffffff;
+  --orange-glow:     rgba(41, 87, 164, 0.35);
+  --border-orange:   rgba(41, 87, 164, 0.3);
   background-color: #ffffff;
-  color: #0a1628;
+  color: #0d1e3c;
 }
 
 /* ── Isla oscura dentro de una página clara (hero, CTA, footer) ── */
 .tema-oscuro {
-  --bg:           #0a1628;
-  --bg-alt:       #060e1a;
+  --bg:           #0d1e3c;
+  --bg-alt:       #081226;
   --text-primary: #f0ece4;
   --text-dim:     rgba(255, 255, 255, 0.6);
   --text-muted:   rgba(255, 255, 255, 0.35);
   --border:       rgba(255, 255, 255, 0.1);
-  --card-bg:      rgba(26, 58, 107, 0.4);
-  --overlay:      rgba(5, 5, 15, 0.92);
+  --card-bg:      rgba(41, 87, 164, 0.35);
+  --overlay:      rgba(5, 8, 18, 0.92);
+  --eyebrow:      #FFCC29;
+  /* Acento en oscuro: amarillo de marca */
+  --orange:          #FFCC29;
+  --orange-dark:     #e6b31e;
+  --orange-contrast: #0d1e3c;
+  --orange-glow:     rgba(255, 204, 41, 0.35);
+  --border-orange:   rgba(255, 204, 41, 0.3);
 }
 
 /* ── Tailwind v4 — Custom theme tokens ── */
 @theme {
   /* Colores */
-  --color-navy:   #0a1628;
-  --color-blue:   #1a3a6b;
-  --color-dark:   #060e1a;
-  --color-orange: #f4821f;
-  --color-gold:   #e6a817;
+  --color-navy:   #0d1e3c;
+  --color-blue:   #2957A4;
+  --color-dark:   #081226;
+  --color-orange: #FFCC29;
+  --color-gold:   #FFCC29;
   --color-white:  #ffffff;
 
   /* Tipografías */
@@ -77,13 +96,13 @@
   --font-inter:        var(--font-inter), sans-serif;
 
   /* Gradientes */
-  --background-image-gradient-orange: linear-gradient(135deg, #f4821f, #e06b10);
-  --background-image-gradient-navy:   linear-gradient(to bottom, #0a1628, #060e1a);
-  --background-image-gradient-hero:   linear-gradient(to right, rgba(5, 5, 15, 0.92) 38%, rgba(5, 5, 15, 0.2) 100%);
+  --background-image-gradient-orange: linear-gradient(135deg, #FFCC29, #e6b31e);
+  --background-image-gradient-navy:   linear-gradient(to bottom, #0d1e3c, #081226);
+  --background-image-gradient-hero:   linear-gradient(to right, rgba(5, 8, 18, 0.92) 38%, rgba(5, 8, 18, 0.2) 100%);
 
   /* Sombras */
-  --shadow-orange:    0 8px 24px rgba(244, 130, 31, 0.4);
-  --shadow-orange-lg: 0 16px 40px rgba(244, 130, 31, 0.5);
+  --shadow-orange:    0 8px 24px rgba(255, 204, 41, 0.4);
+  --shadow-orange-lg: 0 16px 40px rgba(255, 204, 41, 0.5);
   --shadow-card:      0 4px 16px rgba(0, 0, 0, 0.3);
 
   /* Animaciones */
@@ -122,12 +141,29 @@ body {
 
 /* ── Focus visible ── */
 :focus-visible {
-  outline: 2px solid #f4821f;
+  outline: 2px solid var(--orange, #2957A4);
   outline-offset: 3px;
   border-radius: 2px;
 }
 :focus:not(:focus-visible) {
   outline: none;
+}
+
+/* ── Botones — el acento sigue el tema (amarillo en oscuro, azul en claro) ── */
+.btn-primary {
+  background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+  color: var(--orange-contrast);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--orange) 40%, transparent);
+}
+.btn-primary:hover {
+  box-shadow: 0 16px 40px color-mix(in srgb, var(--orange) 50%, transparent);
+}
+.btn-outline {
+  border: 1px solid color-mix(in srgb, var(--orange) 50%, transparent);
+}
+.btn-outline:hover {
+  border-color: var(--orange);
+  background: color-mix(in srgb, var(--orange) 10%, transparent);
 }
 
 /* ── Hero — glow pulsante ── */
@@ -142,7 +178,7 @@ body {
 
 /* ── Destinos grid — card hover ── */
 .destino-card {
-  background: #16315a;
+  background: #16315f;
   border: 1px solid var(--border);
   cursor: pointer;
   transition: border-color 0.25s, box-shadow 0.25s;
@@ -150,7 +186,7 @@ body {
 }
 .destino-card:hover {
   border-color: var(--border-orange);
-  box-shadow: 0 8px 32px rgba(244, 130, 31, 0.15);
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--orange) 15%, transparent);
 }
 .destino-card:focus-visible {
   outline: 2px solid var(--orange);
@@ -159,14 +195,14 @@ body {
 /* ── Destinos grid — botón ver todos ── */
 .destinos-cargar-mas {
   background: var(--orange);
-  color: #fff;
+  color: var(--orange-contrast);
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(244, 130, 31, 0.3);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--orange) 30%, transparent);
   transition: filter 0.2s, box-shadow 0.2s, transform 0.2s;
 }
 .destinos-cargar-mas:hover {
   filter: brightness(1.08);
-  box-shadow: 0 8px 22px rgba(244, 130, 31, 0.45);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--orange) 45%, transparent);
   transform: translateY(-2px);
 }
 .destinos-cargar-mas:focus-visible {
@@ -213,7 +249,7 @@ body {
 }
 .exp-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 28px 56px -24px rgba(10, 22, 40, 0.3);
+  box-shadow: 0 28px 56px -24px rgba(13, 30, 60, 0.3);
   border-color: var(--border-orange);
 }
 .exp-card img { transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -226,7 +262,7 @@ body {
   transition: background 0.2s, color 0.2s;
 }
 .destinos-ver-todos:hover {
-  background: rgba(244, 130, 31, 0.1);
+  background: color-mix(in srgb, var(--orange) 10%, transparent);
   color: var(--orange);
 }
 .destinos-ver-todos:focus-visible {
@@ -325,11 +361,11 @@ body {
 
 /* ── Cómo funciona — CTA glow + link video ── */
 .como-funciona-cta {
-  box-shadow: 0 0 20px rgba(244, 130, 31, 0.4);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--orange) 40%, transparent);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 .como-funciona-cta:hover {
-  box-shadow: 0 0 30px rgba(244, 130, 31, 0.6);
+  box-shadow: 0 0 30px color-mix(in srgb, var(--orange) 60%, transparent);
   transform: translateY(-2px);
 }
 .como-funciona-video {
@@ -375,7 +411,7 @@ body {
 [data-reveal][data-shown="true"] { opacity: 1; transform: none; }
 
 .u-lift { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
-.u-lift:hover { transform: translateY(-6px); box-shadow: 0 14px 30px rgba(10, 22, 40, .12); }
+.u-lift:hover { transform: translateY(-6px); box-shadow: 0 14px 30px rgba(13, 30, 60, .12); }
 
 .u-underline { position: relative; }
 .u-underline::after { content: ""; position: absolute; left: 0; bottom: -4px; height: 2px; width: 100%; background: var(--orange); transform: scaleX(0); transform-origin: left; transition: transform .3s ease; }
@@ -399,7 +435,7 @@ body {
 
 /* ── Equipo Travel World — tarjetas y navegación ── */
 .equipo-card {
-  background: #16315a;
+  background: #16315f;
   border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: 8px;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s ease, box-shadow 0.4s ease;
@@ -407,7 +443,7 @@ body {
 .equipo-card:hover {
   border-color: var(--orange);
   transform: translateY(-8px);
-  box-shadow: 0 20px 40px -10px rgba(244, 130, 31, 0.2), 0 0 20px rgba(244, 130, 31, 0.1);
+  box-shadow: 0 20px 40px -10px color-mix(in srgb, var(--orange) 20%, transparent), 0 0 20px color-mix(in srgb, var(--orange) 10%, transparent);
 }
 /* Marquee continuo del equipo — loop infinito, pausa al hover */
 .equipo-marquee {

@@ -122,7 +122,7 @@ export function IconPicker({ value, onChange }: Props) {
                   className="flex h-8 w-8 items-center justify-center rounded"
                   style={{
                     background: activo ? 'var(--orange)' : 'transparent',
-                    color: activo ? '#fff' : 'var(--text-dim)',
+                    color: activo ? 'var(--orange-contrast)' : 'var(--text-dim)',
                     border: activo ? 'none' : '1px solid transparent',
                   }}
                 >

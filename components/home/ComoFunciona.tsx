@@ -97,7 +97,7 @@ export function ComoFunciona() {
               id="cf-route"
               d="M165,70 Q332,10 500,70 T835,70"
               fill="none"
-              stroke="rgba(244,130,31,0.5)"
+              stroke="color-mix(in srgb, var(--orange) 50%, transparent)"
               strokeWidth="2.5"
               strokeDasharray="6 8"
               className="cf-route-path"
@@ -124,7 +124,7 @@ export function ComoFunciona() {
                     className="mb-8 flex h-24 w-24 items-center justify-center rounded-full transition-transform duration-300 group-hover:scale-110"
                     style={{
                       background: 'var(--orange)',
-                      boxShadow: '0 0 30px rgba(244,130,31,0.25)',
+                      boxShadow: '0 0 30px color-mix(in srgb, var(--orange) 25%, transparent)',
                     }}
                   >
                     <Icon size={40} color="#fff" strokeWidth={1.75} />

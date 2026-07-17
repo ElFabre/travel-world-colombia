@@ -61,7 +61,7 @@ export default async function FaqsPage() {
           >
             <span
               className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-plus-jakarta text-xs font-bold"
-              style={{ background: 'rgba(244,130,31,0.12)', color: 'var(--orange)' }}
+              style={{ background: 'color-mix(in srgb, var(--orange) 12%, transparent)', color: 'var(--orange)' }}
             >
               {i + 1}
             </span>

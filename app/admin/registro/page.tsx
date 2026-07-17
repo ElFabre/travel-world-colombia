@@ -20,7 +20,7 @@ export default async function RegistroPage() {
         // Autenticado pero fuera de la allowlist → pendiente de aprobación.
         <div
           className="w-full max-w-sm rounded-2xl p-8 text-center"
-          style={{ background: '#16315a', border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 30px 60px -24px rgba(10,22,40,0.45)' }}
+          style={{ background: '#16315f', border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 30px 60px -24px rgba(13, 30, 60,0.45)' }}
         >
           <div
             className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full"

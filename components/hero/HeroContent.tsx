@@ -33,7 +33,7 @@ export function HeroContent({ destino }: HeroContentProps) {
           lineHeight: 0.9,
           letterSpacing: '-0.02em',
           color: 'var(--white)',
-          textShadow: '0 2px 24px rgba(6,14,26,0.55)',
+          textShadow: '0 2px 24px rgba(8, 18, 38,0.55)',
         }}
       >
         {destino.nombre}
@@ -47,7 +47,7 @@ export function HeroContent({ destino }: HeroContentProps) {
       {destino.frase_hero && (
         <p
           className="max-w-[330px] font-inter font-light"
-          style={{ fontSize: 'clamp(11px, 2.8vw, 13px)', lineHeight: 1.8, color: 'var(--text-dim)', textShadow: '0 1px 12px rgba(6,14,26,0.6)' }}
+          style={{ fontSize: 'clamp(11px, 2.8vw, 13px)', lineHeight: 1.8, color: 'var(--text-dim)', textShadow: '0 1px 12px rgba(8, 18, 38,0.6)' }}
         >
           {destino.frase_hero}
         </p>
@@ -59,7 +59,7 @@ export function HeroContent({ destino }: HeroContentProps) {
             className="grid h-[34px] w-[34px] shrink-0 place-items-center rounded-full text-[11px] font-bold text-white"
             style={{
               background: 'linear-gradient(135deg, var(--orange), var(--gold))',
-              border: '2px solid rgba(244,130,31,.4)',
+              border: '2px solid color-mix(in srgb, var(--orange) 40%, transparent)',
             }}
           >
             {initials(destino.autor_frase)}

@@ -14,7 +14,7 @@ export function CTABanner() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            'linear-gradient(135deg, rgba(244,130,31,0.18) 0%, rgba(26,58,107,0.5) 50%, rgba(6,14,26,0.8) 100%)',
+            'linear-gradient(135deg, color-mix(in srgb, var(--orange) 18%, transparent) 0%, rgba(41, 87, 164,0.5) 50%, rgba(8, 18, 38,0.8) 100%)',
         }}
       />
       <div
@@ -39,7 +39,7 @@ export function CTABanner() {
         <div className="mb-5 flex justify-center">
           <span
             className="flex h-14 w-14 items-center justify-center rounded-full"
-            style={{ background: 'rgba(244,130,31,0.15)', color: 'var(--orange)' }}
+            style={{ background: 'color-mix(in srgb, var(--orange) 15%, transparent)', color: 'var(--orange)' }}
           >
             <Plane size={28} strokeWidth={1.5} />
           </span>

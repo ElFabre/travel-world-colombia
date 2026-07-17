@@ -34,13 +34,13 @@ export function destinoCardImg(destino: Pick<Destino, 'slug' | 'imagen_hero'>): 
 /** Color RGB del glow del hero según la región del destino. */
 export function glowColor(region?: string): string {
   switch (region) {
-    case 'Caribe':        return '244, 130, 31'   // naranja
+    case 'Caribe':        return '255, 204, 41'   // amarillo de marca
     case 'Europa':        return '70, 130, 220'   // azul
     case 'Asia':          return '230, 168, 23'   // dorado
     case 'Norteamérica':  return '90, 150, 235'   // azul claro
     case 'Centroamérica': return '32, 200, 180'   // turquesa
     case 'Suramérica':    return '60, 200, 120'   // verde
-    default:              return '244, 130, 31'   // naranja (marca)
+    default:              return '255, 204, 41'   // amarillo (marca)
   }
 }
 

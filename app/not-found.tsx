@@ -17,7 +17,7 @@ export default function NotFound() {
       <div className="relative max-w-lg">
         <p
           className="font-plus-jakarta text-[120px] font-extrabold leading-none"
-          style={{ color: 'rgba(244,130,31,0.15)' }}
+          style={{ color: 'color-mix(in srgb, var(--orange) 15%, transparent)' }}
         >
           404
         </p>

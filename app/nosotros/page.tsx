@@ -82,7 +82,7 @@ export default function NosotrosPage() {
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(180deg, rgba(6,14,26,0.92) 0%, rgba(6,14,26,0.66) 55%, rgba(6,14,26,0.45) 100%)',
+              'linear-gradient(180deg, rgba(8, 18, 38,0.92) 0%, rgba(8, 18, 38,0.66) 55%, rgba(8, 18, 38,0.45) 100%)',
           }}
         />
         <div className="relative z-10 mx-auto max-w-3xl">
@@ -115,7 +115,7 @@ export default function NosotrosPage() {
             <li key={label} className="flex flex-col items-center gap-2 text-center">
               <div
                 className="flex h-11 w-11 items-center justify-center rounded-full"
-                style={{ background: 'rgba(244,130,31,0.12)', color: 'var(--orange)' }}
+                style={{ background: 'color-mix(in srgb, var(--orange) 12%, transparent)', color: 'var(--orange)' }}
               >
                 <Icon size={20} strokeWidth={1.5} />
               </div>
@@ -151,7 +151,7 @@ export default function NosotrosPage() {
             >
               <div
                 className="flex h-12 w-12 items-center justify-center rounded-full"
-                style={{ background: 'rgba(244,130,31,0.12)', color: 'var(--orange)' }}
+                style={{ background: 'color-mix(in srgb, var(--orange) 12%, transparent)', color: 'var(--orange)' }}
               >
                 <Target size={22} strokeWidth={1.5} />
               </div>
@@ -159,7 +159,7 @@ export default function NosotrosPage() {
                 <h3 className="font-plus-jakarta text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>
                   Misión
                 </h3>
-                <p className="font-inter text-base leading-relaxed" style={{ color: 'rgba(10,22,40,0.82)', lineHeight: '1.8' }}>
+                <p className="font-inter text-base leading-relaxed" style={{ color: 'rgba(13, 30, 60,0.82)', lineHeight: '1.8' }}>
                   Conectar a familias y viajeros colombianos con experiencias de viaje
                   excepcionales, ofreciendo asesoría personalizada, precios transparentes
                   y acompañamiento antes, durante y después de cada viaje. Somos el aliado
@@ -172,13 +172,13 @@ export default function NosotrosPage() {
             <div
               className="flex flex-col gap-5 rounded-xl p-8"
               style={{
-                background: 'rgba(244,130,31,0.05)',
+                background: 'color-mix(in srgb, var(--orange) 5%, transparent)',
                 border: '1px solid var(--border-orange)',
               }}
             >
               <div
                 className="flex h-12 w-12 items-center justify-center rounded-full"
-                style={{ background: 'rgba(244,130,31,0.15)', color: 'var(--orange)' }}
+                style={{ background: 'color-mix(in srgb, var(--orange) 15%, transparent)', color: 'var(--orange)' }}
               >
                 <Eye size={22} strokeWidth={1.5} />
               </div>
@@ -186,7 +186,7 @@ export default function NosotrosPage() {
                 <h3 className="font-plus-jakarta text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>
                   Visión
                 </h3>
-                <p className="font-inter text-base leading-relaxed" style={{ color: 'rgba(10,22,40,0.82)', lineHeight: '1.8' }}>
+                <p className="font-inter text-base leading-relaxed" style={{ color: 'rgba(13, 30, 60,0.82)', lineHeight: '1.8' }}>
                   Ser la agencia de viajes de referencia en el Sumapaz y Cundinamarca,
                   reconocida a nivel nacional por la calidad de nuestro servicio, la
                   satisfacción de nuestros viajeros y nuestra capacidad de abrir el mundo
@@ -212,7 +212,7 @@ export default function NosotrosPage() {
             >
               Cadenas hoteleras
             </h2>
-            <p className="mt-3 font-inter text-base" style={{ color: 'rgba(10,22,40,0.82)' }}>
+            <p className="mt-3 font-inter text-base" style={{ color: 'rgba(13, 30, 60,0.82)' }}>
               Trabajamos directamente con las mejores cadenas del Caribe y Colombia
             </p>
           </div>
@@ -236,7 +236,7 @@ export default function NosotrosPage() {
             >
               Aerolíneas aliadas
             </h2>
-            <p className="mt-3 font-inter text-base" style={{ color: 'rgba(10,22,40,0.82)' }}>
+            <p className="mt-3 font-inter text-base" style={{ color: 'rgba(13, 30, 60,0.82)' }}>
               Acceso a tarifas especiales con las principales aerolíneas
             </p>
           </div>
@@ -251,12 +251,12 @@ export default function NosotrosPage() {
         <div className="mx-auto max-w-6xl">
           <div
             className="flex flex-col items-center gap-8 rounded-xl p-10 sm:flex-row sm:items-start"
-            style={{ background: 'rgba(244,130,31,0.06)', border: '1px solid var(--border-orange)' }}
+            style={{ background: 'color-mix(in srgb, var(--orange) 6%, transparent)', border: '1px solid var(--border-orange)' }}
           >
             {/* Placeholder certificado */}
             <div
               className="flex h-32 w-32 shrink-0 items-center justify-center rounded-lg"
-              style={{ background: 'rgba(244,130,31,0.1)', border: '1px solid var(--border-orange)' }}
+              style={{ background: 'color-mix(in srgb, var(--orange) 10%, transparent)', border: '1px solid var(--border-orange)' }}
             >
               <Award size={44} strokeWidth={1} style={{ color: 'var(--orange)' }} />
             </div>
@@ -271,7 +271,7 @@ export default function NosotrosPage() {
               </h2>
               <p
                 className="mt-3 max-w-lg font-inter text-base leading-relaxed"
-                style={{ color: 'rgba(10,22,40,0.82)', lineHeight: '1.75' }}
+                style={{ color: 'rgba(13, 30, 60,0.82)', lineHeight: '1.75' }}
               >
                 Travel World Colombia está registrada ante el{' '}
                 <strong style={{ color: 'var(--text-primary)' }}>
@@ -344,7 +344,7 @@ export default function NosotrosPage() {
         className="tema-oscuro relative overflow-hidden px-6 py-20"
         style={{
           background:
-            'linear-gradient(135deg, rgba(244,130,31,0.18) 0%, rgba(10,22,40,0.95) 100%)',
+            'linear-gradient(135deg, color-mix(in srgb, var(--orange) 18%, transparent) 0%, rgba(13, 30, 60,0.95) 100%)',
         }}
       >
         <div

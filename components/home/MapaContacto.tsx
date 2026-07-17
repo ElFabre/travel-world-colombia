@@ -81,7 +81,7 @@ export function MapaContacto() {
                 <li key={label} className="flex items-start gap-4">
                   <div
                     className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
-                    style={{ background: 'rgba(244,130,31,0.12)', color: 'var(--orange)' }}
+                    style={{ background: 'color-mix(in srgb, var(--orange) 12%, transparent)', color: 'var(--orange)' }}
                   >
                     <Icon size={16} strokeWidth={1.5} />
                   </div>

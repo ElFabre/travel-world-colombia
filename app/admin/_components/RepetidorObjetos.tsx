@@ -8,7 +8,7 @@ interface CampoDef {
   key: string
   label: string
   ancho?: 'corto' | 'largo'
-  tipo?: 'texto' | 'icono'
+  tipo?: 'texto' | 'icono' | 'area'
 }
 
 type Fila = Record<string, string>
@@ -52,6 +52,16 @@ export function RepetidorObjetos({
                   key={c.key}
                   value={f[c.key] ?? ''}
                   onChange={val => set(i, c.key, val)}
+                />
+              ) : c.tipo === 'area' ? (
+                <textarea
+                  key={c.key}
+                  value={f[c.key] ?? ''}
+                  onChange={e => set(i, c.key, e.target.value)}
+                  placeholder={c.label}
+                  rows={2}
+                  className="w-full basis-full rounded px-2 py-2 font-inter text-base outline-none"
+                  style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                 />
               ) : (
                 <input

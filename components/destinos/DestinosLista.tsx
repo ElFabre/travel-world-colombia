@@ -38,7 +38,7 @@ export function DestinosLista({ destinos }: DestinosListaProps) {
             className="shrink-0 rounded-full px-5 py-2 font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase transition-all duration-200 cursor-pointer"
             style={
               filtro === pais
-                ? { background: 'var(--orange)', color: '#fff', boxShadow: '0 4px 16px rgba(244,130,31,0.4)' }
+                ? { background: 'var(--orange)', color: 'var(--orange-contrast)', boxShadow: '0 4px 16px color-mix(in srgb, var(--orange) 40%, transparent)' }
                 : { background: 'var(--bg-alt)', color: 'var(--text-dim)', border: '1px solid var(--border)' }
             }
           >
@@ -78,12 +78,12 @@ export function DestinosLista({ destinos }: DestinosListaProps) {
                   />
                   <div
                     className="absolute inset-0"
-                    style={{ background: 'linear-gradient(to top, rgba(6,14,26,0.85) 0%, transparent 55%)' }}
+                    style={{ background: 'linear-gradient(to top, rgba(8, 18, 38,0.85) 0%, transparent 55%)' }}
                   />
                   {/* País badge */}
                   <span
                     className="absolute left-3 top-3 flex items-center gap-1 rounded-full px-3 py-1 font-inter text-[11px] font-medium backdrop-blur-sm"
-                    style={{ background: 'rgba(6,14,26,0.7)', color: 'rgba(255,255,255,0.9)', border: '1px solid rgba(255,255,255,0.15)' }}
+                    style={{ background: 'rgba(8, 18, 38,0.7)', color: 'rgba(255,255,255,0.9)', border: '1px solid rgba(255,255,255,0.15)' }}
                   >
                     <MapPin size={10} />
                     {d.pais}
@@ -92,7 +92,7 @@ export function DestinosLista({ destinos }: DestinosListaProps) {
                   {d.precio_desde && (
                     <span
                       className="absolute bottom-3 left-3 font-plus-jakarta text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-sm"
-                      style={{ background: 'var(--orange)', color: '#fff' }}
+                      style={{ background: 'var(--orange)', color: 'var(--orange-contrast)' }}
                     >
                       {d.precio_desde}
                     </span>
@@ -101,7 +101,7 @@ export function DestinosLista({ destinos }: DestinosListaProps) {
                   {d.duracion && (
                     <span
                       className="absolute bottom-3 right-3 flex items-center gap-1 font-inter text-[11px] backdrop-blur-sm px-2 py-1 rounded"
-                      style={{ background: 'rgba(6,14,26,0.75)', color: 'rgba(255,255,255,0.9)' }}
+                      style={{ background: 'rgba(8, 18, 38,0.75)', color: 'rgba(255,255,255,0.9)' }}
                     >
                       <Clock size={10} />
                       {d.duracion}

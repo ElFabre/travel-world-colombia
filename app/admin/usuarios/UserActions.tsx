@@ -38,7 +38,7 @@ export function AprobarBtn({ email }: { email: string }) {
       disabled={pending}
       onClick={() => start(() => aprobarUsuario(email))}
       className={btn}
-      style={{ background: 'var(--orange)', color: '#fff' }}
+      style={{ background: 'var(--orange)', color: 'var(--orange-contrast)' }}
     >
       <Check size={14} />
       {pending ? 'Aprobando…' : 'Aprobar'}

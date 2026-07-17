@@ -274,6 +274,22 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
       </Seccion>
 
       <Seccion
+        titulo="Itinerario día a día"
+        ayuda="El plan del viaje, un día por fila. El número de día (01, 02…) se asigna solo según el orden. Cada día lleva un título, una etiqueta opcional (ej. 'Cena incluida') y una descripción corta. Se muestra como una línea de tiempo en la página del viaje."
+      >
+        <RepetidorObjetos
+          name="itinerario"
+          etiqueta="día"
+          inicial={d?.itinerario as unknown as Record<string, string>[] | undefined}
+          campos={[
+            { key: 'titulo', label: 'Título del día (ej. Arribo y bienvenida)' },
+            { key: 'badge', label: 'Etiqueta (ej. Cena incluida)' },
+            { key: 'descripcion', label: 'Descripción corta del día', tipo: 'area' },
+          ]}
+        />
+      </Seccion>
+
+      <Seccion
         titulo="Stats (barra de cifras)"
         ayuda="Cifras destacadas del destino que aparecen en una barra (ej. '500+ familias'). Cada fila: número + etiqueta."
       >
@@ -334,7 +350,7 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
           type="submit"
           disabled={pending}
           className="rounded-md px-6 py-2.5 font-plus-jakarta text-sm font-bold"
-          style={{ background: 'var(--orange)', color: '#fff', opacity: pending ? 0.6 : 1 }}
+          style={{ background: 'var(--orange)', color: 'var(--orange-contrast)', opacity: pending ? 0.6 : 1 }}
         >
           {pending ? 'Guardando…' : 'Guardar viaje'}
         </button>

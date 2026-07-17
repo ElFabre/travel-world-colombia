@@ -35,7 +35,7 @@ export default async function DestinosPage() {
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(90deg, rgba(10,22,40,0.96) 0%, rgba(10,22,40,0.8) 35%, rgba(10,22,40,0.5) 70%, rgba(10,22,40,0.2) 100%)',
+              'linear-gradient(90deg, rgba(13, 30, 60,0.96) 0%, rgba(13, 30, 60,0.8) 35%, rgba(13, 30, 60,0.5) 70%, rgba(13, 30, 60,0.2) 100%)',
           }}
         />
 

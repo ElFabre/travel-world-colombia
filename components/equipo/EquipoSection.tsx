@@ -23,7 +23,7 @@ export function EquipoSection() {
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-0 h-[500px] w-full -translate-x-1/2"
-        style={{ background: 'radial-gradient(circle, rgba(244,130,31,0.06) 0%, rgba(10,22,40,0) 70%)' }}
+        style={{ background: 'radial-gradient(circle, color-mix(in srgb, var(--orange) 6%, transparent) 0%, rgba(13, 30, 60,0) 70%)' }}
       />
 
       <div className="relative z-10 mx-auto max-w-6xl">

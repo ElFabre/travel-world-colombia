@@ -9,7 +9,7 @@ const initial: LoginState = {}
 const inputStyle = {
   background: '#fff',
   border: '1px solid rgba(255,255,255,0.18)',
-  color: '#0a1628',
+  color: '#0d1e3c',
 } as const
 
 export default function LoginPage() {
@@ -20,7 +20,7 @@ export default function LoginPage() {
       <form
         action={action}
         className="w-full max-w-sm rounded-2xl p-8"
-        style={{ background: '#16315a', border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 30px 60px -24px rgba(10,22,40,0.45)' }}
+        style={{ background: '#16315f', border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 30px 60px -24px rgba(13, 30, 60,0.45)' }}
       >
         <h1 className="mb-1 font-plus-jakarta text-2xl font-extrabold" style={{ color: '#fff' }}>
           Panel de administración
@@ -57,7 +57,7 @@ export default function LoginPage() {
           type="submit"
           disabled={pending}
           className="w-full rounded-md px-4 py-2.5 font-plus-jakarta text-sm font-bold uppercase tracking-wide"
-          style={{ background: 'var(--orange)', color: '#fff', opacity: pending ? 0.6 : 1 }}
+          style={{ background: 'var(--orange)', color: 'var(--orange-contrast)', opacity: pending ? 0.6 : 1 }}
         >
           {pending ? 'Entrando…' : 'Entrar'}
         </button>

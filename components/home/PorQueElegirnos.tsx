@@ -91,7 +91,7 @@ const CARDS: Card[] = [
 ]
 
 const GRADIENT_DIVIDER =
-  'linear-gradient(90deg, transparent, #f4821f, #e6a817, transparent)'
+  'linear-gradient(90deg, transparent, var(--orange), var(--gold), transparent)'
 
 /* ─────────── Componente ─────────── */
 export function PorQueElegirnos() {
@@ -147,7 +147,7 @@ export function PorQueElegirnos() {
                   style={
                     featured
                       ? { background: 'rgba(255,255,255,0.2)' }
-                      : { background: 'rgba(244,130,31,0.2)' }
+                      : { background: 'color-mix(in srgb, var(--orange) 20%, transparent)' }
                   }
                 >
                   <Icon size={24} style={{ color: featured ? '#fff' : 'var(--orange)' }} strokeWidth={2} />

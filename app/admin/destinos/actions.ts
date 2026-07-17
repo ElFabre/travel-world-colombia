@@ -70,6 +70,7 @@ function construirPayload(formData: FormData) {
     stats: jsonArray(formData.get('stats')),
     highlights: jsonArray(formData.get('highlights')),
     info_clave: jsonArray(formData.get('info_clave')),
+    itinerario: jsonArray(formData.get('itinerario')),
     galeria: jsonArray(formData.get('galeria')),
     cta_titulo: texto(formData.get('cta_titulo')),
     cta_subtitulo: texto(formData.get('cta_subtitulo')),
@@ -86,7 +87,14 @@ function construirPayload(formData: FormData) {
   const imagen_thumb = texto(formData.get('imagen_thumb'))
   const imagen_about = texto(formData.get('imagen_about'))
 
-  return { ...parsed.data, imagen_hero, imagen_thumb, imagen_about }
+  const payload = { ...parsed.data, imagen_hero, imagen_thumb, imagen_about }
+
+  // Postgres necesita null explícito para vaciar una columna: JSON.stringify
+  // omite las claves undefined, así que un campo borrado en el formulario
+  // nunca llegaría al UPDATE y la web seguiría mostrando el valor viejo.
+  return Object.fromEntries(
+    Object.entries(payload).map(([k, v]) => [k, v === undefined ? null : v])
+  ) as typeof payload
 }
 
 function revalidar(slug?: string) {
@@ -100,7 +108,14 @@ function revalidar(slug?: string) {
 
 /** Crea un nuevo destino. */
 export async function crearDestino(_prev: FormState, formData: FormData): Promise<FormState> {
-  const { user } = await requireEditor()
+  // Si la sesión expiró o el rol no permite editar, mostramos el mensaje en el
+  // formulario en vez de dejar que la excepción tumbe la página con un error genérico.
+  let user
+  try {
+    ;({ user } = await requireEditor())
+  } catch (e) {
+    return { error: (e as Error).message }
+  }
   const admin = createAdminClient()
 
   let payload
@@ -128,7 +143,12 @@ export async function crearDestino(_prev: FormState, formData: FormData): Promis
 
 /** Actualiza un destino existente (id se enlaza con .bind). */
 export async function actualizarDestino(id: string, _prev: FormState, formData: FormData): Promise<FormState> {
-  const { user } = await requireEditor()
+  let user
+  try {
+    ;({ user } = await requireEditor())
+  } catch (e) {
+    return { error: (e as Error).message }
+  }
   const admin = createAdminClient()
 
   let payload
