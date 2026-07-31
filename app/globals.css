@@ -469,3 +469,47 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ── Itinerario: cards apiladas con scroll (stacking cards) ──
+   Cada día es una card sticky: al scrollear, la siguiente se monta encima
+   de la anterior (tapado total). Con soporte de animaciones scroll-driven,
+   la card que queda atrás se encoge y atenúa (profundidad); sin soporte,
+   el apilado funciona igual, solo sin encogido. */
+.itin-stack {
+  view-timeline-name: --itin-stack;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.itin-card-wrap {
+  position: sticky;
+  top: 5.5rem;
+}
+.itin-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  box-shadow: 0 24px 48px -20px rgba(13, 30, 60, 0.3);
+  transform-origin: top center;
+}
+@supports (animation-timeline: view()) {
+  .itin-card {
+    animation: itin-shrink linear both;
+    animation-timeline: --itin-stack;
+    /* Cada card se encoge durante su franja del recorrido del contenedor:
+       justo mientras la card siguiente se le monta encima. */
+    animation-range: exit-crossing calc(var(--i) / var(--n) * 100%)
+                     exit-crossing calc((var(--i) + 1) / var(--n) * 100%);
+  }
+  @keyframes itin-shrink {
+    to {
+      /* Las cards más profundas quedan más pequeñas y atenuadas (pila real). */
+      transform: scale(calc(1 - 0.07 * (var(--rev) + 1) / var(--n)));
+      filter: brightness(calc(1 - 0.18 * (var(--rev) + 1) / var(--n)));
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .itin-card { animation: none !important; }
+}
