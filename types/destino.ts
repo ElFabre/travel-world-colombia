@@ -8,6 +8,8 @@ export interface Highlight {
   titulo: string
   descripcion: string
   imagen?: string
+  /** Valor de la actividad cuando es opcional (texto libre, ej. "$180.000"). */
+  precio?: string
 }
 
 export interface InfoClave {
@@ -23,6 +25,10 @@ export interface ItinerarioDia {
   /** Etiqueta corta opcional, ej. "Cena incluida". */
   badge?: string
   descripcion?: string
+  /** Fecha opcional para salidas fijas, ej. "11 NOV". */
+  fecha?: string
+  /** Foto del día (subida desde el panel a Storage). */
+  imagen?: string
 }
 
 export interface Destino {

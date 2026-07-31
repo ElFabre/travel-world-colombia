@@ -7,6 +7,7 @@ import type { Destino } from '@/types/destino'
 import type { FormState } from '../destinos/actions'
 import { RepetidorObjetos } from './RepetidorObjetos'
 import { HighlightsEditor } from './HighlightsEditor'
+import { ItinerarioEditor } from './ItinerarioEditor'
 import { GaleriaEditor } from './GaleriaEditor'
 import { BUCKET_DESTINOS, subirAStorage, validarImagen, slugDelFormulario } from '@/lib/supabase/upload-cliente'
 import { PAISES } from '@/lib/paises'
@@ -275,18 +276,9 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
 
       <Seccion
         titulo="Itinerario día a día"
-        ayuda="El plan del viaje, un día por fila. El número de día (01, 02…) se asigna solo según el orden. Cada día lleva un título, una etiqueta opcional (ej. 'Cena incluida') y una descripción corta. Se muestra como una línea de tiempo en la página del viaje."
+        ayuda="El plan del viaje, un día por fila. El número de día (01, 02…) se asigna solo según el orden. Cada día lleva foto (opcional), título, fecha opcional para salidas fijas (ej. '11 NOV'), etiqueta (ej. 'Cena incluida') y descripción. En la web se ve con la foto a la izquierda y el texto justificado a la derecha."
       >
-        <RepetidorObjetos
-          name="itinerario"
-          etiqueta="día"
-          inicial={d?.itinerario as unknown as Record<string, string>[] | undefined}
-          campos={[
-            { key: 'titulo', label: 'Título del día (ej. Arribo y bienvenida)' },
-            { key: 'badge', label: 'Etiqueta (ej. Cena incluida)' },
-            { key: 'descripcion', label: 'Descripción corta del día', tipo: 'area' },
-          ]}
-        />
+        <ItinerarioEditor name="itinerario" inicial={d?.itinerario} />
       </Seccion>
 
       <Seccion
@@ -306,7 +298,7 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
 
       <Seccion
         titulo="Experiencias únicas"
-        ayuda="Tarjetas de experiencias del destino, cada una con un emoji, un título, una descripción y una foto. Se muestran en 'Experiencias únicas'. Recomendado: 3."
+        ayuda="Tarjetas de experiencias del destino, cada una con un emoji, un título, una descripción y una foto. Se muestran TODAS en 'Experiencias únicas'. Si la actividad es opcional, escribe su valor y saldrá como etiqueta naranja sobre la tarjeta."
       >
         <HighlightsEditor name="highlights" inicial={d?.highlights} />
       </Seccion>

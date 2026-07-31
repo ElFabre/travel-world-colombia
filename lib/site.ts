@@ -8,7 +8,7 @@ export const SITE = {
   // Vercel; al conectar el dominio propio basta con definir NEXT_PUBLIC_SITE_URL
   // en Vercel (Production) — no hay que tocar código.
   url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://travel-world-colombia.vercel.app',
-  email: 'info@travelworldcolombia.com',
+  email: 'agencia@travelworldcolombia.com',
 
   // NAP — Name, Address, Phone (no modificar el formato sin actualizar GBP/Schema)
   direccion: 'C.C. Manila, Transversal 12 #22-42, Local 126',
@@ -16,7 +16,7 @@ export const SITE = {
   region: 'Cundinamarca',
   pais: 'Colombia',
 
-  horario: 'Lun–Vie 9am–6pm · Sáb 9am–1pm',
+  horario: 'Lun–Vie 9am–5pm · Sáb 9am–1pm · Dom cerrado',
 
   reseñas: 126,
 } as const
@@ -33,6 +33,18 @@ export function whatsappUrl(destino?: string): string {
   const texto = destino
     ? `Hola! Me interesa información sobre viajes a ${destino} 🌎`
     : 'Hola! Me interesa información sobre sus planes de viaje 🌎'
+  return `https://wa.me/${WHATSAPP.principal}?text=${encodeURIComponent(texto)}`
+}
+
+/** URL de WhatsApp para reservar un programa (mensaje personalizado). */
+export function whatsappReservaUrl(destino: string): string {
+  const texto = `Hola! Quiero reservar el viaje a ${destino} ✈️`
+  return `https://wa.me/${WHATSAPP.principal}?text=${encodeURIComponent(texto)}`
+}
+
+/** URL de WhatsApp para resolver dudas sobre un programa. */
+export function whatsappDudasUrl(destino: string): string {
+  const texto = `Hola! Tengo algunas dudas sobre el viaje a ${destino} 🙂`
   return `https://wa.me/${WHATSAPP.principal}?text=${encodeURIComponent(texto)}`
 }
 

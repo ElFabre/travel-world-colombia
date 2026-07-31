@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import Script from 'next/script'
 import { notFound } from 'next/navigation'
 import { Clock, Users, ArrowRight, Quote, Star } from 'lucide-react'
 import { getDestino, getResenaDestino } from '@/lib/destinos'
@@ -9,7 +10,7 @@ import { IncluyeTabs } from '@/components/destinos/IncluyeTabs'
 import { SectionTag } from '@/components/ui/SectionTag'
 import { Icono } from '@/components/ui/Icono'
 import { Button } from '@/components/ui/Button'
-import { SITE, whatsappUrl } from '@/lib/site'
+import { SITE, whatsappUrl, whatsappReservaUrl, whatsappDudasUrl } from '@/lib/site'
 
 export const revalidate = 1800
 
@@ -63,6 +64,8 @@ export default async function DestinoPage({ params }: Props) {
   if (!d) notFound()
 
   const waUrl = whatsappUrl(d.nombre)
+  const waReserva = whatsappReservaUrl(d.nombre)
+  const waDudas = whatsappDudasUrl(d.nombre)
   const resena = await getResenaDestino(d.nombre)
   // Foto de "Sobre el destino": la dedicada, o la miniatura/hero como respaldo.
   const aboutImg = d.imagen_about ?? d.imagen_thumb ?? d.imagen_hero
@@ -216,8 +219,8 @@ export default async function DestinoPage({ params }: Props) {
                   {d.descripcion}
                 </p>
               )}
-              <a href={waUrl} className="group mt-8 inline-flex items-center gap-2 font-plus-jakarta text-sm font-bold" style={{ color: 'var(--eyebrow)' }}>
-                Descubre más sobre este plan
+              <a href={waReserva} className="group mt-8 inline-flex items-center gap-2 font-plus-jakarta text-sm font-bold" style={{ color: 'var(--eyebrow)' }}>
+                Quiero reservar
                 <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1.5" />
               </a>
             </div>
@@ -277,7 +280,7 @@ export default async function DestinoPage({ params }: Props) {
         </section>
       ) : null}
 
-      {/* ── EXPERIENCIAS ÚNICAS (3 cards con imagen) ── */}
+      {/* ── EXPERIENCIAS ÚNICAS (todas las cargadas en el panel) ── */}
       {d.highlights && d.highlights.length > 0 && (
         <section className="px-6 py-24" style={{ background: 'var(--bg-alt)' }}>
           <div className="mx-auto max-w-6xl">
@@ -288,7 +291,7 @@ export default async function DestinoPage({ params }: Props) {
               </h2>
             </div>
             <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {d.highlights.slice(0, 3).map(h => (
+              {d.highlights.map(h => (
                 <li
                   key={h.titulo}
                   className="exp-card destino-reveal flex flex-col overflow-hidden rounded-2xl"
@@ -305,6 +308,11 @@ export default async function DestinoPage({ params }: Props) {
                     {h.imagen && h.icono && (
                       <span className="absolute left-3 top-3 flex h-10 w-10 items-center justify-center rounded-full" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(4px)' }}>
                         <Icono nombre={h.icono} size={18} style={{ color: 'var(--navy)' }} />
+                      </span>
+                    )}
+                    {h.precio && (
+                      <span className="absolute right-3 top-3 rounded-full px-3 py-1.5 font-plus-jakarta text-xs font-bold" style={{ background: 'var(--orange)', color: 'var(--orange-contrast)', boxShadow: '0 4px 16px rgba(0,0,0,0.25)' }}>
+                        Opcional · {h.precio}
                       </span>
                     )}
                   </div>
@@ -387,9 +395,57 @@ export default async function DestinoPage({ params }: Props) {
             <p className="mt-3 font-plus-jakarta text-lg font-bold" style={{ color: 'var(--orange)' }}>{conDesde(d.precio_desde)}</p>
           )}
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Button variant="whatsapp" href={waUrl}>Cotizar por WhatsApp</Button>
-            <Button variant="outline" href="/destinos">Ver otros destinos</Button>
+            <Button variant="whatsapp" href={waReserva}>Quiero reservar</Button>
+            <Button variant="outline" href={waDudas}>Tengo algunas dudas</Button>
           </div>
+        </div>
+      </section>
+
+      {/* ── POR QUÉ NOS PREFIEREN (reseñas de Google — widget de GHL) ── */}
+      <section className="px-6 py-24" style={{ background: 'var(--bg-alt)' }}>
+        <div className="mx-auto max-w-6xl">
+          <div className="destino-reveal mb-10 text-center">
+            <SectionTag className="mb-4">Reseñas de Google ⭐</SectionTag>
+            <h2 className="font-plus-jakarta text-3xl font-bold sm:text-4xl" style={{ color: 'var(--text-primary)' }}>
+              ¿Por qué nos prefieren nuestros clientes?
+            </h2>
+          </div>
+          <iframe
+            className="lc_reviews_widget"
+            src="https://reputationhub.site/reputation/widgets/review_widget/RMFUo0i4KOVl7eZHEn7s?widgetId=6a6c1fb394c29db1b5de6da0"
+            frameBorder="0"
+            scrolling="no"
+            title="Reseñas de Google de Travel World Colombia"
+            style={{ minWidth: '100%', width: '100%', minHeight: '420px' }}
+          />
+          <Script src="https://reputationhub.site/reputation/assets/review-widget.js" strategy="lazyOnload" />
+        </div>
+      </section>
+
+      {/* ── SOBRE NOSOTROS (cierre con logo) ── */}
+      <section className="tema-oscuro relative overflow-hidden px-6 py-24" style={{ background: 'var(--navy)' }}>
+        <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(ellipse at bottom, color-mix(in srgb, var(--orange) 8%, transparent), transparent 60%)' }} />
+        <div className="destino-reveal relative mx-auto flex max-w-2xl flex-col items-center text-center">
+          <Image
+            src="/images/travel-world-colombia-logo-blanco.png"
+            alt="Travel World Colombia"
+            width={260}
+            height={104}
+            className="h-auto w-52 sm:w-64"
+          />
+          <SectionTag className="mb-4 mt-10">Agencia de viajes</SectionTag>
+          <h2 className="font-plus-jakarta text-3xl font-extrabold tracking-tight sm:text-4xl" style={{ color: 'var(--text-primary)' }}>
+            Travel World Colombia
+          </h2>
+          <div aria-hidden className="mt-5 h-1 w-16 rounded" style={{ background: 'var(--orange)' }} />
+          <p className="mt-5 font-inter text-base italic" style={{ color: 'var(--orange)' }}>
+            Más de 15 años cumpliendo sueños
+          </p>
+          <p className="mt-6 font-inter text-base leading-relaxed" style={{ color: 'var(--text-dim)' }}>
+            Somos una agencia con más de 15 años de experiencia en el mercado, cumpliendo los
+            sueños de nuestros pasajeros con viajes a nivel nacional e internacional. Hacemos
+            realidad cada destino, con la atención cercana que usted merece.
+          </p>
         </div>
       </section>
     </div>
