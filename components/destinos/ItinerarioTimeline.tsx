@@ -2,6 +2,49 @@ import Image from 'next/image'
 import type { ItinerarioDia } from '@/types/destino'
 
 /**
+ * Descripción de un día. Si el texto trae saltos de línea (una actividad por
+ * línea, como se escribe en el panel), cada línea se muestra como un punto de
+ * una lista con marcador — mucho más legible que el párrafo corrido. Si es un
+ * solo párrafo, se muestra justificado como respaldo.
+ */
+function DescripcionDia({ texto }: { texto: string }) {
+  const lineas = texto
+    .split(/\n+/)
+    .map(l => l.replace(/^[•\-–▪]\s*/, '').trim())
+    .filter(Boolean)
+
+  if (lineas.length <= 1) {
+    return (
+      <p
+        className="mt-3 font-inter text-sm leading-relaxed sm:text-[15px]"
+        style={{ color: 'var(--text-dim)', textAlign: 'justify', hyphens: 'auto' }}
+      >
+        {texto}
+      </p>
+    )
+  }
+
+  return (
+    <ul className="mt-4 flex flex-col gap-2.5">
+      {lineas.map((linea, i) => (
+        <li
+          key={i}
+          className="flex gap-3 font-inter text-sm leading-relaxed sm:text-[15px]"
+          style={{ color: 'var(--text-dim)' }}
+        >
+          <span
+            aria-hidden
+            className="mt-[0.55em] h-1.5 w-1.5 shrink-0 rounded-full"
+            style={{ background: 'var(--orange)' }}
+          />
+          <span className="min-w-0">{linea}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+/**
  * Itinerario día a día en filas: foto a la izquierda con la etiqueta del día
  * ("DÍA 03 · 11 NOV") superpuesta, y a la derecha el título con la descripción
  * en texto justificado. En móvil la foto va arriba y el texto debajo. Los días
@@ -70,14 +113,7 @@ export function ItinerarioTimeline({ dias }: { dias: ItinerarioDia[] }) {
                   {dia.badge}
                 </span>
               )}
-              {dia.descripcion && (
-                <p
-                  className="mt-3 font-inter text-sm leading-relaxed sm:text-[15px]"
-                  style={{ color: 'var(--text-dim)', textAlign: 'justify', hyphens: 'auto' }}
-                >
-                  {dia.descripcion}
-                </p>
-              )}
+              {dia.descripcion && <DescripcionDia texto={dia.descripcion} />}
             </div>
           </li>
         )

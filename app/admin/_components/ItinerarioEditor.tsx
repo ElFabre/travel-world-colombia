@@ -77,7 +77,7 @@ export function ItinerarioEditor({ name, inicial }: { name: string; inicial?: Di
                 <input value={f.fecha ?? ''} onChange={e => set(i, 'fecha', e.target.value)} placeholder="Fecha (ej. 11 NOV)" className="w-32 rounded px-2 py-2 font-inter text-sm outline-none" style={inputStyle} />
               </div>
               <input value={f.badge ?? ''} onChange={e => set(i, 'badge', e.target.value)} placeholder="Etiqueta (ej. Cena incluida)" className="w-full rounded px-2 py-2 font-inter text-sm outline-none" style={inputStyle} />
-              <textarea value={f.descripcion ?? ''} onChange={e => set(i, 'descripcion', e.target.value)} placeholder="Descripción del día" rows={3} className="w-full rounded px-2 py-2 font-inter text-base outline-none" style={inputStyle} />
+              <textarea value={f.descripcion ?? ''} onChange={e => set(i, 'descripcion', e.target.value)} placeholder="Descripción del día — escribe una actividad por línea (Enter) y en la web se verá como lista" rows={4} className="w-full rounded px-2 py-2 font-inter text-base outline-none" style={inputStyle} />
             </div>
 
             <button type="button" onClick={() => quitar(i)} className="flex h-7 w-7 shrink-0 items-center justify-center rounded" style={{ color: '#ef4444', border: '1px solid var(--border)' }} aria-label="Quitar">
