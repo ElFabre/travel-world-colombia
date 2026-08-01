@@ -379,7 +379,7 @@ export default async function DestinoPage({ params }: Props) {
       )}
 
       {/* ── CTA FINAL ── */}
-      <section className="tema-oscuro relative overflow-hidden px-6 py-24" style={{ background: 'linear-gradient(135deg, color-mix(in srgb, var(--orange) 15%, transparent) 0%, rgba(13, 30, 60,0.9) 100%)' }}>
+      <section className="tema-oscuro relative overflow-hidden px-6 py-24" style={{ background: 'linear-gradient(135deg, #16315f 0%, var(--navy) 100%)' }}>
         <div aria-hidden className="pointer-events-none absolute inset-0" style={{ borderTop: '1px solid var(--border-orange)', borderBottom: '1px solid var(--border-orange)' }} />
         <div className="destino-reveal relative mx-auto max-w-3xl text-center">
           <SectionTag className="mb-4">¿Listo para viajar?</SectionTag>
