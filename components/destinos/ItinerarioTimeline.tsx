@@ -82,7 +82,7 @@ export function ItinerarioTimeline({ dias }: { dias: ItinerarioDia[] }) {
             style={{ '--i': i, '--rev': dias.length - 1 - i } as React.CSSProperties}
           >
             <article
-              className={`itin-card ${dia.imagen ? 'grid gap-5 md:grid-cols-[minmax(0,300px)_1fr] md:items-start md:gap-8' : ''}`}
+              className={`itin-card tema-oscuro ${dia.imagen ? 'grid gap-5 md:grid-cols-[minmax(0,300px)_1fr] md:items-start md:gap-8' : ''}`}
             >
               {/* Foto del día con la etiqueta superpuesta */}
               {dia.imagen && (
