@@ -194,9 +194,44 @@ decidir si habla.
 
 **Segunda implicación:** el mismo WhatsApp mezcla clientes finales con
 **proveedores y mayoristas** ("Ya te la monto", "Sí claro, ¿para qué fecha
-desean viajar?" — ahí el que vende es el otro). Sol debe detectar que su
-interlocutor NO es un cliente y no intentar calificarlo (existen los tags
-`mayorista / operadores` y `proveedor`).
+desean viajar?" — ahí el que vende es el otro).
+
+### Detección de "no es un cliente": tag primero, razonamiento de red
+
+La agencia ya etiqueta a muchos: **146 contactos** con `proveedor` (23) o
+`mayorista / operadores` (123); en la muestra de 100 conversaciones recientes,
+14 los traen. La disciplina de etiquetado es buena (solo 1 de 100 contactos sin
+ningún tag).
+
+Pero la cobertura **no es total**. Al contrastar los casos que detecté leyendo:
+
+| Mensaje | ¿Tenía tag? |
+|---|---|
+| "Sí claro, ¿para qué fecha desean viajar?" | ✅ `mayorista / operadores` |
+| "Bienvenida a nuestros servicios? ¿En qué podemos servirte?" | ❌ **sin tag, y marcado `new_lead`** |
+
+El segundo caso es el peligroso: es **el saludo automático de otro negocio**,
+registrado en el CRM como lead nuevo. Si Sol se guía solo por tags, intentaría
+calificarlo — es decir, **dos bots conversando entre sí** indefinidamente,
+quemando tokens y dejando un hilo absurdo en el CRM.
+
+**Diseño en tres capas:**
+
+1. **Tag = compuerta dura y gratis.** Si el contacto trae `proveedor` o
+   `mayorista / operadores`, Sol **no interviene**, punto. Sin llamada al
+   modelo, sin costo. Es el camino rápido para 146 contactos conocidos.
+2. **Razonamiento = red de seguridad.** Para los no etiquetados, Sol evalúa si
+   su interlocutor es cliente. Señales de que NO lo es: ofrece servicios en vez
+   de pedirlos, habla de tarifas netas o comisiones, responde como negocio,
+   manda catálogos, o es claramente un autorespondedor.
+3. **Auto-etiquetado.** Cuando Sol detecta un no-cliente sin tag, lo etiqueta
+   (`proveedor` o `sol_fuera_de_alcance`) y se retira. La lista mejora sola y
+   la próxima vez lo atrapa la capa 1.
+
+**Anti-bot-a-bot (obligatorio):** si el interlocutor parece automatizado
+(respuestas instantáneas, idénticas, con estructura de menú), Sol corta,
+etiqueta y no vuelve a escribir. Además, tope duro de mensajes consecutivos sin
+intervención humana por conversación.
 
 ---
 
