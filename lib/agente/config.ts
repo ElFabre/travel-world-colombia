@@ -61,6 +61,13 @@ export const ACTIVO_DESDE = new Date(
   process.env.AGENTE_ACTIVO_DESDE ?? '2099-01-01T00:00:00Z'
 )
 
+/**
+ * Modo prueba: mientras el bot actual sigue en producción, Sol solo conversa
+ * con contactos que tengan este tag. Vaciar la variable (AGENTE_TAG_PRUEBAS="")
+ * la abre a todos los contactos.
+ */
+export const TAG_PRUEBAS = process.env.AGENTE_TAG_PRUEBAS ?? 'pruebas_fabrizio'
+
 /** Horario de atención de la agencia (America/Bogota), para fijar expectativas. */
 export const HORARIO = {
   zona: 'America/Bogota',

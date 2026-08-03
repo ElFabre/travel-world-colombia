@@ -60,6 +60,49 @@ export interface ConversacionGhl {
   unreadCount?: number
 }
 
+async function enviar<T>(ruta: string, cuerpo: unknown): Promise<T> {
+  const res = await fetch(`${GHL.api}${ruta}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token()}`,
+      Version: GHL.version,
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(cuerpo),
+    signal: AbortSignal.timeout(10000),
+  })
+  if (!res.ok) {
+    const detalle = await res.text().catch(() => '')
+    throw new Error(`GHL ${ruta} respondió ${res.status}: ${detalle.slice(0, 300)}`)
+  }
+  return res.json() as Promise<T>
+}
+
+/**
+ * Envía un mensaje al cliente y devuelve el messageId que asigna GHL.
+ *
+ * Ese id se guarda en `agente_mensajes_enviados`: es la primera capa del
+ * anti-bucle, porque el mismo mensaje vuelve por el webhook como saliente y hay
+ * que reconocerlo como propio.
+ */
+export async function enviarMensaje(
+  contactId: string,
+  texto: string,
+  tipo = 'WhatsApp'
+): Promise<{ messageId?: string; conversationId?: string }> {
+  const r = await enviar<{ messageId?: string; conversationId?: string }>(
+    '/conversations/messages',
+    { type: tipo, contactId, message: texto }
+  )
+  return { messageId: r.messageId, conversationId: r.conversationId }
+}
+
+/** Agrega tags al contacto (escalada, estado, fuera de alcance). */
+export async function agregarTags(contactId: string, tags: string[]): Promise<void> {
+  await enviar(`/contacts/${contactId}/tags`, { tags })
+}
+
 export async function obtenerContacto(contactId: string): Promise<ContactoGhl | null> {
   const r = await pedir<{ contact?: ContactoGhl }>(`/contacts/${contactId}`)
   return r.contact ?? null

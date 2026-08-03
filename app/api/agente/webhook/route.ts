@@ -6,6 +6,7 @@ import { identificarAutor } from '@/lib/agente/autor'
 import { registrarEvento } from '@/lib/agente/eventos'
 import { enriquecerDesdeContacto } from '@/lib/agente/enriquecer'
 import { TAGS } from '@/lib/agente/config'
+import { atender } from '@/lib/agente/conversacion'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -99,21 +100,41 @@ export async function POST(req: NextRequest) {
       payload: extra?.mensajeCrudo ?? crudo,
     })
 
+    const tags = n.tags.length ? n.tags : (extra?.tagsContacto ?? [])
+    const conversationId = n.conversationId ?? extra?.conversationId
+
+    // Solo los mensajes del cliente disparan un turno de Sol.
+    let notaTurno: string | null = null
+    if (autor === 'cliente' && n.contactId && conversationId) {
+      try {
+        const turno = await atender({
+          contactId: n.contactId,
+          conversationId,
+          nombre: n.nombreContacto,
+          canal: n.canal ?? extra?.canal,
+          tags,
+          fechaMensaje: extra?.mensajeCrudo?.dateAdded
+            ? new Date(extra.mensajeCrudo.dateAdded)
+            : new Date(),
+        })
+        notaTurno = `SOL → ${turno.nota}`
+      } catch (err) {
+        notaTurno = `SOL falló: ${(err as Error).message}`
+        console.error('atender error:', err)
+      }
+    }
+
     await registrarEvento({
       tipo: n.tipo,
-      conversationId: n.conversationId ?? extra?.conversationId,
+      conversationId,
       contactId: n.contactId,
       messageId,
       direccion,
       canal: n.canal ?? extra?.canal,
       cuerpo: n.cuerpo ?? extra?.cuerpo,
       autor,
-      payload: {
-        webhook: crudo,
-        mensaje: extra?.mensajeCrudo ?? null,
-        tags: n.tags.length ? n.tags : (extra?.tagsContacto ?? []),
-      },
-      nota: [nota, extra?.esNoCliente ? 'NO CLIENTE (proveedor/mayorista)' : null, ...(extra?.nota ?? [])]
+      payload: { webhook: crudo, mensaje: extra?.mensajeCrudo ?? null, tags },
+      nota: [nota, extra?.esNoCliente ? 'NO CLIENTE (proveedor/mayorista)' : null, ...(extra?.nota ?? []), notaTurno]
         .filter(Boolean)
         .join(' · '),
     })
