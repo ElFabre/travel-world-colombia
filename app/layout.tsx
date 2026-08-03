@@ -7,6 +7,7 @@ import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
 import { PublicOnly } from '@/components/layout/PublicOnly'
 import { Analytics, AnalyticsNoScript } from '@/components/analytics/Analytics'
 import { SITE, WHATSAPP, SOCIALS } from '@/lib/site'
+import { jsonLd } from '@/lib/seo/jsonLd'
 
 const schemaOrg = {
   '@context': 'https://schema.org',
@@ -151,7 +152,7 @@ export default function RootLayout({
         <AnalyticsNoScript />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaOrg) }}
+          dangerouslySetInnerHTML={{ __html: jsonLd(schemaOrg) }}
         />
         <PublicOnly><Navbar /></PublicOnly>
         <main id="contenido">{children}</main>

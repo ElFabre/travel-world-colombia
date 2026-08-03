@@ -4,8 +4,7 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { requireEditor, requireAdminRole } from '@/lib/admin/guard'
-import { isSuperadmin, isApprovedEmail } from '@/lib/admin/allowlist'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { isApprovedEmail } from '@/lib/admin/allowlist'
 import { registrarActividad } from '@/lib/admin/audit'
 
 export type LoginState = { error?: string }
@@ -68,18 +67,13 @@ export async function signUp(_prev: RegisterState, formData: FormData): Promise<
   // nativo y el usuario debe hacer clic en el enlace (lo procesa /auth/confirm)
   // antes de poder iniciar sesión.
 
-  // Pre-aprobación: dejamos el correo en la allowlist como 'editor' para que,
-  // apenas confirme, ya tenga acceso al panel. (Los superadmins de ADMIN_EMAILS
-  // ya son admin y no necesitan fila.)
-  if (!isSuperadmin(email)) {
-    const admin = createAdminClient()
-    await admin
-      .from('admin_allowlist')
-      .upsert({ email: email.toLowerCase(), rol: 'editor', aprobado_por: 'auto' }, { onConflict: 'email' })
-  }
+  // NO se pre-aprueba: la cuenta queda sin fila en `admin_allowlist` hasta que
+  // un admin la apruebe desde /admin/usuarios. (Antes se insertaba aquí como
+  // 'editor' automáticamente, lo que daba acceso al panel a cualquiera que se
+  // registrara — corregido en la auditoría del 2026-08-03.)
 
   return {
-    ok: 'Cuenta creada. Te enviamos un correo de confirmación: ábrelo y haz clic en el enlace para activar tu cuenta.',
+    ok: 'Cuenta creada. Te enviamos un correo de confirmación. Cuando la actives, un administrador debe aprobar tu acceso antes de que puedas entrar al panel.',
   }
 }
 

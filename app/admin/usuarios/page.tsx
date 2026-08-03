@@ -44,11 +44,11 @@ export default async function UsuariosPage() {
           Usuarios
         </h1>
         <p className="mt-1 font-inter text-sm" style={{ color: 'var(--text-dim)' }}>
-          Los nuevos registros entran como <strong>editor</strong> automáticamente · cambia su rol aquí
+          Quien se registra queda <strong>pendiente</strong> hasta que un administrador lo apruebe aquí
         </p>
       </div>
 
-      {/* Pendientes (raro con auto-aprobación; p.ej. cuentas creadas a mano en Supabase) */}
+      {/* Pendientes: cuentas registradas o creadas en Supabase, aún sin aprobar. */}
       {pendientes.length > 0 && (
         <Seccion icon={<Clock size={16} />} titulo="Pendientes" n={pendientes.length}>
           {pendientes.map(u => (

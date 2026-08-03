@@ -1,5 +1,6 @@
 import { getResenas } from '@/lib/destinos'
 import { SITE } from '@/lib/site'
+import { jsonLd } from '@/lib/seo/jsonLd'
 
 /**
  * JSON-LD de reseñas para la organización. Emite `aggregateRating` + `review`
@@ -40,7 +41,7 @@ export async function OrganizationReviews() {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: jsonLd(schema) }}
     />
   )
 }

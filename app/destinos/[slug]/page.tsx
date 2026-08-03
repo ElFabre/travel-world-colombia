@@ -11,6 +11,7 @@ import { SectionTag } from '@/components/ui/SectionTag'
 import { Icono } from '@/components/ui/Icono'
 import { Button } from '@/components/ui/Button'
 import { SITE, whatsappUrl, whatsappReservaUrl, whatsappDudasUrl } from '@/lib/site'
+import { jsonLd } from '@/lib/seo/jsonLd'
 
 export const revalidate = 1800
 
@@ -125,7 +126,7 @@ export default async function DestinoPage({ params }: Props) {
     <div className="tema-claro">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaTouristDestination) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(schemaTouristDestination) }}
       />
 
       {/* ── HERO ── */}

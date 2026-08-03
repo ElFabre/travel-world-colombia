@@ -2,6 +2,7 @@ import { ChevronDown } from 'lucide-react'
 import { getFaqs } from '@/lib/faqs'
 import { SectionTag } from '@/components/ui/SectionTag'
 import { Reveal } from '@/components/ui/Reveal'
+import { jsonLd } from '@/lib/seo/jsonLd'
 
 /**
  * Sección de preguntas frecuentes — acordeón visible + JSON-LD (FAQPage).
@@ -27,7 +28,7 @@ export async function FaqSection() {
     <section aria-labelledby="faq-title" className="px-6 py-20">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(schema) }}
       />
       <div className="mx-auto max-w-3xl">
         <div className="mb-10 text-center">

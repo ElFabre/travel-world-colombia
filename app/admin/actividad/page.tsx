@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import {
   PlusCircle, Pencil, Trash2, Eye, EyeOff, Star, StarOff, Activity, UserCheck, UserX, UserCog,
 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getAdminUser } from '@/lib/admin/guard'
 import type { AccionAudit } from '@/lib/admin/audit'
 
@@ -40,7 +40,8 @@ export default async function ActividadPage() {
   const user = await getAdminUser()
   if (!user) redirect('/admin/login')
 
-  const supabase = await createClient()
+  // Service-role: no depende de RLS (ver nota en app/admin/viajes/page.tsx).
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('audit_log')
     .select('*')

@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Plus } from 'lucide-react'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getAdminSession } from '@/lib/admin/guard'
 import { destinoCardImg } from '@/lib/hero'
 import type { Destino } from '@/types/destino'
@@ -15,7 +15,10 @@ export default async function ViajesPage() {
   if (!session) redirect('/admin/login')
   const { rol } = session
 
-  const supabase = await createClient()
+  // Service-role: el panel muestra también los viajes ocultos y no depende de
+  // las políticas RLS (que ahora exigen estar en admin_allowlist, y los
+  // superadmins de ADMIN_EMAILS pueden no tener fila).
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('destinos')
     .select('*')
