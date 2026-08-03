@@ -3,10 +3,18 @@ import { z } from 'zod'
 /**
  * Payload del webhook de GHL.
  *
- * A propósito es PERMISIVO (`passthrough`, casi todo opcional): en la Fase 1 el
- * objetivo es justamente descubrir la forma real del evento con tráfico de
- * producción. Rechazar por forma inesperada nos dejaría sin la información que
- * venimos a recolectar. El payload crudo se guarda completo en `agente_eventos`.
+ * ⚠️ FORMA REAL (verificada con tráfico de producción el 2026-08-03): la acción
+ * "Webhook personalizado" de GHL manda ÚNICAMENTE los datos del contacto —
+ *
+ *     { "id": "toX9eLYXnTq6JlETo78C", "name": "Nath ✨", "email": "", "phone": "310 3548495" }
+ *
+ * — sin el texto del mensaje, sin conversación y sin dirección. El `id` es el
+ * del CONTACTO. Por eso el webhook se trata como un "campanazo" y el contenido
+ * se pide por API (`lib/agente/ghl.ts`).
+ *
+ * El esquema sigue siendo PERMISIVO (`passthrough`, casi todo opcional) porque
+ * GHL puede enriquecer el payload si algún día se configuran datos
+ * personalizados en la acción, y no queremos rechazar eventos por eso.
  */
 export const eventoGhlSchema = z
   .object({
@@ -32,24 +40,39 @@ export const eventoGhlSchema = z
     // Autoría.
     userId: z.string().optional(),
     user_id: z.string().optional(),
+
+    // Forma real observada: datos del contacto.
+    name: z.string().optional(),
+    phone: z.string().optional(),
+    email: z.string().optional(),
   })
   .passthrough()
 
 export type EventoGhl = z.infer<typeof eventoGhlSchema>
 
-/** Normaliza los alias de GHL a un solo shape. */
+/**
+ * Normaliza los alias de GHL a un solo shape.
+ *
+ * Ojo con `id`: en el payload real es el id del CONTACTO, no del mensaje. Solo
+ * se toma como `messageId` cuando el evento trae explícitamente datos de
+ * mensaje; si no, se usa como `contactId`.
+ */
 export function normalizar(e: EventoGhl) {
   const mensaje = typeof e.message === 'object' && e.message !== null ? (e.message as Record<string, unknown>) : null
   const str = (v: unknown) => (typeof v === 'string' ? v : undefined)
 
+  const messageId = e.messageId ?? e.message_id ?? str(mensaje?.id)
+  const contactId = e.contactId ?? e.contact_id ?? str(mensaje?.contactId) ?? e.id
+
   return {
     tipo: e.type ?? str(mensaje?.type),
     conversationId: e.conversationId ?? e.conversation_id ?? str(mensaje?.conversationId),
-    contactId: e.contactId ?? e.contact_id ?? str(mensaje?.contactId),
-    messageId: e.messageId ?? e.message_id ?? str(mensaje?.id) ?? e.id,
+    contactId,
+    messageId,
     direccion: e.direction ?? str(mensaje?.direction),
     canal: e.messageType ?? str(mensaje?.messageType),
     cuerpo: e.body ?? (typeof e.message === 'string' ? e.message : str(mensaje?.body)),
     userId: e.userId ?? e.user_id ?? str(mensaje?.userId),
+    nombreContacto: e.name,
   }
 }

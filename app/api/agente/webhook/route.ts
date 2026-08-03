@@ -4,6 +4,7 @@ import { timingSafeEqual } from 'node:crypto'
 import { eventoGhlSchema, normalizar } from '@/lib/agente/schemas'
 import { identificarAutor } from '@/lib/agente/autor'
 import { registrarEvento } from '@/lib/agente/eventos'
+import { enriquecerDesdeContacto } from '@/lib/agente/enriquecer'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -63,13 +64,34 @@ export async function POST(req: NextRequest) {
     }
 
     const n = normalizar(parsed.data)
+
+    // El webhook solo trae el contacto: el contenido se pide a la API.
+    const extra = n.contactId ? await enriquecerDesdeContacto(n.contactId) : null
+
+    const direccion = n.direccion ?? extra?.direccion
+    const messageId = n.messageId ?? extra?.messageId
+
     const { autor, nota } = await identificarAutor({
-      direccion: n.direccion,
-      messageId: n.messageId,
-      payload: crudo,
+      direccion,
+      messageId,
+      // La huella del bot actual viene en el mensaje real, no en el webhook.
+      payload: extra?.mensajeCrudo ?? crudo,
     })
 
-    await registrarEvento({ ...n, autor, nota, payload: crudo })
+    await registrarEvento({
+      tipo: n.tipo,
+      conversationId: n.conversationId ?? extra?.conversationId,
+      contactId: n.contactId,
+      messageId,
+      direccion,
+      canal: n.canal ?? extra?.canal,
+      cuerpo: n.cuerpo ?? extra?.cuerpo,
+      autor,
+      payload: { webhook: crudo, mensaje: extra?.mensajeCrudo ?? null, tags: extra?.tagsContacto ?? [] },
+      nota: [nota, extra?.esNoCliente ? 'NO CLIENTE (proveedor/mayorista)' : null, ...(extra?.nota ?? [])]
+        .filter(Boolean)
+        .join(' · '),
+    })
   })
 
   return Response.json({ ok: true })
