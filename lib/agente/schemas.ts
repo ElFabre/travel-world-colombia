@@ -45,6 +45,12 @@ export const eventoGhlSchema = z
     name: z.string().optional(),
     phone: z.string().optional(),
     email: z.string().optional(),
+
+    // Acción "Webhook" (gratuita): manda el registro completo del contacto.
+    // `tags` viene como cadena separada por comas, no como arreglo.
+    tags: z.union([z.string(), z.array(z.string())]).optional(),
+    full_name: z.string().optional(),
+    workflow: z.record(z.string(), z.unknown()).optional(),
   })
   .passthrough()
 
@@ -64,6 +70,13 @@ export function normalizar(e: EventoGhl) {
   const messageId = e.messageId ?? e.message_id ?? str(mensaje?.id)
   const contactId = e.contactId ?? e.contact_id ?? str(mensaje?.contactId) ?? e.id
 
+  // La acción gratuita manda los tags como "a,b,c"; la premium no los manda.
+  const tags = Array.isArray(e.tags)
+    ? e.tags
+    : typeof e.tags === 'string'
+      ? e.tags.split(',').map(t => t.trim()).filter(Boolean)
+      : []
+
   return {
     tipo: e.type ?? str(mensaje?.type),
     conversationId: e.conversationId ?? e.conversation_id ?? str(mensaje?.conversationId),
@@ -73,6 +86,7 @@ export function normalizar(e: EventoGhl) {
     canal: e.messageType ?? str(mensaje?.messageType),
     cuerpo: e.body ?? (typeof e.message === 'string' ? e.message : str(mensaje?.body)),
     userId: e.userId ?? e.user_id ?? str(mensaje?.userId),
-    nombreContacto: e.name,
+    nombreContacto: e.name ?? e.full_name,
+    tags,
   }
 }

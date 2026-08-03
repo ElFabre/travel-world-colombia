@@ -5,6 +5,7 @@ import { eventoGhlSchema, normalizar } from '@/lib/agente/schemas'
 import { identificarAutor } from '@/lib/agente/autor'
 import { registrarEvento } from '@/lib/agente/eventos'
 import { enriquecerDesdeContacto } from '@/lib/agente/enriquecer'
+import { TAGS } from '@/lib/agente/config'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -65,7 +66,27 @@ export async function POST(req: NextRequest) {
 
     const n = normalizar(parsed.data)
 
-    // El webhook solo trae el contacto: el contenido se pide a la API.
+    // Compuerta barata: la acción gratuita ya manda los tags, así que a un
+    // proveedor o mayorista se le cierra la puerta SIN gastar una sola llamada
+    // a la API (ni al modelo, cuando Sol tenga voz).
+    const esNoCliente = n.tags.some(t => (TAGS.noCliente as readonly string[]).includes(t))
+    if (esNoCliente) {
+      await registrarEvento({
+        tipo: n.tipo,
+        conversationId: n.conversationId,
+        contactId: n.contactId,
+        messageId: n.messageId,
+        direccion: n.direccion,
+        canal: n.canal,
+        cuerpo: n.cuerpo,
+        autor: 'cliente',
+        payload: { webhook: crudo, mensaje: null, tags: n.tags },
+        nota: 'NO CLIENTE (proveedor/mayorista) · descartado por tags, sin llamar a la API',
+      })
+      return
+    }
+
+    // Falta la dirección y la huella del autor: eso solo está en la API.
     const extra = n.contactId ? await enriquecerDesdeContacto(n.contactId) : null
 
     const direccion = n.direccion ?? extra?.direccion
@@ -87,7 +108,11 @@ export async function POST(req: NextRequest) {
       canal: n.canal ?? extra?.canal,
       cuerpo: n.cuerpo ?? extra?.cuerpo,
       autor,
-      payload: { webhook: crudo, mensaje: extra?.mensajeCrudo ?? null, tags: extra?.tagsContacto ?? [] },
+      payload: {
+        webhook: crudo,
+        mensaje: extra?.mensajeCrudo ?? null,
+        tags: n.tags.length ? n.tags : (extra?.tagsContacto ?? []),
+      },
       nota: [nota, extra?.esNoCliente ? 'NO CLIENTE (proveedor/mayorista)' : null, ...(extra?.nota ?? [])]
         .filter(Boolean)
         .join(' · '),
