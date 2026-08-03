@@ -7,7 +7,9 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/admin/', '/api/', '/_next/'],
+        // `/_next/` NO se bloquea: Googlebot necesita los assets y las
+        // imágenes optimizadas para renderizar la página al indexarla.
+        disallow: ['/admin/', '/api/'],
       },
     ],
     sitemap: `${SITE.url}/sitemap.xml`,

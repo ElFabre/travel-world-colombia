@@ -32,8 +32,11 @@ const ACCIONES: Record<AccionAudit, { label: string; color: string; Icon: typeof
   'cambiar-rol':       { label: 'Cambió rol',      color: 'var(--orange)', Icon: UserCog },
 }
 
+// timeZone explícita: en Vercel el proceso corre en UTC, así que sin esto la
+// bitácora mostraría las horas corridas 5 h.
 const fmtFecha = new Intl.DateTimeFormat('es-CO', {
   day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
+  timeZone: 'America/Bogota',
 })
 
 export default async function ActividadPage() {

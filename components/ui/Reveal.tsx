@@ -21,10 +21,11 @@ export function Reveal({
   const ref = useRef<HTMLDivElement>(null)
   const [shown, setShown] = useState(false)
 
+  // prefers-reduced-motion NO se atiende aquí: globals.css ya fuerza el estado
+  // visible ([data-reveal] con opacity 1 !important) en ese modo.
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { setShown(true); return }
     const io = new IntersectionObserver(
       ([e]) => { if (e.isIntersecting) { setShown(true); io.disconnect() } },
       { threshold: 0.15, rootMargin: '0px 0px -8% 0px' }

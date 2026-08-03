@@ -25,7 +25,20 @@ export async function crearResena(_prev: ResenaState, formData: FormData): Promi
   const fuente = String(formData.get('fuente') ?? 'manual').trim() || 'manual'
 
   const admin = createAdminClient()
-  const { error } = await admin.from('resenas').insert({ nombre, texto, estrellas, destino, fuente, activa: true })
+  // Orden explícito (como en FAQ): sin esto todas quedaban en 0 y, como la
+  // tabla no tiene created_at, Postgres no garantizaba un orden estable — el
+  // testimonio que salía en cada ficha podía cambiar entre renders.
+  const { data: ultima } = await admin
+    .from('resenas')
+    .select('orden')
+    .order('orden', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  const orden = (ultima?.orden ?? 0) + 1
+
+  const { error } = await admin
+    .from('resenas')
+    .insert({ nombre, texto, estrellas, destino, fuente, orden, activa: true })
   if (error) return { error: error.message }
 
   await registrarActividad({ email: user.email!, accion: 'crear', nombre: `Reseña de ${nombre}` })

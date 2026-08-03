@@ -23,10 +23,11 @@ export function CountUp({
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { setVal(to); return }
     const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return
       io.disconnect()
+      // Con movimiento reducido, saltar directo al valor final (sin animar).
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { setVal(to); return }
       const start = performance.now()
       const tick = (now: number) => {
         const p = Math.min(1, (now - start) / duration)

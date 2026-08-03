@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import { cache } from 'react'
+import { createPublicClient } from '@/lib/supabase/publico'
 
 export interface Faq {
   id: string
@@ -11,8 +12,8 @@ export interface Faq {
  * así que RLS solo expone las filas con `activa = true`. Alimenta tanto el
  * acordeón visible como el JSON-LD (FAQPage) de la web.
  */
-export async function getFaqs(): Promise<Faq[]> {
-  const supabase = await createClient()
+export const getFaqs = cache(async function getFaqs(): Promise<Faq[]> {
+  const supabase = createPublicClient()
   const { data, error } = await supabase
     .from('faqs')
     .select('id, pregunta, respuesta')
@@ -25,4 +26,4 @@ export async function getFaqs(): Promise<Faq[]> {
     return []
   }
   return (data ?? []) as Faq[]
-}
+})

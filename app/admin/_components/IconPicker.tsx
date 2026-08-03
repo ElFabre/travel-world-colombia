@@ -1,28 +1,9 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { icons } from 'lucide-react'
 import { Search, X } from 'lucide-react'
 import { Icono } from '@/components/ui/Icono'
-
-/** PascalCase de lucide → kebab-case que guarda el CMS (ej. FileCheck → file-check). */
-function aKebab(pascal: string): string {
-  return pascal.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
-}
-
-/** Iconos sugeridos para "Información clave" de un viaje (deben existir en lucide). */
-const SUGERIDOS = [
-  'plane', 'map-pin', 'globe', 'compass', 'calendar', 'calendar-days', 'clock',
-  'wallet', 'banknote', 'credit-card', 'coins', 'languages', 'thermometer',
-  'sun', 'cloud-sun', 'umbrella', 'droplet', 'wind', 'snowflake', 'waves',
-  'tree-palm', 'mountain', 'mountain-snow', 'trees', 'tent', 'flower',
-  'utensils', 'coffee', 'wine', 'beer', 'bed', 'hotel', 'car', 'bus', 'ship',
-  'sailboat', 'anchor', 'bike', 'train-front', 'ticket', 'camera', 'binoculars',
-  'heart', 'star', 'shield-check', 'file-check', 'id-card', 'users', 'baby',
-  'dog', 'fish', 'bird', 'music', 'shopping-bag', 'gift', 'key', 'flag',
-  'award', 'sparkles', 'briefcase', 'backpack', 'footprints', 'life-buoy',
-  'phone', 'wifi', 'zap', 'plug',
-]
+import { NOMBRES_ICONOS } from '@/lib/iconos'
 
 interface Props {
   value: string
@@ -49,19 +30,12 @@ export function IconPicker({ value, onChange }: Props) {
     }
   }, [abierto])
 
-  // Lista a mostrar: si hay búsqueda, filtra todos los iconos de lucide;
-  // si no, muestra la lista de sugeridos (que existan en lucide).
+  // Solo iconos del catálogo (`lib/iconos.ts`), que es el mismo que sabe
+  // dibujar la web: así nunca se guarda un icono que luego salga como texto.
   const lista = useMemo(() => {
-    const todos = Object.keys(icons)
-    if (q.trim()) {
-      const t = q.trim().toLowerCase().replace(/[\s_-]+/g, '')
-      return todos
-        .filter(n => n.toLowerCase().includes(t))
-        .slice(0, 60)
-        .map(aKebab)
-    }
-    const existentes = new Set(todos.map(aKebab))
-    return SUGERIDOS.filter(n => existentes.has(n))
+    const t = q.trim().toLowerCase().replace(/[\s_-]+/g, '')
+    if (!t) return NOMBRES_ICONOS
+    return NOMBRES_ICONOS.filter(n => n.replace(/-/g, '').includes(t))
   }, [q])
 
   return (

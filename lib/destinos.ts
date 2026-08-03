@@ -1,9 +1,10 @@
-import { createClient } from '@/lib/supabase/server'
+import { cache } from 'react'
+import { createPublicClient } from '@/lib/supabase/publico'
 import type { Destino } from '@/types/destino'
 
 /** Lista de destinos activos, ordenados por `orden`. */
-export async function getDestinos(): Promise<Destino[]> {
-  const supabase = await createClient()
+export const getDestinos = cache(async function getDestinos(): Promise<Destino[]> {
+  const supabase = createPublicClient()
   const { data, error } = await supabase
     .from('destinos')
     .select('*')
@@ -15,7 +16,7 @@ export async function getDestinos(): Promise<Destino[]> {
     return []
   }
   return (data ?? []) as Destino[]
-}
+})
 
 export interface ResenaDestino {
   nombre: string
@@ -27,37 +28,58 @@ export interface ResenaDestino {
  * Una reseña activa asociada a un destino (por nombre), para el testimonio de
  * la página de detalle. Reusa la tabla `resenas` que se gestiona en el panel.
  */
-export async function getResenaDestino(destino: string): Promise<ResenaDestino | null> {
-  const supabase = await createClient()
-  const { data } = await supabase
+export const getResenaDestino = cache(async function getResenaDestino(
+  destino: string
+): Promise<ResenaDestino | null> {
+  const supabase = createPublicClient()
+  const { data, error } = await supabase
     .from('resenas')
     .select('nombre, texto, estrellas')
     .eq('activa', true)
     .ilike('destino', destino)
     .order('orden', { ascending: true })
+    .order('id', { ascending: true })
     .limit(1)
     .maybeSingle()
+
+  if (error) {
+    console.error('getResenaDestino error:', error.message)
+    return null
+  }
   return (data as ResenaDestino) ?? null
-}
+})
 
 /**
  * Reseñas activas (de la tabla gestionada en el panel) para el markup JSON-LD
  * de reseñas. Reusa el cliente público → RLS solo expone las activas.
  */
-export async function getResenas(limite = 8): Promise<ResenaDestino[]> {
-  const supabase = await createClient()
-  const { data } = await supabase
+export const getResenas = cache(async function getResenas(limite = 8): Promise<ResenaDestino[]> {
+  const supabase = createPublicClient()
+  const { data, error } = await supabase
     .from('resenas')
     .select('nombre, texto, estrellas')
     .eq('activa', true)
     .order('orden', { ascending: true })
+    .order('id', { ascending: true })
     .limit(limite)
-  return (data as ResenaDestino[]) ?? []
-}
 
-/** Un destino activo por slug. Devuelve null si no existe. */
-export async function getDestino(slug: string): Promise<Destino | null> {
-  const supabase = await createClient()
+  if (error) {
+    console.error('getResenas error:', error.message)
+    return []
+  }
+  return (data as ResenaDestino[]) ?? []
+})
+
+/**
+ * Un destino activo por slug. `null` = no existe (la página responde 404).
+ *
+ * Si la consulta FALLA (Supabase caído, timeout) lanzamos en vez de devolver
+ * null: un 404 se indexa y se cachea como "esta página no existe", mientras que
+ * el error boundary da un 500 reintentable. Cacheado por request: la ficha lo
+ * pide en generateMetadata y de nuevo al renderizar.
+ */
+export const getDestino = cache(async function getDestino(slug: string): Promise<Destino | null> {
+  const supabase = createPublicClient()
   const { data, error } = await supabase
     .from('destinos')
     .select('*')
@@ -67,7 +89,7 @@ export async function getDestino(slug: string): Promise<Destino | null> {
 
   if (error) {
     console.error('getDestino error:', error.message)
-    return null
+    throw new Error(`No se pudo cargar el destino "${slug}": ${error.message}`)
   }
   return (data as Destino) ?? null
-}
+})

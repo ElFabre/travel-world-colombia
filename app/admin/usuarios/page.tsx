@@ -7,7 +7,7 @@ import { AprobarBtn, RevocarBtn, RoleSelect } from './UserActions'
 
 export const dynamic = 'force-dynamic'
 
-const fmtFecha = new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })
+const fmtFecha = new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'America/Bogota' })
 
 interface AllowRow { email: string; rol: Role | null; aprobado_por: string | null; created_at: string }
 

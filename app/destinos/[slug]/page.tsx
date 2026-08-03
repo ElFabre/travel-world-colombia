@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Script from 'next/script'
 import { notFound } from 'next/navigation'
 import { Clock, Users, ArrowRight, Quote, Star } from 'lucide-react'
-import { getDestino, getResenaDestino } from '@/lib/destinos'
+import { getDestino, getDestinos, getResenaDestino } from '@/lib/destinos'
 import { InfoClaveCarousel } from '@/components/destinos/InfoClaveCarousel'
 import { ItinerarioTimeline } from '@/components/destinos/ItinerarioTimeline'
 import { IncluyeTabs } from '@/components/destinos/IncluyeTabs'
@@ -20,13 +20,28 @@ interface Props {
 }
 
 /**
+ * Prerenderiza en el build una página por cada viaje activo. Los viajes que se
+ * activen después siguen funcionando: se generan bajo demanda la primera vez y
+ * quedan cacheados (dynamicParams por defecto).
+ */
+export async function generateStaticParams() {
+  const destinos = await getDestinos()
+  return destinos.map(d => ({ slug: d.slug }))
+}
+
+/**
  * Convierte el precio libre ("desde $899 USD", "$2.000.000 COP") en una oferta
- * para JSON-LD. Quita todo lo que no sean dígitos (los precios no usan
- * decimales), así "2.000.000" → "2000000". Devuelve null si no hay número.
+ * para JSON-LD. Toma SOLO el primer número del texto y le quita los separadores
+ * de miles: "2.000.000" → "2000000".
+ *
+ * Antes se concatenaban todos los dígitos del texto, así que "Desde $899 USD ·
+ * 8 días" publicaba lowPrice "8998" — un precio inventado que Google puede
+ * mostrar como rich result.
  */
 function precioToOffer(precio?: string): { lowPrice: string; priceCurrency: string } | null {
   if (!precio) return null
-  const lowPrice = precio.replace(/[^\d]/g, '')
+  const primerNumero = precio.match(/\d[\d.,\s]*/)?.[0]
+  const lowPrice = primerNumero?.replace(/[^\d]/g, '') ?? ''
   if (!lowPrice) return null
   const priceCurrency = /usd|d[oó]lar/i.test(precio) ? 'USD' : 'COP'
   return { lowPrice, priceCurrency }
