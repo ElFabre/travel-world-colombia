@@ -1,7 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { decidir, type Decision } from '@/lib/agente/claude'
 import { agregarTags, enviarMensaje, ultimosMensajes, type MensajeGhl } from '@/lib/agente/ghl'
-import { ACTIVO_DESDE, HORARIO, TAGS, TAG_PRUEBAS } from '@/lib/agente/config'
+import { ACTIVO_DESDE, HORARIO, RAFAGA_MS, TAGS, TAG_PRUEBAS } from '@/lib/agente/config'
 
 /** ¿Estamos dentro del horario de atención de la agencia (hora de Colombia)? */
 export function enHorario(ahora = new Date()): boolean {
@@ -18,6 +18,46 @@ export function enHorario(ahora = new Date()): boolean {
   if (dia === 'Sun') return false
   if (dia === 'Sat') return hora >= HORARIO.sabado.desde && hora < HORARIO.sabado.hasta
   return hora >= HORARIO.semana.desde && hora < HORARIO.semana.hasta
+}
+
+/**
+ * Espera la ventana de ráfaga y decide si a este mensaje le toca responder.
+ *
+ * La ventana es DESLIZANTE: si mientras esperamos llega otro mensaje del
+ * cliente, cedemos el turno a ese (que a su vez esperará su propia ventana y
+ * verá toda la conversación acumulada). Así una ráfaga de cuatro mensajes
+ * separados por 8 segundos se agrupa entera aunque dure medio minuto.
+ *
+ * Se apoya en `agente_eventos`, donde el evento ya quedó registrado antes de
+ * llamar aquí: basta con preguntar si existe uno más nuevo del cliente en la
+ * misma conversación.
+ *
+ * @returns true si soy el último mensaje y debo atender; false si cedo el turno.
+ */
+export async function meTocaResponder(
+  conversationId: string,
+  recibidoEn: string
+): Promise<boolean> {
+  if (RAFAGA_MS <= 0) return true
+
+  await new Promise(r => setTimeout(r, RAFAGA_MS))
+
+  const admin = createAdminClient()
+  const { data, error } = await admin
+    .from('agente_eventos')
+    .select('id')
+    .eq('conversation_id', conversationId)
+    .eq('autor', 'cliente')
+    .gt('recibido_en', recibidoEn)
+    .limit(1)
+
+  // Ante un fallo de lectura preferimos atender: peor que responder de más es
+  // que el cliente se quede sin respuesta.
+  if (error) {
+    console.error('meTocaResponder error:', error.message)
+    return true
+  }
+  return (data?.length ?? 0) === 0
 }
 
 export interface ResultadoTurno {

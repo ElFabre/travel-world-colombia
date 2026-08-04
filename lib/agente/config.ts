@@ -68,6 +68,22 @@ export const ACTIVO_DESDE = new Date(
  */
 export const TAG_PRUEBAS = process.env.AGENTE_TAG_PRUEBAS ?? 'pruebas_fabrizio'
 
+/**
+ * Ventana para agrupar ráfagas de mensajes, en milisegundos.
+ *
+ * En WhatsApp la gente escribe en pedazos ("hola" … "quiero ir a Perú"), y
+ * responder a cada pedazo es a la vez caro y peor: el primer mensaje se
+ * contesta sin saber lo que viene. Sol espera este tiempo y, si llega otro
+ * mensaje, cede el turno al más reciente (ventana DESLIZANTE: el reloj se
+ * reinicia con cada mensaje nuevo).
+ *
+ * 10 s por decisión del usuario. Medido sobre 698 mensajes reales de la
+ * cuenta: la pausa mediana entre mensajes seguidos es de 10,9 s, así que esta
+ * ventana atrapa cerca de la mitad de las ráfagas de forma directa y bastantes
+ * más al deslizarse. Poner 0 desactiva el agrupamiento.
+ */
+export const RAFAGA_MS = Number(process.env.AGENTE_RAFAGA_MS ?? 10_000)
+
 /** Horario de atención de la agencia (America/Bogota), para fijar expectativas. */
 export const HORARIO = {
   zona: 'America/Bogota',

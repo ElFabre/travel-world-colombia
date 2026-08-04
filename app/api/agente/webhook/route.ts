@@ -3,13 +3,20 @@ import type { NextRequest } from 'next/server'
 import { timingSafeEqual } from 'node:crypto'
 import { eventoGhlSchema, normalizar } from '@/lib/agente/schemas'
 import { identificarAutor } from '@/lib/agente/autor'
-import { registrarEvento } from '@/lib/agente/eventos'
+import { anotarEvento, registrarEvento } from '@/lib/agente/eventos'
 import { enriquecerDesdeContacto } from '@/lib/agente/enriquecer'
 import { TAGS, ACTIVO_DESDE, TAG_PRUEBAS } from '@/lib/agente/config'
-import { atender } from '@/lib/agente/conversacion'
+import { atender, meTocaResponder } from '@/lib/agente/conversacion'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+/**
+ * El trabajo de `after()` incluye la espera de ráfaga (10 s) más la llamada al
+ * modelo (4–17 s medidos) y los envíos a GHL. 90 s da margen de sobra sin
+ * dejar funciones colgadas si algo se atasca.
+ */
+export const maxDuration = 90
 
 /**
  * Webhook del agente Sol — FASE 1: escucha y registra, NO responde a nadie.
@@ -103,28 +110,9 @@ export async function POST(req: NextRequest) {
     const tags = n.tags.length ? n.tags : (extra?.tagsContacto ?? [])
     const conversationId = n.conversationId ?? extra?.conversationId
 
-    // Solo los mensajes del cliente disparan un turno de Sol.
-    let notaTurno: string | null = null
-    if (autor === 'cliente' && n.contactId && conversationId) {
-      try {
-        const turno = await atender({
-          contactId: n.contactId,
-          conversationId,
-          nombre: n.nombreContacto,
-          canal: n.canal ?? extra?.canal,
-          tags,
-          fechaMensaje: extra?.mensajeCrudo?.dateAdded
-            ? new Date(extra.mensajeCrudo.dateAdded)
-            : new Date(),
-        })
-        notaTurno = `SOL → ${turno.nota}`
-      } catch (err) {
-        notaTurno = `SOL falló: ${(err as Error).message}`
-        console.error('atender error:', err)
-      }
-    }
-
-    await registrarEvento({
+    // El evento se registra ANTES de esperar la ráfaga: así, si llega otro
+    // mensaje mientras esperamos, ese ve el nuestro y sabe que es más nuevo.
+    const evento = await registrarEvento({
       tipo: n.tipo,
       conversationId,
       contactId: n.contactId,
@@ -134,10 +122,35 @@ export async function POST(req: NextRequest) {
       cuerpo: n.cuerpo ?? extra?.cuerpo,
       autor,
       payload: { webhook: crudo, mensaje: extra?.mensajeCrudo ?? null, tags },
-      nota: [nota, extra?.esNoCliente ? 'NO CLIENTE (proveedor/mayorista)' : null, ...(extra?.nota ?? []), notaTurno]
+      nota: [nota, extra?.esNoCliente ? 'NO CLIENTE (proveedor/mayorista)' : null, ...(extra?.nota ?? [])]
         .filter(Boolean)
         .join(' · '),
     })
+
+    // Solo los mensajes del cliente disparan un turno de Sol.
+    if (autor !== 'cliente' || !n.contactId || !conversationId) return
+
+    try {
+      if (evento && !(await meTocaResponder(conversationId, evento.recibidoEn))) {
+        await anotarEvento(evento.id, 'SOL → cede el turno: llegó otro mensaje (ráfaga)')
+        return
+      }
+
+      const turno = await atender({
+        contactId: n.contactId,
+        conversationId,
+        nombre: n.nombreContacto,
+        canal: n.canal ?? extra?.canal,
+        tags,
+        fechaMensaje: extra?.mensajeCrudo?.dateAdded
+          ? new Date(extra.mensajeCrudo.dateAdded)
+          : new Date(),
+      })
+      if (evento) await anotarEvento(evento.id, `SOL → ${turno.nota}`)
+    } catch (err) {
+      console.error('atender error:', err)
+      if (evento) await anotarEvento(evento.id, `SOL falló: ${(err as Error).message}`)
+    }
   })
 
   return Response.json({ ok: true })
