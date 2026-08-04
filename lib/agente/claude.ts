@@ -91,7 +91,13 @@ export async function decidir(
     max_tokens: 4000,
     system: [
       { type: 'text', text: INSTRUCCIONES },
-      { type: 'text', text: conocimiento, cache_control: { type: 'ephemeral' } },
+      // TTL de 1 hora en vez de los 5 minutos por defecto. El bloque cacheado
+      // (instrucciones + catálogo) es IDÉNTICO para todas las conversaciones,
+      // así que cualquier mensaje de cualquier cliente lo mantiene caliente.
+      // Medido: escribir el caché cuesta ~5x lo que cuesta leerlo, y en
+      // WhatsApp los mensajes llegan espaciados — con 5 minutos casi siempre
+      // se pagaría la escritura.
+      { type: 'text', text: conocimiento, cache_control: { type: 'ephemeral', ttl: '1h' } },
     ],
     messages: [
       ...historial,
