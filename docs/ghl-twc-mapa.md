@@ -78,6 +78,28 @@ probablemente NO lo toca, lo maneja el equipo/workflows.)
 
 - IA - NOMBRE — `contact.ia__nombre` (TEXT) — `ZJgh8LCTvQz6VIne19uz` (nombre capturado por el bot actual)
 
+Campos del agente Sol (creados por API el 2026-08-04, propuesta §6.2 del diseño;
+`lib/agente/crm.ts` los detecta por `fieldKey` y escribe los que apliquen):
+
+| Campo | fieldKey | Tipo | ID |
+|---|---|---|---|
+| Sol Estado | `contact.sol_estado` | SINGLE_OPTIONS (conversando/calificado/escalado/dormido/no_interesado/fuera_de_alcance) | `ViQHLxaiqquWXN3C4g1R` |
+| Sol Temperatura | `contact.sol_temperatura` | SINGLE_OPTIONS (caliente/tibio/frio/no_interesado) | `Pb7LLMKqnSaRNWeYXplh` |
+| Sol Resumen | `contact.sol_resumen` | LARGE_TEXT | `UwiRAbz1hd52PZEnTN1I` |
+| Sol Proximo Seguimiento | `contact.sol_proximo_seguimiento` | DATE | `SbW0fZvzaMlyrSljEsZs` |
+| Sol Intentos Seguimiento | `contact.sol_intentos_seguimiento` | NUMERICAL | `FzV3rBcYBNOTl0Dd7icw` |
+| Sol Motivo Cierre | `contact.sol_motivo_cierre` | TEXT | `raDE38awjgeZkDz9nJPw` |
+| Sol Objeciones | `contact.sol_objeciones` | LARGE_TEXT | `ZWdjCHswoFSpXl86d9gR` |
+| Sol Ultima Interaccion | `contact.sol_ultima_interaccion` | DATE | `3lFkVNxsnsEAem7o6BFB` |
+| Sol Canal | `contact.sol_canal` | SINGLE_OPTIONS (whatsapp/instagram/facebook/widget) | `Xu5kJNEhfEq0VJE2VeNq` |
+| Sol Idioma | `contact.sol_idioma` | TEXT | `6HTkEjejzS5pYuFseaz4` |
+| Sol Confianza | `contact.sol_confianza` | SINGLE_OPTIONS (alta/media/baja) | `fwAJmk7Br9RB85UEFqmY` |
+
+> Nota API: no existe endpoint para CREAR carpetas de campos de contacto (la V2
+> de `/custom-fields` rechaza `objectKey: contact`), pero el PUT clásico de
+> `/locations/{id}/customFields/{fieldId}` SÍ acepta `parentId` para moverlos
+> de carpeta. Los campos nuevos caen por defecto en `Y050KGaF6GSPM0NGqjBo`.
+
 ### Otros folders (operación interna — el agente NO los toca)
 
 - **Pasajeros P1–P8** (`29aTQqp17HR5lKH9ZTnb`): nombre, documento, pasaporte,
