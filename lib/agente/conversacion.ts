@@ -1,6 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { decidir, type Decision } from '@/lib/agente/claude'
-import { agregarTags, enviarMensaje, ultimosMensajes } from '@/lib/agente/ghl'
+import { agregarTags, enviarMensaje, rutaDeRespuesta, ultimosMensajes } from '@/lib/agente/ghl'
 import { sincronizarCrm } from '@/lib/agente/crm'
 import { ACTIVO_DESDE, HORARIO, RAFAGA_MS, TAGS, TAG_PRUEBAS } from '@/lib/agente/config'
 
@@ -124,7 +124,12 @@ export async function atender(e: Entrada): Promise<ResultadoTurno> {
   const habla = decision.accion !== 'callar' && decision.mensaje.trim() !== ''
 
   if (habla) {
-    const { messageId } = await enviarMensaje(e.contactId, decision.mensaje.trim())
+    // Por el mismo canal por el que escribió el cliente (custom provider incluido).
+    const { messageId } = await enviarMensaje(
+      e.contactId,
+      decision.mensaje.trim(),
+      rutaDeRespuesta(mensajes)
+    )
     if (messageId) await registrarEnviado(messageId, e.conversationId, e.contactId)
   }
 
@@ -134,8 +139,10 @@ export async function atender(e: Entrada): Promise<ResultadoTurno> {
 
   const notasCrm = await sincronizarCrm({
     contactId: e.contactId,
+    conversationId: e.conversationId,
     canal: e.canal,
     decision,
+    intentos: 0, // el cliente escribió: el contador de seguimientos se reinicia
   })
 
   return {
@@ -145,7 +152,7 @@ export async function atender(e: Entrada): Promise<ResultadoTurno> {
   }
 }
 
-async function esNuestro(messageId?: string): Promise<boolean> {
+export async function esNuestro(messageId?: string): Promise<boolean> {
   if (!messageId) return false
   const admin = createAdminClient()
   const { data, error } = await admin
@@ -157,7 +164,7 @@ async function esNuestro(messageId?: string): Promise<boolean> {
   return Boolean(data)
 }
 
-async function registrarEnviado(messageId: string, conversationId: string, contactId: string) {
+export async function registrarEnviado(messageId: string, conversationId: string, contactId: string) {
   const admin = createAdminClient()
   const { error } = await admin
     .from('agente_mensajes_enviados')

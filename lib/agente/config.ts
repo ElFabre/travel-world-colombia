@@ -99,6 +99,13 @@ export const TAG_PRUEBAS = process.env.AGENTE_TAG_PRUEBAS ?? 'pruebas_fabrizio'
  */
 export const RAFAGA_MS = Number(process.env.AGENTE_RAFAGA_MS ?? 10_000)
 
+/**
+ * Tope de seguimientos sin respuesta (§5 del diseño: decaimiento y corte).
+ * Al agotarlos el contacto pasa a `dormido` y Sol no vuelve a escribirle por
+ * iniciativa propia — si el cliente escribe, la conversación revive sola.
+ */
+export const MAX_INTENTOS_SEGUIMIENTO = 3
+
 /** Horario de atención de la agencia (America/Bogota), para fijar expectativas. */
 export const HORARIO = {
   zona: 'America/Bogota',

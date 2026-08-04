@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { INSTRUCCIONES, ESQUEMA_DECISION } from '@/lib/agente/prompt'
 import { construirConocimiento } from '@/lib/agente/conocimiento'
+import { HORARIO } from '@/lib/agente/config'
 import type { MensajeGhl } from '@/lib/agente/ghl'
 
 export interface Decision {
@@ -18,6 +19,11 @@ export interface Decision {
     presupuesto?: string
   }
   resumen?: string
+  /** Cuándo y con qué ángulo volver a escribir si el cliente no contesta. */
+  seguimiento?: { proximo_contacto: string; angulo: string }
+  objeciones?: string
+  idioma?: string
+  confianza?: 'alta' | 'media' | 'baja'
 }
 
 let cliente: Anthropic | null = null
@@ -61,7 +67,13 @@ function aHistorial(mensajes: MensajeGhl[]): Anthropic.MessageParam[] {
  */
 export async function decidir(
   mensajes: MensajeGhl[],
-  contexto: { nombre?: string; canal?: string; enHorario: boolean }
+  contexto: {
+    nombre?: string
+    canal?: string
+    enHorario: boolean
+    /** Presente cuando el turno lo dispara un seguimiento programado, no un mensaje del cliente. */
+    seguimiento?: { intento: number; maximo: number; angulo?: string }
+  }
 ): Promise<Decision> {
   const historial = aHistorial(mensajes)
   if (historial.length === 0) {
@@ -76,9 +88,22 @@ export async function decidir(
 
   const conocimiento = await construirConocimiento()
 
+  // Fecha con día de la semana: sin ella el modelo no puede programar
+  // seguimientos ("en 3 días", "el lunes") ni esquivar los domingos.
+  const hoy = new Date()
+  const fechaLarga = new Intl.DateTimeFormat('es-CO', {
+    timeZone: HORARIO.zona,
+    dateStyle: 'full',
+  }).format(hoy)
+  const fechaIso = new Intl.DateTimeFormat('en-CA', { timeZone: HORARIO.zona }).format(hoy)
+
   const situacion = [
+    `Hoy es ${fechaLarga} (${fechaIso}), hora de Colombia.`,
     contexto.nombre ? `El contacto se llama ${contexto.nombre}.` : null,
     contexto.canal ? `Canal: ${contexto.canal}.` : null,
+    contexto.seguimiento
+      ? `Este turno es un SEGUIMIENTO programado (intento ${contexto.seguimiento.intento} de ${contexto.seguimiento.maximo}): el cliente NO ha contestado tu último mensaje; no hay mensaje nuevo suyo.${contexto.seguimiento.angulo ? ` Ángulo que dejaste anotado: ${contexto.seguimiento.angulo}` : ''}`
+      : null,
     contexto.enHorario
       ? 'Estás dentro del horario de atención: si escalas, una asesora puede responder hoy.'
       : 'Estás FUERA del horario de atención: si escalas, avísale que una asesora le escribe cuando abran, sin prometer una hora exacta.',

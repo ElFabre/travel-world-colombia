@@ -5,7 +5,13 @@ import {
   moverOportunidad,
   oportunidadesDe,
 } from '@/lib/agente/ghl'
-import { CAMPOS_CALIFICACION, HORARIO, PIPELINE } from '@/lib/agente/config'
+import { createAdminClient } from '@/lib/supabase/admin'
+import {
+  CAMPOS_CALIFICACION,
+  HORARIO,
+  MAX_INTENTOS_SEGUIMIENTO,
+  PIPELINE,
+} from '@/lib/agente/config'
 import type { Decision } from '@/lib/agente/claude'
 
 /**
@@ -30,8 +36,14 @@ import type { Decision } from '@/lib/agente/claude'
 
 export interface EntradaCrm {
   contactId: string
+  conversationId?: string
   canal?: string
   decision: Decision
+  /**
+   * Seguimientos sin respuesta acumulados, contando este turno. Un turno
+   * normal (el cliente escribió) es 0: el contador se reinicia solo.
+   */
+  intentos?: number
 }
 
 export async function sincronizarCrm(e: EntradaCrm): Promise<string[]> {
@@ -53,6 +65,7 @@ export async function sincronizarCrm(e: EntradaCrm): Promise<string[]> {
     await paso('nota', () => dejarNotaDeEscalada(e))
   }
   await paso('pipeline', () => moverSiCalificado(e))
+  await paso('agenda', () => programarSeguimiento(e))
 
   return notas
 }
@@ -141,16 +154,29 @@ async function camposSolExistentes(): Promise<Map<string, string>> {
   return porClave
 }
 
-async function escribirCamposSol({ contactId, canal, decision }: EntradaCrm): Promise<string | null> {
+async function escribirCamposSol(e: EntradaCrm): Promise<string | null> {
+  const { contactId, canal, decision } = e
   const existentes = await camposSolExistentes()
   if (existentes.size === 0) return null // aún no los crean; silencio, sin error
 
+  const dormido = (e.intentos ?? 0) >= MAX_INTENTOS_SEGUIMIENTO
   const valores: Record<string, string | number | undefined> = {
-    sol_estado: derivarEstado(decision),
+    sol_estado: derivarEstado(decision, dormido),
     sol_temperatura: decision.temperatura === 'no_aplica' ? undefined : decision.temperatura,
     sol_resumen: decision.resumen?.trim() || undefined,
     sol_ultima_interaccion: fechaBogota(),
     sol_canal: canalNormalizado(canal),
+    sol_proximo_seguimiento: proximoSeguimientoValido(decision),
+    sol_intentos_seguimiento: e.intentos,
+    sol_objeciones: decision.objeciones?.trim() || undefined,
+    sol_idioma: decision.idioma?.trim() || undefined,
+    sol_confianza: decision.confianza,
+    sol_motivo_cierre:
+      decision.temperatura === 'no_interesado'
+        ? decision.motivo
+        : dormido
+          ? `sin respuesta tras ${MAX_INTENTOS_SEGUIMIENTO} seguimientos`
+          : undefined,
   }
 
   const campos = Object.entries(valores)
@@ -162,16 +188,28 @@ async function escribirCamposSol({ contactId, canal, decision }: EntradaCrm): Pr
   return `sol_* actualizados (${campos.length})`
 }
 
-function derivarEstado(decision: Decision): string {
+function derivarEstado(decision: Decision, dormido = false): string {
   if (decision.accion === 'escalar') return 'escalado'
   if (decision.temperatura === 'no_interesado') return 'no_interesado'
+  if (dormido) return 'dormido'
   if (estaCalificado(decision.datos)) return 'calificado'
   return 'conversando'
 }
 
 /** Fecha local de Colombia en YYYY-MM-DD (formato que aceptan los campos DATE). */
-function fechaBogota(): string {
+export function fechaBogota(): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: HORARIO.zona }).format(new Date())
+}
+
+/**
+ * La fecha de seguimiento que propone el modelo, saneada: formato YYYY-MM-DD y
+ * en el futuro. Cualquier otra cosa se descarta — mejor un lead sin seguimiento
+ * que un runner persiguiendo fechas del pasado en bucle.
+ */
+function proximoSeguimientoValido(decision: Decision): string | undefined {
+  const fecha = decision.seguimiento?.proximo_contacto?.trim()
+  if (!fecha || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return undefined
+  return fecha > fechaBogota() ? fecha : undefined
 }
 
 function canalNormalizado(canal?: string): string | undefined {
@@ -241,4 +279,49 @@ async function moverSiCalificado({ contactId, decision }: EntradaCrm): Promise<s
 
   await moverOportunidad(abierta.id, PIPELINE.id, PIPELINE.etapas.calificadoPorBot)
   return 'oportunidad movida a "Calificado por Bot"'
+}
+
+/**
+ * Cola operativa del seguimiento dinámico (§5): una fila por contacto en
+ * `agente_seguimientos`, que el runner de /api/agente/seguimiento consume.
+ * Los campos `sol_*` de GHL son el espejo visible; esta cola es la que manda.
+ */
+async function programarSeguimiento(e: EntradaCrm): Promise<string | null> {
+  if (!e.conversationId) return null // sin conversación no hay a qué volver
+
+  const d = e.decision
+  const intentos = e.intentos ?? 0
+  const fecha = proximoSeguimientoValido(d)
+
+  let fila: { estado: string; programado_para: string | null; nota: string | null }
+  if (d.accion === 'escalar') {
+    fila = { estado: 'cerrado', programado_para: null, nota: 'escalado a una asesora' }
+  } else if (d.temperatura === 'no_interesado') {
+    fila = { estado: 'cerrado', programado_para: null, nota: d.motivo }
+  } else if (intentos >= MAX_INTENTOS_SEGUIMIENTO) {
+    fila = {
+      estado: 'dormido',
+      programado_para: null,
+      nota: `sin respuesta tras ${MAX_INTENTOS_SEGUIMIENTO} seguimientos`,
+    }
+  } else if (fecha) {
+    fila = { estado: 'pendiente', programado_para: fecha, nota: d.seguimiento?.angulo ?? null }
+  } else {
+    fila = { estado: 'cerrado', programado_para: null, nota: 'sin seguimiento programado' }
+  }
+
+  const admin = createAdminClient()
+  const { error } = await admin.from('agente_seguimientos').upsert({
+    contact_id: e.contactId,
+    conversation_id: e.conversationId,
+    canal: canalNormalizado(e.canal) ?? null,
+    intentos,
+    actualizado_en: new Date().toISOString(),
+    ...fila,
+  })
+  if (error) throw new Error(error.message)
+
+  return fila.estado === 'pendiente'
+    ? `seguimiento programado para ${fila.programado_para}`
+    : `seguimiento: ${fila.estado}`
 }

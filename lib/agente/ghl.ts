@@ -51,6 +51,8 @@ export interface MensajeGhl {
   userId?: string
   dateAdded?: string
   attachments?: string[]
+  /** Presente cuando el canal es una app del marketplace (custom provider). */
+  conversationProviderId?: string
 }
 
 export interface ConversacionGhl {
@@ -79,6 +81,38 @@ async function mandar<T>(metodo: 'POST' | 'PUT', ruta: string, cuerpo: unknown):
   return res.json() as Promise<T>
 }
 
+/** Por dónde sale la respuesta: tipo de la API y, si aplica, el proveedor. */
+export interface RutaMensaje {
+  tipo: string
+  conversationProviderId?: string
+}
+
+/**
+ * Deriva la ruta de respuesta del último mensaje ENTRANTE de la conversación:
+ * se responde por donde el cliente escribió. Crítico para los canales de
+ * marketplace (TYPE_CUSTOM_SMS, p. ej. la app "Whatsapp, iMessage and SMS" que
+ * usa la cuenta): un envío con `type: 'WhatsApp'` ahí queda `failed` en
+ * silencio — GHL lo acepta pero no hay canal nativo que lo entregue
+ * (verificado el 2026-08-04 con la primera respuesta en vivo de Sol).
+ */
+export function rutaDeRespuesta(mensajes: MensajeGhl[]): RutaMensaje {
+  const entrante = mensajes.find(m => m.direction === 'inbound' && m.messageType)
+  switch (entrante?.messageType) {
+    case 'TYPE_CUSTOM_SMS':
+      return { tipo: 'SMS', conversationProviderId: entrante.conversationProviderId }
+    case 'TYPE_SMS':
+      return { tipo: 'SMS' }
+    case 'TYPE_INSTAGRAM':
+      return { tipo: 'IG' }
+    case 'TYPE_FACEBOOK':
+      return { tipo: 'FB' }
+    case 'TYPE_LIVE_CHAT':
+      return { tipo: 'Live_Chat' }
+    default:
+      return { tipo: 'WhatsApp' }
+  }
+}
+
 /**
  * Envía un mensaje al cliente y devuelve el messageId que asigna GHL.
  *
@@ -89,12 +123,19 @@ async function mandar<T>(metodo: 'POST' | 'PUT', ruta: string, cuerpo: unknown):
 export async function enviarMensaje(
   contactId: string,
   texto: string,
-  tipo = 'WhatsApp'
+  ruta: RutaMensaje = { tipo: 'WhatsApp' }
 ): Promise<{ messageId?: string; conversationId?: string }> {
   const r = await mandar<{ messageId?: string; conversationId?: string }>(
     'POST',
     '/conversations/messages',
-    { type: tipo, contactId, message: texto }
+    {
+      type: ruta.tipo,
+      contactId,
+      message: texto,
+      ...(ruta.conversationProviderId
+        ? { conversationProviderId: ruta.conversationProviderId }
+        : {}),
+    }
   )
   return { messageId: r.messageId, conversationId: r.conversationId }
 }
