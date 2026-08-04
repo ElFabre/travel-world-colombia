@@ -5,7 +5,7 @@ import { eventoGhlSchema, normalizar } from '@/lib/agente/schemas'
 import { identificarAutor } from '@/lib/agente/autor'
 import { registrarEvento } from '@/lib/agente/eventos'
 import { enriquecerDesdeContacto } from '@/lib/agente/enriquecer'
-import { TAGS } from '@/lib/agente/config'
+import { TAGS, ACTIVO_DESDE, TAG_PRUEBAS } from '@/lib/agente/config'
 import { atender } from '@/lib/agente/conversacion'
 
 export const dynamic = 'force-dynamic'
@@ -143,8 +143,31 @@ export async function POST(req: NextRequest) {
   return Response.json({ ok: true })
 }
 
-/** Sonda de vida para comprobar que la ruta está desplegada. */
+/**
+ * Sonda de vida y diagnóstico de configuración. Va detrás del mismo secreto y
+ * NUNCA devuelve valores: solo si cada variable está presente. Sirve para
+ * confirmar desde fuera que el despliegue tiene todo lo que necesita.
+ */
 export async function GET(req: NextRequest) {
   if (!secretoValido(req)) return Response.json({ ok: false }, { status: 401 })
-  return Response.json({ ok: true, fase: 1, modo: 'solo escucha' })
+
+  const activoDesde = ACTIVO_DESDE
+  const encendido = activoDesde.getTime() <= Date.now()
+
+  return Response.json({
+    ok: true,
+    encendido,
+    modo: encendido
+      ? TAG_PRUEBAS
+        ? `responde solo a contactos con el tag "${TAG_PRUEBAS}"`
+        : 'responde a todos los contactos'
+      : 'mudo (solo escucha y registra)',
+    activoDesde: activoDesde.toISOString(),
+    configuracion: {
+      ANTHROPIC_API_KEY: Boolean(process.env.ANTHROPIC_API_KEY),
+      GHL_TWC_PIT: Boolean(process.env.GHL_TWC_PIT),
+      AGENTE_WEBHOOK_SECRET: Boolean(process.env.AGENTE_WEBHOOK_SECRET),
+      SUPABASE_SERVICE_ROLE_KEY: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
+    },
+  })
 }
