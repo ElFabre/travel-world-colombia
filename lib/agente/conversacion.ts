@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { decidir, type Decision } from '@/lib/agente/claude'
-import { agregarTags, enviarMensaje, ultimosMensajes, type MensajeGhl } from '@/lib/agente/ghl'
+import { agregarTags, enviarMensaje, ultimosMensajes } from '@/lib/agente/ghl'
+import { sincronizarCrm } from '@/lib/agente/crm'
 import { ACTIVO_DESDE, HORARIO, RAFAGA_MS, TAGS, TAG_PRUEBAS } from '@/lib/agente/config'
 
 /** ¿Estamos dentro del horario de atención de la agencia (hora de Colombia)? */
@@ -117,18 +118,31 @@ export async function atender(e: Entrada): Promise<ResultadoTurno> {
     enHorario: enHorario(),
   })
 
-  if (decision.accion === 'callar' || !decision.mensaje.trim()) {
-    return { actuo: false, decision, nota: `callar: ${decision.motivo}` }
-  }
+  // Primero la voz, después la mano: el mensaje al cliente sale de inmediato y
+  // la escritura en el CRM va al final, donde un fallo ya no le quita respuesta
+  // a nadie (sincronizarCrm nunca lanza: reporta cada tropiezo como nota).
+  const habla = decision.accion !== 'callar' && decision.mensaje.trim() !== ''
 
-  const { messageId } = await enviarMensaje(e.contactId, decision.mensaje.trim())
-  if (messageId) await registrarEnviado(messageId, e.conversationId, e.contactId)
+  if (habla) {
+    const { messageId } = await enviarMensaje(e.contactId, decision.mensaje.trim())
+    if (messageId) await registrarEnviado(messageId, e.conversationId, e.contactId)
+  }
 
   if (decision.accion === 'escalar') {
     await agregarTags(e.contactId, [TAGS.transferenciaHumano, TAGS.stopBot])
   }
 
-  return { actuo: true, decision, nota: `${decision.accion}: ${decision.motivo}` }
+  const notasCrm = await sincronizarCrm({
+    contactId: e.contactId,
+    canal: e.canal,
+    decision,
+  })
+
+  return {
+    actuo: habla,
+    decision,
+    nota: [`${habla ? decision.accion : 'callar'}: ${decision.motivo}`, ...notasCrm].join(' · '),
+  }
 }
 
 async function esNuestro(messageId?: string): Promise<boolean> {

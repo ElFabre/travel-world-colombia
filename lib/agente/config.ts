@@ -37,6 +37,21 @@ export const PIPELINE = {
 export const PIPELINE_POSTVENTA = 'X2FPIf6vQa6E5VSNE922'
 
 /**
+ * Campos de calificación que YA existen en la subcuenta (folder ⭐
+ * `AmOICbYAU4SyDMfuDNCL`). Se reusan a propósito — los workflows y las
+ * asesoras dependen de ellos — aunque tengan typos de origen (`fecha_de_vije`).
+ */
+export const CAMPOS_CALIFICACION = {
+  destino: 'NXvGm4sqiOhcqu7frkz1', // contact.destino_principal (LARGE_TEXT)
+  fechas: 'BZk9ykccXGa8Sm2BHgFh', // contact.fecha_de_vije (TEXT)
+  ciudadSalida: 'HMOk7JJUomhEQ6TBlwzx', // contact.ciudad_de_salida (TEXT)
+  adultos: 'qtGK9F59HWK2u7Mqsyp1', // contact.cantidad_de_adultos (NUMERICAL)
+  ninos: '1WNgkrRxbGKKXEsZYs5n', // contact.cantidad_de_nios (NUMERICAL)
+  edadesNinos: 'q9pQKxDIUG9CuIKiQSpR', // contact.edades_de_los_nios (TEXT)
+  presupuesto: 'yd3GW4sXa8tiY8aCUpvq', // contact.presupuesto_estimado (MONETORY)
+} as const
+
+/**
  * Tags existentes en la cuenta que Sol respeta o usa. Se reusan a propósito
  * (no se inventan nuevos) para no romper los workflows que ya funcionan.
  */

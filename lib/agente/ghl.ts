@@ -60,9 +60,9 @@ export interface ConversacionGhl {
   unreadCount?: number
 }
 
-async function enviar<T>(ruta: string, cuerpo: unknown): Promise<T> {
+async function mandar<T>(metodo: 'POST' | 'PUT', ruta: string, cuerpo: unknown): Promise<T> {
   const res = await fetch(`${GHL.api}${ruta}`, {
-    method: 'POST',
+    method: metodo,
     headers: {
       Authorization: `Bearer ${token()}`,
       Version: GHL.version,
@@ -91,7 +91,8 @@ export async function enviarMensaje(
   texto: string,
   tipo = 'WhatsApp'
 ): Promise<{ messageId?: string; conversationId?: string }> {
-  const r = await enviar<{ messageId?: string; conversationId?: string }>(
+  const r = await mandar<{ messageId?: string; conversationId?: string }>(
+    'POST',
     '/conversations/messages',
     { type: tipo, contactId, message: texto }
   )
@@ -100,7 +101,63 @@ export async function enviarMensaje(
 
 /** Agrega tags al contacto (escalada, estado, fuera de alcance). */
 export async function agregarTags(contactId: string, tags: string[]): Promise<void> {
-  await enviar(`/contacts/${contactId}/tags`, { tags })
+  await mandar('POST', `/contacts/${contactId}/tags`, { tags })
+}
+
+/**
+ * Escribe campos personalizados del contacto. GHL hace merge: solo pisa los
+ * campos que van en el arreglo, el resto del contacto queda igual.
+ */
+export async function actualizarCampos(
+  contactId: string,
+  campos: { id: string; field_value: string | number }[]
+): Promise<void> {
+  await mandar('PUT', `/contacts/${contactId}`, { customFields: campos })
+}
+
+/** Nota interna en el timeline del contacto (la ven las asesoras, no el cliente). */
+export async function crearNota(contactId: string, texto: string): Promise<void> {
+  await mandar('POST', `/contacts/${contactId}/notes`, { body: texto })
+}
+
+export interface CampoPersonalizadoGhl {
+  id: string
+  fieldKey?: string
+  name?: string
+  dataType?: string
+}
+
+/** Todos los campos personalizados de la subcuenta (~150, modelo contacto). */
+export async function listarCamposPersonalizados(): Promise<CampoPersonalizadoGhl[]> {
+  const r = await pedir<{ customFields?: CampoPersonalizadoGhl[] }>(
+    `/locations/${GHL.locationId}/customFields`
+  )
+  return r.customFields ?? []
+}
+
+export interface OportunidadGhl {
+  id: string
+  name?: string
+  pipelineId?: string
+  pipelineStageId?: string
+  status?: string
+}
+
+/** Oportunidades de un contacto (para saber en qué etapa del pipeline va). */
+export async function oportunidadesDe(contactId: string): Promise<OportunidadGhl[]> {
+  const r = await pedir<{ opportunities?: OportunidadGhl[] }>(
+    `/opportunities/search?location_id=${GHL.locationId}&contact_id=${contactId}`
+  )
+  return r.opportunities ?? []
+}
+
+/** Mueve una oportunidad de etapa dentro de un pipeline. */
+export async function moverOportunidad(
+  opportunityId: string,
+  pipelineId: string,
+  pipelineStageId: string
+): Promise<void> {
+  await mandar('PUT', `/opportunities/${opportunityId}`, { pipelineId, pipelineStageId })
 }
 
 export async function obtenerContacto(contactId: string): Promise<ContactoGhl | null> {
