@@ -92,6 +92,9 @@ async function guardarCalificacion({ contactId, decision }: EntradaCrm): Promise
   texto(CAMPOS_CALIFICACION.fechas, 'fechas', d.fechas)
   texto(CAMPOS_CALIFICACION.ciudadSalida, 'ciudad de salida', d.ciudad_salida)
   texto(CAMPOS_CALIFICACION.edadesNinos, 'edades niños', d.edades_ninos)
+  texto(CAMPOS_CALIFICACION.duracion, 'duración', d.duracion)
+  texto(CAMPOS_CALIFICACION.habitaciones, 'habitaciones', d.habitaciones)
+  texto(CAMPOS_CALIFICACION.fuenteLead, 'fuente', d.fuente_lead)
 
   if (typeof d.adultos === 'number' && d.adultos > 0) {
     campos.push({ id: CAMPOS_CALIFICACION.adultos, field_value: d.adultos })
@@ -113,9 +116,81 @@ async function guardarCalificacion({ contactId, decision }: EntradaCrm): Promise
     }
   }
 
+  // Nivel de urgencia: se deriva de la temperatura (no se le pregunta al cliente).
+  const urgencia = urgenciaDeTemperatura(decision.temperatura)
+  if (urgencia) {
+    campos.push({ id: CAMPOS_CALIFICACION.nivelUrgencia, field_value: urgencia })
+    escritos.push('urgencia')
+  }
+
+  // Viaje a la medida: solo se marca "yes" cuando el modelo lo detecta; un plan
+  // estándar del catálogo no toca el campo (para no pisar lo que ponga una asesora).
+  if (decision.viaje_personalizado === true) {
+    campos.push({ id: CAMPOS_CALIFICACION.viajePersonalizado, field_value: 'yes' })
+    escritos.push('personalizado')
+  }
+
+  // El brief para cotizar: se llena cuando el lead ya está listo (calificado o
+  // escalado), reusando el resumen que redacta Sol para la asesora.
+  const brief = componerBrief(decision)
+  if (brief) {
+    campos.push({ id: CAMPOS_CALIFICACION.mensajeCotizacion, field_value: brief })
+    escritos.push('brief cotización')
+  }
+
   if (campos.length === 0) return null
   await actualizarCampos(contactId, campos)
   return `calificación guardada (${escritos.join(', ')})`
+}
+
+/** Temperatura del lead → texto para el campo "Nivel de urgencia". */
+function urgenciaDeTemperatura(temp: Decision['temperatura']): string | null {
+  switch (temp) {
+    case 'caliente':
+      return 'Alta'
+    case 'tibio':
+      return 'Media'
+    case 'frio':
+      return 'Baja'
+    default:
+      return null // no_interesado / no_aplica: no es una urgencia
+  }
+}
+
+/**
+ * El "Mensaje de cotización": el brief que la asesora lee para cotizar sin
+ * re-preguntar. Se arma con los datos capturados y el resumen que redacta Sol,
+ * y solo cuando el lead ya está listo (calificado o escalado).
+ */
+function componerBrief(decision: Decision): string | null {
+  const listo = decision.accion === 'escalar' || estaCalificado(decision.datos)
+  if (!listo) return null
+
+  const d = decision.datos
+  const viajeros = [
+    d.adultos ? `${d.adultos} adulto(s)` : null,
+    d.ninos ? `${d.ninos} niño(s)${d.edades_ninos ? ` de ${d.edades_ninos}` : ''}` : null,
+  ]
+    .filter(Boolean)
+    .join(', ')
+
+  const lineas = [
+    d.destino ? `Destino: ${d.destino}` : null,
+    d.fechas ? `Fechas: ${d.fechas}` : null,
+    d.duracion ? `Duración: ${d.duracion}` : null,
+    viajeros ? `Viajeros: ${viajeros}` : null,
+    d.ciudad_salida ? `Sale de: ${d.ciudad_salida}` : null,
+    d.habitaciones ? `Acomodación: ${d.habitaciones}` : null,
+    d.presupuesto ? `Presupuesto: ${d.presupuesto}` : null,
+    decision.viaje_personalizado ? 'Viaje a la medida / fuera de catálogo' : null,
+    decision.objeciones?.trim() ? `Objeciones: ${decision.objeciones.trim()}` : null,
+  ].filter(Boolean)
+
+  const cuerpo = [decision.resumen?.trim() || null, lineas.length ? lineas.join('\n') : null]
+    .filter(Boolean)
+    .join('\n\n')
+
+  return cuerpo || null
 }
 
 /** "5 millones", "$4.500.000", "2500 USD", "2k" → número para el campo MONETORY. */

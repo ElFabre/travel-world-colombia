@@ -105,11 +105,15 @@ export async function atender(e: Entrada): Promise<ResultadoTurno> {
   }
 
   // 4. Historial y re-verificación anti-choque: si el último mensaje es
-  //    saliente y NO es nuestro, una asesora está atendiendo → silencio.
+  //    saliente y NO es nuestro, una persona del equipo tomó el chat (desde el
+  //    celular o desde el CRM). Ahí sí se apaga a Sol de forma permanente: el
+  //    humano siempre gana. Esta es la ÚNICA vía por la que Sol se pone stop_bot
+  //    a sí mismo — escalar ya no lo hace (ver más abajo).
   const mensajes = await ultimosMensajes(e.conversationId, 20)
   const ultimo = mensajes[0]
   if (ultimo?.direction === 'outbound' && !(await esNuestro(ultimo.id))) {
-    return { actuo: false, nota: 'un humano respondió de último; Sol se calla' }
+    await agregarTags(e.contactId, [TAGS.stopBot])
+    return { actuo: false, nota: 'un humano tomó el chat; Sol se apaga (stop_bot)' }
   }
 
   const decision = await decidir(mensajes, {
@@ -133,8 +137,11 @@ export async function atender(e: Entrada): Promise<ResultadoTurno> {
     if (messageId) await registrarEnviado(messageId, e.conversationId, e.contactId)
   }
 
+  // Escalar avisa al equipo (dispara la notificación) pero NO apaga a Sol: queda
+  // en "espera caliente" acompañando al cliente hasta que una persona tome el
+  // chat. El stop_bot lo pone la detección de intervención humana (compuerta 4).
   if (decision.accion === 'escalar') {
-    await agregarTags(e.contactId, [TAGS.transferenciaHumano, TAGS.stopBot])
+    await agregarTags(e.contactId, [TAGS.transferenciaHumano])
   }
 
   const notasCrm = await sincronizarCrm({

@@ -49,6 +49,13 @@ export const CAMPOS_CALIFICACION = {
   ninos: '1WNgkrRxbGKKXEsZYs5n', // contact.cantidad_de_nios (NUMERICAL)
   edadesNinos: 'q9pQKxDIUG9CuIKiQSpR', // contact.edades_de_los_nios (TEXT)
   presupuesto: 'yd3GW4sXa8tiY8aCUpvq', // contact.presupuesto_estimado (MONETORY)
+  // Ampliación 2026-08-05: los 6 campos del folder ⭐ que Sol no llenaba.
+  duracion: '1wTz5oZRnHLo09EctUUK', // contact.duracin_del_viaje (TEXT)
+  habitaciones: 'f7ghGzey7b9kzpLzkSwX', // contact.habitaciones (TEXT)
+  nivelUrgencia: 'QBEH9FEY3GVI176JtwA4', // contact.nivel_de_urgencia (TEXT) — derivado de la temperatura
+  viajePersonalizado: 'TLYWLxgscWHRy4zwT5pG', // contact.viaje_personalizado (SINGLE yes/no)
+  fuenteLead: 'n0Tqq31LOxsaeHgI2vCQ', // contact.fuente_de_lead (TEXT) — solo si el cliente lo dice
+  mensajeCotizacion: '9VrVWrHxICznEh1e3f81', // contact.mensaje_de_cotizacion (LARGE_TEXT) — el brief para la asesora
 } as const
 
 /**

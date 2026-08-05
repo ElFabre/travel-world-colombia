@@ -117,6 +117,9 @@ async function atenderSeguimiento(fila: FilaSeguimiento): Promise<string> {
   const mensajes = await ultimosMensajes(fila.conversation_id, 20)
   const ultimo = mensajes[0]
   if (ultimo?.direction === 'outbound' && !(await esNuestro(ultimo.id))) {
+    // Un humano tomó el chat: se apaga a Sol (igual que la compuerta 4 del
+    // webhook) y se cierra la fila. El humano siempre gana.
+    await agregarTags(fila.contact_id, [TAGS.stopBot])
     return cerrar(fila, 'un humano escribió de último; el lead es suyo')
   }
 
@@ -140,8 +143,10 @@ async function atenderSeguimiento(fila: FilaSeguimiento): Promise<string> {
     if (messageId) await registrarEnviado(messageId, fila.conversation_id, fila.contact_id)
   }
 
+  // Escalar avisa al equipo pero no apaga a Sol (espera caliente); el stop_bot
+  // lo pone la intervención humana. Consistente con el webhook.
   if (decision.accion === 'escalar') {
-    await agregarTags(fila.contact_id, [TAGS.transferenciaHumano, TAGS.stopBot])
+    await agregarTags(fila.contact_id, [TAGS.transferenciaHumano])
   }
 
   // Si el modelo escribió pero olvidó programar el siguiente intento, la

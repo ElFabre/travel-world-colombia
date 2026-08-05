@@ -17,7 +17,12 @@ export interface Decision {
     edades_ninos?: string
     ciudad_salida?: string
     presupuesto?: string
+    duracion?: string
+    habitaciones?: string
+    fuente_lead?: string
   }
+  /** El viaje es a la medida o fuera de catálogo (no un plan estándar). */
+  viaje_personalizado?: boolean
   resumen?: string
   /** Cuándo y con qué ángulo volver a escribir si el cliente no contesta. */
   seguimiento?: { proximo_contacto: string; angulo: string }
