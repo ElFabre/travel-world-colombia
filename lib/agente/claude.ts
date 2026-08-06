@@ -10,6 +10,8 @@ export interface Decision {
   motivo: string
   mensaje: string
   temperatura: 'caliente' | 'tibio' | 'frio' | 'no_interesado' | 'no_aplica'
+  /** Qué tan pronto viaja, derivado de las fechas capturadas. Insumo de la urgencia. */
+  proximidad_viaje?: 'inminente' | 'cercano' | 'lejano' | 'desconocido'
   datos: {
     destino?: string
     fechas?: string
@@ -77,6 +79,8 @@ export async function decidir(
     nombre?: string
     canal?: string
     enHorario: boolean
+    /** Primer contacto: el saludo + aviso de datos salen aparte, Sol no debe re-presentarse. */
+    primerContacto?: boolean
     /** Presente cuando el turno lo dispara un seguimiento programado, no un mensaje del cliente. */
     seguimiento?: { intento: number; maximo: number; angulo?: string }
   }
@@ -110,6 +114,9 @@ export async function decidir(
     `Hoy es ${fechaLarga} (${fechaIso}), hora de Colombia.`,
     contexto.nombre ? `El contacto se llama ${contexto.nombre}.` : null,
     contexto.canal ? `Canal: ${contexto.canal}.` : null,
+    contexto.primerContacto
+      ? 'Es el PRIMER mensaje de este contacto: por separado ya se le envía el saludo con tu nombre y el aviso de datos. NO te vuelvas a presentar ni saludes con "Soy Sol"; entra directo, cálida, a ayudarle.'
+      : null,
     contexto.seguimiento
       ? `Este turno es un SEGUIMIENTO programado (intento ${contexto.seguimiento.intento} de ${contexto.seguimiento.maximo}): el cliente NO ha contestado tu último mensaje; no hay mensaje nuevo suyo.${contexto.seguimiento.angulo ? ` Ángulo que dejaste anotado: ${contexto.seguimiento.angulo}` : ''}`
       : null,

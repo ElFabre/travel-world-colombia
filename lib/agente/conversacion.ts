@@ -2,7 +2,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { decidir, type Decision } from '@/lib/agente/claude'
 import { agregarTags, enviarMensaje, rutaDeRespuesta, ultimosMensajes } from '@/lib/agente/ghl'
 import { sincronizarCrm } from '@/lib/agente/crm'
-import { ACTIVO_DESDE, HORARIO, RAFAGA_MS, TAGS, TAG_PRUEBAS } from '@/lib/agente/config'
+import { ACTIVO_DESDE, AVISO_DATOS, HORARIO, RAFAGA_MS, TAGS, TAG_PRUEBAS } from '@/lib/agente/config'
 
 /** ¿Estamos dentro del horario de atención de la agencia (hora de Colombia)? */
 export function enHorario(ahora = new Date()): boolean {
@@ -116,10 +116,15 @@ export async function atender(e: Entrada): Promise<ResultadoTurno> {
     return { actuo: false, nota: 'un humano tomó el chat; Sol se apaga (stop_bot)' }
   }
 
+  // Primer contacto = todavía no tiene el tag del aviso de datos. Si Sol habla,
+  // el aviso saldrá aparte antes de su respuesta, así que no debe re-presentarse.
+  const primerContacto = !e.tags.includes(TAGS.avisoDatos)
+
   const decision = await decidir(mensajes, {
     nombre: e.nombre,
     canal: e.canal,
     enHorario: enHorario(),
+    primerContacto,
   })
 
   // Primero la voz, después la mano: el mensaje al cliente sale de inmediato y
@@ -129,11 +134,23 @@ export async function atender(e: Entrada): Promise<ResultadoTurno> {
 
   if (habla) {
     // Por el mismo canal por el que escribió el cliente (custom provider incluido).
-    const { messageId } = await enviarMensaje(
-      e.contactId,
-      decision.mensaje.trim(),
-      rutaDeRespuesta(mensajes)
-    )
+    const ruta = rutaDeRespuesta(mensajes)
+
+    // Aviso de tratamiento de datos (Ley 1581): una sola vez, como mensaje
+    // aparte, ANTES de la primera respuesta real de Sol. Determinístico (texto
+    // legal). Si falla, se reintenta el próximo turno (el tag no se pone) y no
+    // se le quita la respuesta al cliente.
+    if (primerContacto) {
+      try {
+        const aviso = await enviarMensaje(e.contactId, AVISO_DATOS, ruta)
+        if (aviso.messageId) await registrarEnviado(aviso.messageId, e.conversationId, e.contactId)
+        await agregarTags(e.contactId, [TAGS.avisoDatos])
+      } catch (err) {
+        console.error('aviso de datos falló:', (err as Error).message)
+      }
+    }
+
+    const { messageId } = await enviarMensaje(e.contactId, decision.mensaje.trim(), ruta)
     if (messageId) await registrarEnviado(messageId, e.conversationId, e.contactId)
   }
 

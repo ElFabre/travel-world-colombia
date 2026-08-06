@@ -116,8 +116,9 @@ async function guardarCalificacion({ contactId, decision }: EntradaCrm): Promise
     }
   }
 
-  // Nivel de urgencia: se deriva de la temperatura (no se le pregunta al cliente).
-  const urgencia = urgenciaDeTemperatura(decision.temperatura)
+  // Nivel de urgencia: intención (temperatura) + qué tan pronto viaja. No se le
+  // pregunta al cliente; se deriva de lo que Sol ya razonó.
+  const urgencia = nivelDeUrgencia(decision.temperatura, decision.proximidad_viaje)
   if (urgencia) {
     campos.push({ id: CAMPOS_CALIFICACION.nivelUrgencia, field_value: urgencia })
     escritos.push('urgencia')
@@ -143,18 +144,27 @@ async function guardarCalificacion({ contactId, decision }: EntradaCrm): Promise
   return `calificación guardada (${escritos.join(', ')})`
 }
 
-/** Temperatura del lead → texto para el campo "Nivel de urgencia". */
-function urgenciaDeTemperatura(temp: Decision['temperatura']): string | null {
-  switch (temp) {
-    case 'caliente':
-      return 'Alta'
-    case 'tibio':
-      return 'Media'
-    case 'frio':
-      return 'Baja'
-    default:
-      return null // no_interesado / no_aplica: no es una urgencia
-  }
+/**
+ * Nivel de urgencia para la cola de las asesoras. Cruza la INTENCIÓN de compra
+ * (temperatura) con la PROXIMIDAD del viaje: un tibio que viaja en 3 semanas es
+ * urgente aunque no esté decidido, y un caliente ya decidido es urgente aunque
+ * viaje lejos. La proximidad solo sube la urgencia, nunca la baja.
+ */
+function nivelDeUrgencia(
+  temp: Decision['temperatura'],
+  proximidad: Decision['proximidad_viaje']
+): string | null {
+  // no_interesado / no_aplica: no es una urgencia.
+  if (temp !== 'caliente' && temp !== 'tibio' && temp !== 'frio') return null
+
+  // Viaja en menos de un mes: urgente aunque el interés esté tibio o frío.
+  if (proximidad === 'inminente') return 'Alta'
+  // Ya quiere avanzar: urgente sin importar cuándo viaje.
+  if (temp === 'caliente') return 'Alta'
+  // Interés real: 'cercano' (1-3 meses) lo vuelve prioritario.
+  if (temp === 'tibio') return proximidad === 'cercano' ? 'Alta' : 'Media'
+  // Frío: solo sube a Media si el viaje ya está cerca.
+  return proximidad === 'cercano' ? 'Media' : 'Baja'
 }
 
 /**
@@ -168,29 +178,66 @@ function componerBrief(decision: Decision): string | null {
 
   const d = decision.datos
   const viajeros = [
-    d.adultos ? `${d.adultos} adulto(s)` : null,
-    d.ninos ? `${d.ninos} niño(s)${d.edades_ninos ? ` de ${d.edades_ninos}` : ''}` : null,
+    d.adultos ? `${d.adultos} adulto${d.adultos === 1 ? '' : 's'}` : null,
+    d.ninos ? `${d.ninos} niño${d.ninos === 1 ? '' : 's'}${d.edades_ninos ? ` (${d.edades_ninos})` : ''}` : null,
   ]
     .filter(Boolean)
-    .join(', ')
+    .join(' + ')
 
-  const lineas = [
-    d.destino ? `Destino: ${d.destino}` : null,
-    d.fechas ? `Fechas: ${d.fechas}` : null,
-    d.duracion ? `Duración: ${d.duracion}` : null,
-    viajeros ? `Viajeros: ${viajeros}` : null,
-    d.ciudad_salida ? `Sale de: ${d.ciudad_salida}` : null,
-    d.habitaciones ? `Acomodación: ${d.habitaciones}` : null,
-    d.presupuesto ? `Presupuesto: ${d.presupuesto}` : null,
-    decision.viaje_personalizado ? 'Viaje a la medida / fuera de catálogo' : null,
-    decision.objeciones?.trim() ? `Objeciones: ${decision.objeciones.trim()}` : null,
+  // Ficha: solo las líneas con dato, con etiqueta emoji para escaneo rápido.
+  const ficha = [
+    d.destino ? `📍 Destino: ${d.destino}` : null,
+    d.fechas
+      ? `📅 Fechas: ${d.fechas}${d.duracion ? ` · ${d.duracion}` : ''}`
+      : d.duracion
+        ? `⏳ Duración: ${d.duracion}`
+        : null,
+    viajeros ? `👥 Viajeros: ${viajeros}` : null,
+    d.ciudad_salida ? `🛫 Sale de: ${d.ciudad_salida}` : null,
+    d.habitaciones ? `🏨 Acomodación: ${d.habitaciones}` : null,
+    d.presupuesto ? `💰 Presupuesto: ${d.presupuesto}` : null,
+    decision.viaje_personalizado ? '🧩 Viaje a la medida / fuera de catálogo' : null,
   ].filter(Boolean)
 
-  const cuerpo = [decision.resumen?.trim() || null, lineas.length ? lineas.join('\n') : null]
-    .filter(Boolean)
-    .join('\n\n')
+  // Termómetro: intención + proximidad + urgencia, para priorizar de un vistazo.
+  const termometro = lineaTermometro(decision)
 
-  return cuerpo || null
+  const partes = [
+    decision.resumen?.trim() || null,
+    ficha.length ? ficha.join('\n') : null,
+    termometro,
+    decision.objeciones?.trim() ? `⚠️ Objeciones: ${decision.objeciones.trim()}` : null,
+  ].filter(Boolean)
+
+  if (partes.length === 0) return null
+  return ['📝 RESUMEN PARA COTIZAR', ...partes].join('\n\n')
+}
+
+const ETIQUETA_TEMP: Record<string, string> = {
+  caliente: '🔥 Caliente',
+  tibio: '🌤️ Tibio',
+  frio: '❄️ Frío',
+}
+
+const TEXTO_PROXIMIDAD: Record<string, string> = {
+  inminente: 'viaja pronto (menos de 1 mes)',
+  cercano: 'viaja en 1-3 meses',
+  lejano: 'viaja en +3 meses',
+}
+
+/** "🔥 Caliente · viaja pronto (menos de 1 mes) · urgencia Alta" o null si no aplica. */
+function lineaTermometro(decision: Decision): string | null {
+  const etiqueta = ETIQUETA_TEMP[decision.temperatura]
+  if (!etiqueta) return null // no_interesado / no_aplica: no es un lead a cotizar
+
+  const urgencia = nivelDeUrgencia(decision.temperatura, decision.proximidad_viaje)
+  return [
+    etiqueta,
+    decision.proximidad_viaje ? TEXTO_PROXIMIDAD[decision.proximidad_viaje] : null,
+    urgencia ? `urgencia ${urgencia}` : null,
+  ]
+    .filter(Boolean)
+    .join(' · ')
 }
 
 /** "5 millones", "$4.500.000", "2500 USD", "2k" → número para el campo MONETORY. */

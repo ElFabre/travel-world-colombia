@@ -69,7 +69,22 @@ export const TAGS = {
   transferenciaHumano: 'transferencia a humano',
   /** No son clientes: Sol no interviene. */
   noCliente: ['proveedor', 'mayorista / operadores'],
+  /** Ya se le envió el aviso de tratamiento de datos: no repetirlo. */
+  avisoDatos: 'sol_aviso_datos',
 } as const
+
+/**
+ * Aviso de tratamiento de datos (Ley 1581 de 2012): consentimiento informado +
+ * enlace a la política. Se envía UNA sola vez por contacto, como mensaje aparte,
+ * antes de la primera respuesta real de Sol. Es texto LEGAL: va literal, nunca
+ * lo redacta el modelo (que podría reformularlo o soltar el enlace). Para
+ * cambiarlo, edítalo aquí.
+ */
+export const AVISO_DATOS =
+  '¡Hola! Soy Sol, tu asesora en Travel World Colombia 🌍\n\n' +
+  'Con gusto te ayudo a planear tu viaje. Para cuidar tus datos: al continuar ' +
+  'por este chat aceptas nuestros términos y el tratamiento de tu información ' +
+  'según nuestra política 👉 https://bit.ly/4tGfmuG'
 
 /**
  * Momento a partir del cual Sol atiende conversaciones. Decisión del cliente:
