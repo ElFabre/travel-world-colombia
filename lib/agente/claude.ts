@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { INSTRUCCIONES, ESQUEMA_DECISION } from '@/lib/agente/prompt'
 import { construirConocimiento } from '@/lib/agente/conocimiento'
+import { resolverAudios } from '@/lib/agente/transcribir'
 import { HORARIO } from '@/lib/agente/config'
 import type { MensajeGhl } from '@/lib/agente/ghl'
 
@@ -80,7 +81,10 @@ export async function decidir(
     seguimiento?: { intento: number; maximo: number; angulo?: string }
   }
 ): Promise<Decision> {
-  const historial = aHistorial(mensajes)
+  // Las notas de voz llegan como audio; Claude no lo lee, así que se transcriben
+  // (con caché) y quedan como texto antes de armar el historial.
+  const conTexto = await resolverAudios(mensajes)
+  const historial = aHistorial(conTexto)
   if (historial.length === 0) {
     return {
       accion: 'callar',
