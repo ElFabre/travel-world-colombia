@@ -48,10 +48,15 @@ export async function resolverAudios(mensajes: MensajeGhl[]): Promise<MensajeGhl
       continue
     }
     const url = urlDeAudio(m)!
-    const texto = await transcribirAudio(url)
-    if (texto) {
-      transcripciones.set(m.id, texto)
-      await guardarCache(m.id, url, texto)
+    const r = await transcribirAudio(url)
+    if ('texto' in r) {
+      transcripciones.set(m.id, r.texto)
+      await guardarCache(m.id, url, r.texto)
+    } else {
+      // Deja el motivo del fallo en la tabla para poder diagnosticarlo desde
+      // Supabase (los logs de Vercel no siempre son accesibles). No se usa como
+      // transcripción: leerCache ignora las filas __ERROR__ y se reintenta.
+      await guardarCache(m.id, url, `__ERROR__ ${r.error}`)
     }
   }
 
@@ -62,17 +67,14 @@ export async function resolverAudios(mensajes: MensajeGhl[]): Promise<MensajeGhl
   })
 }
 
-/** Descarga el audio y lo manda a OpenAI. Devuelve null ante cualquier fallo. */
-async function transcribirAudio(url: string): Promise<string | null> {
+/** Descarga el audio y lo manda a OpenAI. `error` trae el motivo si falla. */
+async function transcribirAudio(url: string): Promise<{ texto: string } | { error: string }> {
   const apiKey = process.env.OPENAI_API_KEY
-  if (!apiKey) {
-    console.error('transcribirAudio: falta OPENAI_API_KEY')
-    return null
-  }
+  if (!apiKey) return { error: 'falta OPENAI_API_KEY en el runtime' }
 
   try {
     const audio = await fetch(url, { signal: AbortSignal.timeout(15_000) })
-    if (!audio.ok) throw new Error(`descarga del audio: ${audio.status}`)
+    if (!audio.ok) return { error: `descarga del audio: HTTP ${audio.status}` }
     const blob = await audio.blob()
 
     const form = new FormData()
@@ -87,13 +89,13 @@ async function transcribirAudio(url: string): Promise<string | null> {
     })
     if (!res.ok) {
       const detalle = await res.text().catch(() => '')
-      throw new Error(`OpenAI ${res.status}: ${detalle.slice(0, 200)}`)
+      return { error: `OpenAI ${res.status} (modelo ${MODELO}): ${detalle.slice(0, 200)}` }
     }
     const data = (await res.json()) as { text?: string }
-    return data.text?.trim() || null
+    const texto = data.text?.trim()
+    return texto ? { texto } : { error: 'OpenAI devolvió texto vacío' }
   } catch (err) {
-    console.error('transcribirAudio falló:', (err as Error).message)
-    return null
+    return { error: `excepción: ${(err as Error).message}` }
   }
 }
 
@@ -115,7 +117,11 @@ async function leerCache(ids: string[]): Promise<Map<string, string>> {
     console.error('leerCache transcripciones:', error.message)
     return cache
   }
-  for (const fila of data ?? []) cache.set(fila.message_id, fila.texto)
+  // Las filas __ERROR__ son diagnóstico, no transcripciones: se ignoran como
+  // caché (así se reintenta) pero quedan en la tabla para leerlas.
+  for (const fila of data ?? []) {
+    if (!fila.texto.startsWith('__ERROR__')) cache.set(fila.message_id, fila.texto)
+  }
   return cache
 }
 
