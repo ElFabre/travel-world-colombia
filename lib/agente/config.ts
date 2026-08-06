@@ -103,8 +103,12 @@ export const TAG_PRUEBAS = process.env.AGENTE_TAG_PRUEBAS ?? 'pruebas_fabrizio'
  * cuenta: la pausa mediana entre mensajes seguidos es de 10,9 s, así que esta
  * ventana atrapa cerca de la mitad de las ráfagas de forma directa y bastantes
  * más al deslizarse. Poner 0 desactiva el agrupamiento.
+ *
+ * ⚠️ TEMPORAL (2026-08-06): default en 0 mientras el usuario configura y prueba
+ * a Sol. Para restaurar los 10 s: volver el default a 10_000, o dejar
+ * `AGENTE_RAFAGA_MS=10000` en Vercel (el env var manda sobre el default).
  */
-export const RAFAGA_MS = Number(process.env.AGENTE_RAFAGA_MS ?? 10_000)
+export const RAFAGA_MS = Number(process.env.AGENTE_RAFAGA_MS ?? 0)
 
 /**
  * Tope de seguimientos sin respuesta (§5 del diseño: decaimiento y corte).
