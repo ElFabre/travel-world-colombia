@@ -163,6 +163,7 @@ async function atenderSeguimiento(fila: FilaSeguimiento): Promise<string> {
     conversationId: fila.conversation_id,
     canal: fila.canal ?? undefined,
     decision,
+    tags, // snapshot del turno: hace idempotente el handoff (tag/nota una sola vez)
     // Un intento solo cuenta si de verdad escribimos; callar y reprogramar no gasta.
     intentos: habla ? intento : fila.intentos,
   })

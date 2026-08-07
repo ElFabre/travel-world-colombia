@@ -1,5 +1,6 @@
 import {
   actualizarCampos,
+  agregarTags,
   crearNota,
   listarCamposPersonalizados,
   moverOportunidad,
@@ -11,6 +12,7 @@ import {
   HORARIO,
   MAX_INTENTOS_SEGUIMIENTO,
   PIPELINE,
+  TAGS,
 } from '@/lib/agente/config'
 import type { Decision } from '@/lib/agente/claude'
 
@@ -39,6 +41,8 @@ export interface EntradaCrm {
   conversationId?: string
   canal?: string
   decision: Decision
+  /** Tags del contacto (snapshot del turno). Sirve para hacer el handoff idempotente. */
+  tags?: string[]
   /**
    * Seguimientos sin respuesta acumulados, contando este turno. Un turno
    * normal (el cliente escribió) es 0: el contador se reinicia solo.
@@ -61,9 +65,7 @@ export async function sincronizarCrm(e: EntradaCrm): Promise<string[]> {
 
   await paso('calificación', () => guardarCalificacion(e))
   await paso('campos sol', () => escribirCamposSol(e))
-  if (e.decision.accion === 'escalar') {
-    await paso('nota', () => dejarNotaDeEscalada(e))
-  }
+  await paso('handoff', () => marcarHandoff(e))
   await paso('pipeline', () => moverSiCalificado(e))
   await paso('agenda', () => programarSeguimiento(e))
 
@@ -345,8 +347,41 @@ function canalNormalizado(canal?: string): string | undefined {
 }
 
 /**
- * El briefing que hoy no existe: la asesora entra a cerrar, no a re-preguntar.
- * Se deja como nota interna del contacto en el momento de escalar.
+ * Traspaso al equipo, UNA sola vez por contacto (idempotente contra los tags del
+ * snapshot del turno; conversacion.ts pasa `e.tags`):
+ *
+ *  - **Escalada dura** (accion "escalar"): nota interna. El tag
+ *    `transferencia a humano` lo pone conversacion.ts y dispara la notificación.
+ *  - **Lead calificado** (handoff silencioso): pone `sol_calificado` —el tag que
+ *    dispara el workflow del equipo— más la nota interna con el brief. Sol sigue
+ *    en espera caliente y el cliente no percibe el traspaso.
+ *
+ * ⚠️ El workflow de GHL sobre `sol_calificado` debe notificar/reasignar SOLO al
+ * equipo; si le manda un mensaje al cliente, conversacion.ts lo leería como
+ * intervención humana y pondría `stop_bot`, apagando a Sol.
+ */
+async function marcarHandoff(e: EntradaCrm): Promise<string | null> {
+  const { decision } = e
+  const tags = e.tags ?? []
+
+  if (decision.accion === 'escalar') {
+    if (tags.includes(TAGS.transferenciaHumano)) return null // ya escalado antes
+    await dejarNotaDeEscalada(e)
+    return 'nota interna de escalada'
+  }
+
+  if (estaCalificado(decision.datos) && !tags.includes(TAGS.calificado)) {
+    await agregarTags(e.contactId, [TAGS.calificado])
+    await dejarNotaDeEscalada(e) // el mismo brief sirve para quien arme la cotización
+    return `handoff silencioso: ${TAGS.calificado} + nota con brief`
+  }
+
+  return null
+}
+
+/**
+ * El briefing que hoy no existe: quien reciba el lead entra a cerrar, no a
+ * re-preguntar. Se deja como nota interna al escalar o al dejarlo listo.
  */
 async function dejarNotaDeEscalada({ contactId, decision }: EntradaCrm): Promise<string | null> {
   const d = decision.datos
@@ -367,7 +402,9 @@ async function dejarNotaDeEscalada({ contactId, decision }: EntradaCrm): Promise
   ].filter(Boolean)
 
   const texto = [
-    '🤖 Sol escaló esta conversación.',
+    decision.accion === 'escalar'
+      ? '🤖 Sol escaló esta conversación.'
+      : '🤖 Sol dejó este lead listo para cotizar.',
     decision.resumen?.trim() || `Motivo: ${decision.motivo}`,
     datos.length ? `Datos capturados:\n- ${datos.join('\n- ')}` : null,
     decision.temperatura !== 'no_aplica' ? `Temperatura: ${decision.temperatura}` : null,
@@ -418,6 +455,10 @@ async function programarSeguimiento(e: EntradaCrm): Promise<string | null> {
   let fila: { estado: string; programado_para: string | null; nota: string | null }
   if (d.accion === 'escalar') {
     fila = { estado: 'cerrado', programado_para: null, nota: 'escalado a una asesora' }
+  } else if (estaCalificado(d.datos)) {
+    // Handoff silencioso: el equipo arma la cotización. Sol no persigue por su
+    // cuenta (el empujón al cliente sería la fase 2 del híbrido, aún no activa).
+    fila = { estado: 'cerrado', programado_para: null, nota: 'calificado; el equipo arma la cotización' }
   } else if (d.temperatura === 'no_interesado') {
     fila = { estado: 'cerrado', programado_para: null, nota: d.motivo }
   } else if (intentos >= MAX_INTENTOS_SEGUIMIENTO) {

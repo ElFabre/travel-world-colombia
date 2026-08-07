@@ -71,6 +71,12 @@ export const TAGS = {
   noCliente: ['proveedor', 'mayorista / operadores'],
   /** Ya se le envió el aviso de tratamiento de datos: no repetirlo. */
   avisoDatos: 'sol_aviso_datos',
+  /**
+   * Lead listo para cotizar. Handoff silencioso: Sol lo pone al calificar, sigue
+   * en espera caliente, y un workflow de GHL (que NO debe mensajear al cliente)
+   * notifica al asignado. Se pone una sola vez por contacto.
+   */
+  calificado: 'sol_calificado',
 } as const
 
 /**

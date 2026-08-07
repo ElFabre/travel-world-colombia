@@ -166,6 +166,7 @@ export async function atender(e: Entrada): Promise<ResultadoTurno> {
     conversationId: e.conversationId,
     canal: e.canal,
     decision,
+    tags: e.tags, // snapshot del turno: hace idempotente el handoff (tag/nota una sola vez)
     intentos: 0, // el cliente escribió: el contador de seguimientos se reinicia
   })
 
