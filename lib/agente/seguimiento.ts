@@ -12,6 +12,7 @@ import { enHorario, esNuestro, registrarEnviado } from '@/lib/agente/conversacio
 import { fechaBogota, sincronizarCrm } from '@/lib/agente/crm'
 import { registrarEvento } from '@/lib/agente/eventos'
 import {
+  CAMPO_IA_NOMBRE,
   HORARIO,
   MAX_INTENTOS_SEGUIMIENTO,
   PIPELINE,
@@ -95,6 +96,9 @@ async function atenderSeguimiento(fila: FilaSeguimiento): Promise<string> {
   if (!contacto) return cerrar(fila, 'el contacto ya no existe en GHL')
 
   const tags = contacto.tags ?? []
+  const nombreConfirmado =
+    (contacto.customFields?.find(f => f.id === CAMPO_IA_NOMBRE)?.value as string | undefined)?.trim() ||
+    undefined
   if (TAG_PRUEBAS && !tags.includes(TAG_PRUEBAS)) {
     return `saltado: modo prueba (falta el tag ${TAG_PRUEBAS})`
   }
@@ -126,6 +130,7 @@ async function atenderSeguimiento(fila: FilaSeguimiento): Promise<string> {
   const intento = fila.intentos + 1
   const decision = await decidir(mensajes, {
     nombre: [contacto.firstName, contacto.lastName].filter(Boolean).join(' ') || undefined,
+    nombreConfirmado,
     canal: fila.canal ?? undefined,
     enHorario: enHorario(),
     seguimiento: { intento, maximo: MAX_INTENTOS_SEGUIMIENTO, angulo: fila.nota ?? undefined },
@@ -164,6 +169,7 @@ async function atenderSeguimiento(fila: FilaSeguimiento): Promise<string> {
     canal: fila.canal ?? undefined,
     decision,
     tags, // snapshot del turno: hace idempotente el handoff (tag/nota una sola vez)
+    nombreConfirmado, // evita re-escribir ia__nombre si no cambió
     // Un intento solo cuenta si de verdad escribimos; callar y reprogramar no gasta.
     intentos: habla ? intento : fila.intentos,
   })

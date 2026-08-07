@@ -59,6 +59,13 @@ export const CAMPOS_CALIFICACION = {
 } as const
 
 /**
+ * "IA - NOMBRE" (folder IA `a3uTifBfuZDOYpqDRYzj`): el nombre REAL que el cliente
+ * dice ser (el de WhatsApp no siempre lo es). Sol lo pregunta una vez y lo
+ * escribe aquí; un workflow de la cuenta copia este campo al "Nombre" principal.
+ */
+export const CAMPO_IA_NOMBRE = 'ZJgh8LCTvQz6VIne19uz' // contact.ia__nombre (TEXT)
+
+/**
  * Tags existentes en la cuenta que Sol respeta o usa. Se reusan a propósito
  * (no se inventan nuevos) para no romper los workflows que ya funcionan.
  */

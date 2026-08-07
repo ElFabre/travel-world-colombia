@@ -140,6 +140,7 @@ export async function POST(req: NextRequest) {
         contactId: n.contactId,
         conversationId,
         nombre: n.nombreContacto,
+        nombreConfirmado: extra?.nombreConfirmado,
         canal: n.canal ?? extra?.canal,
         tags,
         fechaMensaje: extra?.mensajeCrudo?.dateAdded

@@ -8,6 +8,7 @@ import {
 } from '@/lib/agente/ghl'
 import { createAdminClient } from '@/lib/supabase/admin'
 import {
+  CAMPO_IA_NOMBRE,
   CAMPOS_CALIFICACION,
   HORARIO,
   MAX_INTENTOS_SEGUIMIENTO,
@@ -43,6 +44,8 @@ export interface EntradaCrm {
   decision: Decision
   /** Tags del contacto (snapshot del turno). Sirve para hacer el handoff idempotente. */
   tags?: string[]
+  /** Nombre real ya guardado en ia__nombre: no se reescribe si no cambió. */
+  nombreConfirmado?: string
   /**
    * Seguimientos sin respuesta acumulados, contando este turno. Un turno
    * normal (el cliente escribió) es 0: el contador se reinicia solo.
@@ -78,7 +81,8 @@ function estaCalificado(d: Decision['datos']): boolean {
   return Boolean(d.destino?.trim() && d.fechas?.trim() && pax > 0)
 }
 
-async function guardarCalificacion({ contactId, decision }: EntradaCrm): Promise<string | null> {
+async function guardarCalificacion(e: EntradaCrm): Promise<string | null> {
+  const { contactId, decision } = e
   const d = decision.datos
   const campos: { id: string; field_value: string | number }[] = []
   const escritos: string[] = []
@@ -88,6 +92,14 @@ async function guardarCalificacion({ contactId, decision }: EntradaCrm): Promise
       campos.push({ id, field_value: valor.trim() })
       escritos.push(nombre)
     }
+  }
+
+  // Nombre real → ia__nombre (un workflow lo copia al "Nombre" principal). Solo
+  // si cambió, para no re-disparar ese workflow con el mismo valor cada turno.
+  const nombre = d.nombre?.trim()
+  if (nombre && nombre !== e.nombreConfirmado?.trim()) {
+    campos.push({ id: CAMPO_IA_NOMBRE, field_value: nombre })
+    escritos.push('nombre')
   }
 
   texto(CAMPOS_CALIFICACION.destino, 'destino', d.destino)

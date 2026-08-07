@@ -13,6 +13,7 @@ export interface Decision {
   /** Qué tan pronto viaja, derivado de las fechas capturadas. Insumo de la urgencia. */
   proximidad_viaje?: 'inminente' | 'cercano' | 'lejano' | 'desconocido'
   datos: {
+    nombre?: string
     destino?: string
     fechas?: string
     adultos?: number
@@ -77,6 +78,8 @@ export async function decidir(
   mensajes: MensajeGhl[],
   contexto: {
     nombre?: string
+    /** Nombre real ya capturado (ia__nombre): si viene, Sol NO lo repregunta. */
+    nombreConfirmado?: string
     canal?: string
     enHorario: boolean
     /** Primer contacto: el saludo + aviso de datos salen aparte, Sol no debe re-presentarse. */
@@ -112,7 +115,11 @@ export async function decidir(
 
   const situacion = [
     `Hoy es ${fechaLarga} (${fechaIso}), hora de Colombia.`,
-    contexto.nombre ? `El contacto se llama ${contexto.nombre}.` : null,
+    contexto.nombreConfirmado
+      ? `El cliente se llama ${contexto.nombreConfirmado} (nombre confirmado). Salúdalo así y NO le preguntes el nombre.`
+      : contexto.nombre
+        ? `En WhatsApp figura como "${contexto.nombre}", pero ese nombre puede NO ser el suyo real. Pregúntale su nombre (o confírmalo) UNA vez, con naturalidad; si no lo da, no insistas.`
+        : 'No sabes su nombre; pregúntaselo una vez, con naturalidad, sin insistir.',
     contexto.canal ? `Canal: ${contexto.canal}.` : null,
     contexto.primerContacto
       ? 'Es el PRIMER mensaje de este contacto: por separado ya se le envía el saludo con tu nombre y el aviso de datos. NO te vuelvas a presentar ni saludes con "Soy Sol"; entra directo, cálida, a ayudarle.'

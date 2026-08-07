@@ -70,7 +70,10 @@ export interface ResultadoTurno {
 interface Entrada {
   contactId: string
   conversationId: string
+  /** Nombre de WhatsApp (puede no ser el real). */
   nombre?: string
+  /** Nombre real ya capturado antes (ia__nombre): si existe, Sol no lo repregunta. */
+  nombreConfirmado?: string
   canal?: string
   tags: string[]
   /** Fecha del mensaje que disparó el turno. */
@@ -122,6 +125,7 @@ export async function atender(e: Entrada): Promise<ResultadoTurno> {
 
   const decision = await decidir(mensajes, {
     nombre: e.nombre,
+    nombreConfirmado: e.nombreConfirmado,
     canal: e.canal,
     enHorario: enHorario(),
     primerContacto,
@@ -167,6 +171,7 @@ export async function atender(e: Entrada): Promise<ResultadoTurno> {
     canal: e.canal,
     decision,
     tags: e.tags, // snapshot del turno: hace idempotente el handoff (tag/nota una sola vez)
+    nombreConfirmado: e.nombreConfirmado, // evita re-escribir ia__nombre si no cambió
     intentos: 0, // el cliente escribió: el contador de seguimientos se reinicia
   })
 

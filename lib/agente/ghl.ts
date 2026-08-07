@@ -41,6 +41,7 @@ export interface ContactoGhl {
   phone?: string
   email?: string
   tags?: string[]
+  customFields?: { id: string; value?: unknown }[]
 }
 
 export interface MensajeGhl {

@@ -1,5 +1,5 @@
 import { conversacionDe, obtenerContacto, ultimosMensajes, type MensajeGhl } from '@/lib/agente/ghl'
-import { TAGS } from '@/lib/agente/config'
+import { CAMPO_IA_NOMBRE, TAGS } from '@/lib/agente/config'
 
 export interface EventoEnriquecido {
   conversationId?: string
@@ -12,6 +12,8 @@ export interface EventoEnriquecido {
   mensajeCrudo?: MensajeGhl
   tagsContacto: string[]
   esNoCliente: boolean
+  /** Nombre REAL ya capturado antes (campo ia__nombre). Si existe, Sol no lo repregunta. */
+  nombreConfirmado?: string
   nota: string[]
 }
 
@@ -34,6 +36,12 @@ export async function enriquecerDesdeContacto(contactId: string): Promise<Evento
       (TAGS.noCliente as readonly string[]).includes(t)
     )
     if (salida.esNoCliente) nota.push('contacto etiquetado como proveedor/mayorista')
+
+    // Nombre real ya capturado (ia__nombre): si está, Sol no lo vuelve a pedir.
+    const iaNombre = contacto?.customFields?.find(f => f.id === CAMPO_IA_NOMBRE)?.value
+    if (typeof iaNombre === 'string' && iaNombre.trim()) {
+      salida.nombreConfirmado = iaNombre.trim()
+    }
   } catch (err) {
     nota.push(`no se pudo leer el contacto: ${(err as Error).message}`)
   }
