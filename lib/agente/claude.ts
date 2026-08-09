@@ -122,7 +122,7 @@ export async function decidir(
         : 'No sabes su nombre; pregúntaselo una vez, con naturalidad, sin insistir.',
     contexto.canal ? `Canal: ${contexto.canal}.` : null,
     contexto.primerContacto
-      ? 'Es el PRIMER mensaje de este contacto: por separado ya se le envía el saludo con tu nombre y el aviso de datos. NO te vuelvas a presentar ni saludes con "Soy Sol"; entra directo, cálida, a ayudarle.'
+      ? 'Es el PRIMER mensaje de este contacto: por separado ya se le envía el saludo con tu nombre y el aviso de datos. NO te vuelvas a presentar ni saludes con "Soy Sol". Salúdalo con calidez, pregúntale su nombre y qué viaje tiene en mente, y sigue SU conversación. En este primer mensaje NO listes destinos ni precios del catálogo: esas recomendaciones son solo para cuando pregunte o mencione un destino o tipo de viaje.'
       : null,
     contexto.seguimiento
       ? `Este turno es un SEGUIMIENTO programado (intento ${contexto.seguimiento.intento} de ${contexto.seguimiento.maximo}): el cliente NO ha contestado tu último mensaje; no hay mensaje nuevo suyo.${contexto.seguimiento.angulo ? ` Ángulo que dejaste anotado: ${contexto.seguimiento.angulo}` : ''}`
