@@ -1,63 +1,98 @@
 import { getDestinos } from '@/lib/destinos'
 import { getFaqs } from '@/lib/faqs'
 import { SITE } from '@/lib/site'
+import type { Destino } from '@/types/destino'
 
 /**
- * Base de conocimiento de Sol: el catálogo real de viajes y las FAQ, leídos en
- * vivo de Supabase. No hay sincronización ni copias: si el cliente edita un
- * programa en el panel, Sol lo sabe en la siguiente conversación.
+ * Base de conocimiento de Sol, leída en vivo de Supabase. Se sirve en DOS capas
+ * para no gastar tokens en cada mensaje (la mayoría de consultas ni tocan el
+ * catálogo, o piden destinos a la medida):
  *
- * Con ~11 destinos el catálogo entero cabe en el prompt, así que no hace falta
- * RAG. El texto que genera esta función es la parte estable del prompt y se
- * cachea (ver `lib/agente/claude.ts`).
+ * 1. `base` — ÍNDICE LIGERO: los ~11 destinos como una línea (nombre, país,
+ *    precio desde, link) + FAQ + datos de la agencia. Es estable e idéntico para
+ *    todas las conversaciones, así que va en el bloque cacheado del prompt.
+ * 2. `detallesPara(texto)` — DETALLE COMPLETO (descripción, incluye, itinerario,
+ *    experiencias) SOLO de los destinos que el cliente menciona en la
+ *    conversación. Va en la parte NO cacheada, fresca por turno.
+ *
+ * Así Sol siempre sabe qué vendemos y a qué precio (barato), y solo carga el
+ * detalle pesado cuando de verdad hace falta.
  */
-/**
- * Recorta un texto largo. El catálogo entero viaja en CADA mensaje, así que
- * cada carácter se paga muchas veces: los muros de texto de "incluye" (que en
- * algunos programas pasan de 1.000 caracteres) se resumen. Si un cliente pide
- * el detalle exacto, Sol escala — que es lo correcto de todos modos.
- */
+
+/** Recorta muros de texto: cada carácter del detalle se paga cuando se incluye. */
 function recortar(texto: string, max: number): string {
   const limpio = texto.replace(/\s+/g, ' ').trim()
   return limpio.length <= max ? limpio : `${limpio.slice(0, max).trimEnd()}…`
 }
 
-export async function construirConocimiento(): Promise<string> {
+/** minúsculas + sin acentos, para emparejar "panama" con "Panamá". */
+function normalizar(s: string): string {
+  return s
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+}
+
+/** Nombres por los que un cliente podría referirse a un destino. */
+function aliasesDe(d: Destino): string[] {
+  return [d.nombre, d.nombre_local, d.slug?.replace(/-/g, ' '), d.pais, d.region]
+    .filter((x): x is string => Boolean(x && x.trim()))
+    .map(normalizar)
+    .filter(a => a.length >= 4) // evita falsos positivos con palabras cortas
+}
+
+/** El detalle pesado de un destino (lo que NO va en el índice ligero). */
+function bloqueDetalle(d: Destino): string {
+  const partes = [
+    `### ${d.nombre}${d.nombre_local ? ` (${d.nombre_local})` : ''}`,
+    d.precio_desde ? `- precio desde: ${d.precio_desde}` : '- precio: no publicado (lo confirma una asesora)',
+    d.duracion ? `- duración: ${d.duracion}` : null,
+    d.descripcion ? `- descripción: ${recortar(d.descripcion, 320)}` : null,
+    d.incluye?.length ? `- incluye: ${recortar(d.incluye.join(' · '), 400)}` : null,
+    d.no_incluye?.length ? `- NO incluye: ${recortar(d.no_incluye.join(' · '), 200)}` : null,
+    d.itinerario?.length
+      ? `- itinerario: ${d.itinerario.map((x, i) => `D${i + 1} ${x.titulo}`).join(' | ')}`
+      : null,
+    d.highlights?.length
+      ? `- experiencias: ${d.highlights.map(h => h.titulo.trim() + (h.precio ? ` (${h.precio})` : '')).join(' · ')}`
+      : null,
+    `- página: ${SITE.url}/destinos/${d.slug}`,
+  ]
+  return partes.filter(Boolean).join('\n')
+}
+
+export interface Conocimiento {
+  /** Índice ligero + FAQ + agencia. Estable y cacheable. */
+  base: string
+  /** Detalle completo de los destinos mencionados en `texto` ('' si ninguno). */
+  detallesPara: (texto: string) => string
+}
+
+export async function construirConocimiento(): Promise<Conocimiento> {
   const [destinos, faqs] = await Promise.all([getDestinos(), getFaqs()])
 
-  const catalogo = destinos
+  const indice = destinos
     .map(d => {
-      const partes = [
-        `### ${d.nombre}${d.nombre_local ? ` (${d.nombre_local})` : ''}`,
-        `- slug: ${d.slug} · país: ${d.pais}${d.region ? ` · región: ${d.region}` : ''}`,
-        d.precio_desde ? `- precio desde: ${d.precio_desde}` : '- precio: no publicado (lo confirma una asesora)',
-        d.duracion ? `- duración: ${d.duracion}` : null,
-        d.descripcion ? `- descripción: ${recortar(d.descripcion, 320)}` : null,
-        d.incluye?.length ? `- incluye: ${recortar(d.incluye.join(' · '), 400)}` : null,
-        d.no_incluye?.length ? `- NO incluye: ${recortar(d.no_incluye.join(' · '), 200)}` : null,
-        d.itinerario?.length
-          ? `- itinerario: ${d.itinerario.map((x, i) => `D${i + 1} ${x.titulo}`).join(' | ')}`
-          : null,
-        d.highlights?.length
-          ? `- experiencias: ${d.highlights.map(h => h.titulo.trim() + (h.precio ? ` (${h.precio})` : '')).join(' · ')}`
-          : null,
-        `- página: ${SITE.url}/destinos/${d.slug}`,
-      ]
-      return partes.filter(Boolean).join('\n')
+      const local = d.nombre_local ? ` (${d.nombre_local})` : ''
+      const lugar = [d.pais, d.region].filter(Boolean).join(', ')
+      const precio = d.precio_desde ? `desde ${d.precio_desde}` : 'precio a confirmar'
+      return `- **${d.nombre}**${local}${lugar ? ` — ${lugar}` : ''} — ${precio} · ${SITE.url}/destinos/${d.slug}`
     })
-    .join('\n\n')
+    .join('\n')
 
   const preguntas = faqs.length
     ? faqs.map(f => `**${f.pregunta}**\n${f.respuesta}`).join('\n\n')
     : '(sin preguntas frecuentes publicadas)'
 
-  return `## Catálogo de viajes (${destinos.length} programas activos)
+  const base = `## Catálogo de viajes — índice (${destinos.length} programas activos)
 
-Estos son los ÚNICOS programas que la agencia vende. Si preguntan por un
-destino que no está aquí, NO lo inventes: se puede armar a medida, y eso lo
-cotiza una asesora.
+Estos son los ÚNICOS programas ya armados que vende la agencia, con su precio de
+referencia. Si el cliente pregunta por un destino que NO está en esta lista, se
+arma a la medida (lo cotiza una asesora) — enmárcalo en positivo, sin decir que
+no está publicado. Cuando el cliente se interese por uno de esta lista, su
+detalle completo (qué incluye, itinerario…) aparecerá más abajo en el contexto.
 
-${catalogo}
+${indice}
 
 ## Preguntas frecuentes
 
@@ -70,4 +105,12 @@ ${preguntas}
 - Dirección: ${SITE.direccion}, ${SITE.ciudad}, ${SITE.region}
 - Horario de atención (hora de Colombia): ${SITE.horario}
 `
+
+  const detallesPara = (texto: string): string => {
+    const t = normalizar(texto)
+    const relevantes = destinos.filter(d => aliasesDe(d).some(a => t.includes(a)))
+    return relevantes.map(bloqueDetalle).join('\n\n')
+  }
+
+  return { base, detallesPara }
 }

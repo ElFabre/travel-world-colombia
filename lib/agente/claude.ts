@@ -102,7 +102,14 @@ export async function decidir(
     }
   }
 
-  const conocimiento = await construirConocimiento()
+  const { base, detallesPara } = await construirConocimiento()
+
+  // Detalle completo SOLO de los destinos que el cliente ya mencionó (el índice
+  // ligero va siempre en el bloque cacheado; esto es la capa "bajo demanda").
+  const textoConversacion = historial
+    .map(m => (typeof m.content === 'string' ? m.content : ''))
+    .join(' ')
+  const detalleDestinos = detallesPara(textoConversacion)
 
   // Fecha con día de la semana: sin ella el modelo no puede programar
   // seguimientos ("en 3 días", "el lunes") ni esquivar los domingos.
@@ -140,16 +147,22 @@ export async function decidir(
     system: [
       { type: 'text', text: INSTRUCCIONES },
       // TTL de 1 hora en vez de los 5 minutos por defecto. El bloque cacheado
-      // (instrucciones + catálogo) es IDÉNTICO para todas las conversaciones,
-      // así que cualquier mensaje de cualquier cliente lo mantiene caliente.
-      // Medido: escribir el caché cuesta ~5x lo que cuesta leerlo, y en
-      // WhatsApp los mensajes llegan espaciados — con 5 minutos casi siempre
-      // se pagaría la escritura.
-      { type: 'text', text: conocimiento, cache_control: { type: 'ephemeral', ttl: '1h' } },
+      // (instrucciones + índice ligero del catálogo) es IDÉNTICO para todas las
+      // conversaciones, así que cualquier mensaje de cualquier cliente lo
+      // mantiene caliente. Medido: escribir el caché cuesta ~5x lo que cuesta
+      // leerlo, y en WhatsApp los mensajes llegan espaciados — con 5 minutos
+      // casi siempre se pagaría la escritura. El detalle pesado NO va aquí: se
+      // inyecta fresco por turno (ver detalleDestinos) solo cuando hace falta.
+      { type: 'text', text: base, cache_control: { type: 'ephemeral', ttl: '1h' } },
     ],
     messages: [
       ...historial,
-      { role: 'system', content: situacion },
+      {
+        role: 'system',
+        content: detalleDestinos
+          ? `${situacion}\n\n## Detalle de los destinos que interesan al cliente\n\n${detalleDestinos}`
+          : situacion,
+      },
     ],
     output_config: {
       effort: 'medium',
