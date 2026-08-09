@@ -74,8 +74,8 @@ export const TAGS = {
   stopBot: 'stop_bot',
   /** Escalada: dispara la notificación al equipo. */
   transferenciaHumano: 'transferencia a humano',
-  /** No son clientes: Sol no interviene. */
-  noCliente: ['proveedor', 'mayorista / operadores'],
+  /** No son clientes: Sol no interviene. Espeja la exclusión del workflow "Sol Webhook". */
+  noCliente: ['proveedor', 'mayorista / operadores', 'zolutium-ai', '[device] - mayorista b2b'],
   /** Ya se le envió el aviso de tratamiento de datos: no repetirlo. */
   avisoDatos: 'sol_aviso_datos',
   /**
