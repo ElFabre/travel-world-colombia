@@ -371,15 +371,10 @@ export const ESQUEMA_DECISION = {
           description:
             'El rango o cifra tal como la dijo, indicando si es total o por persona cuando se sepa ("9 millones total", "1.500 USD por persona"). No lo fuerces.',
         },
-        duracion: { type: 'string', description: 'Cuánto dura el viaje: noches o días ("una semana", "5 noches").' },
-        habitaciones: { type: 'string', description: 'Acomodación si surge ("2 habitaciones", "una sencilla"). No la fuerces.' },
-        fuente_lead: {
-          type: 'string',
-          description: 'Cómo los conoció, SOLO si el cliente lo dice ("los vi en Instagram", "me recomendó una amiga"). Omite si no lo menciona.',
-        },
       },
       additionalProperties: false,
-      description: 'Lo que hayas podido capturar hasta ahora. Omite lo que no sepas; no inventes.',
+      description:
+        'Lo que hayas podido capturar hasta ahora. Omite lo que no sepas; no inventes. (Duración, acomodación, fuente y otros detalles van en el `resumen`, no aquí.)',
     },
     viaje_personalizado: {
       type: 'boolean',
