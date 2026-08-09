@@ -112,11 +112,15 @@ export const ACTIVO_DESDE = new Date(
 )
 
 /**
- * Modo prueba: mientras el bot actual sigue en producción, Sol solo conversa
- * con contactos que tengan este tag. Vaciar la variable (AGENTE_TAG_PRUEBAS="")
- * la abre a todos los contactos.
+ * Modo prueba: Sol solo conversa con contactos que tengan este tag. Para ABRIR a
+ * todos los leads, pon `AGENTE_TAG_PRUEBAS` a un sentinel de "sin compuerta":
+ * vacío, `all`, `*`, `todos`… e incluso `""`/`''` (el error típico al querer
+ * vaciarlo en la UI de Vercel, que lo guarda como comillas literales).
+ * Cualquier otro valor se trata como el tag real de la compuerta de prueba.
  */
-export const TAG_PRUEBAS = process.env.AGENTE_TAG_PRUEBAS ?? 'pruebas_fabrizio'
+const rawTagPruebas = (process.env.AGENTE_TAG_PRUEBAS ?? 'pruebas_fabrizio').trim()
+const SIN_COMPUERTA = new Set(['', '""', "''", 'all', '*', 'todos', 'none', 'off'])
+export const TAG_PRUEBAS = SIN_COMPUERTA.has(rawTagPruebas.toLowerCase()) ? '' : rawTagPruebas
 
 /**
  * Ventana para agrupar ráfagas de mensajes, en milisegundos.
