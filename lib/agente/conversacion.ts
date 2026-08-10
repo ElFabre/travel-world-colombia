@@ -119,9 +119,13 @@ export async function atender(e: Entrada): Promise<ResultadoTurno> {
     return { actuo: false, nota: 'un humano tomó el chat; Sol se apaga (stop_bot)' }
   }
 
-  // Primer contacto = todavía no tiene el tag del aviso de datos. Si Sol habla,
-  // el aviso saldrá aparte antes de su respuesta, así que no debe re-presentarse.
-  const primerContacto = !e.tags.includes(TAGS.avisoDatos)
+  // Primer contacto = conversación genuinamente nueva: nunca se le envió el aviso
+  // Y NADIE ha respondido antes (ni Sol, ni el bot viejo, ni un humano). Si la
+  // conversación ya venía en curso, Sol la continúa sin re-enviar el aviso ni
+  // re-saludar — clave para no interrumpir chats ya iniciados con contactos
+  // antiguos que no traen el tag.
+  const conversacionYaIniciada = mensajes.some(m => m.direction === 'outbound')
+  const primerContacto = !e.tags.includes(TAGS.avisoDatos) && !conversacionYaIniciada
 
   const decision = await decidir(mensajes, {
     nombre: e.nombre,
