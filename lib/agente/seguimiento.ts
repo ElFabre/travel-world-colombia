@@ -8,7 +8,7 @@ import {
   rutaDeRespuesta,
   ultimosMensajes,
 } from '@/lib/agente/ghl'
-import { enHorario, esNuestro, registrarEnviado } from '@/lib/agente/conversacion'
+import { enHorario, humanoTomoElChat, registrarEnviado } from '@/lib/agente/conversacion'
 import { fechaBogota, sincronizarCrm } from '@/lib/agente/crm'
 import { registrarEvento } from '@/lib/agente/eventos'
 import {
@@ -119,12 +119,11 @@ async function atenderSeguimiento(fila: FilaSeguimiento): Promise<string> {
   if (enManosHumanas) return cerrar(fila, 'la oportunidad está en territorio humano')
 
   const mensajes = await ultimosMensajes(fila.conversation_id, 20)
-  const ultimo = mensajes[0]
-  if (ultimo?.direction === 'outbound' && !(await esNuestro(ultimo.id))) {
-    // Un humano tomó el chat: se apaga a Sol (igual que la compuerta 4 del
-    // webhook) y se cierra la fila. El humano siempre gana.
+  if (await humanoTomoElChat(mensajes)) {
+    // Un humano tomó el chat (cualquier saliente que no es de Sol en la ventana,
+    // no solo el último): se apaga a Sol y se cierra la fila. El humano gana.
     await agregarTags(fila.contact_id, [TAGS.stopBot])
-    return cerrar(fila, 'un humano escribió de último; el lead es suyo')
+    return cerrar(fila, 'un humano escribió en el chat; el lead es suyo')
   }
 
   const intento = fila.intentos + 1

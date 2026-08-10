@@ -1,6 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { decidir, type Decision } from '@/lib/agente/claude'
-import { agregarTags, enviarMensaje, rutaDeRespuesta, ultimosMensajes } from '@/lib/agente/ghl'
+import { agregarTags, enviarMensaje, rutaDeRespuesta, ultimosMensajes, type MensajeGhl } from '@/lib/agente/ghl'
 import { sincronizarCrm } from '@/lib/agente/crm'
 import { ACTIVO_DESDE, AVISO_DATOS, HORARIO, RAFAGA_MS, TAGS, TAG_PRUEBAS } from '@/lib/agente/config'
 
@@ -113,10 +113,9 @@ export async function atender(e: Entrada): Promise<ResultadoTurno> {
   //    humano siempre gana. Esta es la ÚNICA vía por la que Sol se pone stop_bot
   //    a sí mismo — escalar ya no lo hace (ver más abajo).
   const mensajes = await ultimosMensajes(e.conversationId, 20)
-  const ultimo = mensajes[0]
-  if (ultimo?.direction === 'outbound' && !(await esNuestro(ultimo.id))) {
+  if (await humanoTomoElChat(mensajes)) {
     await agregarTags(e.contactId, [TAGS.stopBot])
-    return { actuo: false, nota: 'un humano tomó el chat; Sol se apaga (stop_bot)' }
+    return { actuo: false, nota: 'un humano escribió en el chat; Sol se apaga (stop_bot)' }
   }
 
   // Primer contacto = conversación genuinamente nueva: nunca se le envió el aviso
@@ -184,6 +183,39 @@ export async function atender(e: Entrada): Promise<ResultadoTurno> {
     decision,
     nota: [`${habla ? decision.accion : 'callar'}: ${decision.motivo}`, ...notasCrm].join(' · '),
   }
+}
+
+/**
+ * ¿Un humano tomó el chat? True si en la ventana hay CUALQUIER mensaje saliente
+ * real que NO sea de Sol — no solo el último. Antes solo se miraba `mensajes[0]`,
+ * así que si el asesor escribía y LUEGO el cliente respondía, el último era del
+ * cliente (inbound) y la intervención humana se colaba: Sol seguía compitiendo.
+ *
+ * Excluye los registros de actividad del sistema (TYPE_ACTIVITY_*, p. ej.
+ * "Opportunity updated"), que son "salientes" pero no los escribe una persona.
+ * Una sola consulta en lote a `agente_mensajes_enviados` (los envíos de Sol).
+ */
+export async function humanoTomoElChat(mensajes: MensajeGhl[]): Promise<boolean> {
+  const salientes = mensajes.filter(
+    (m): m is MensajeGhl & { id: string } =>
+      m.direction === 'outbound' &&
+      Boolean(m.id) &&
+      Boolean(m.messageType) &&
+      !m.messageType!.startsWith('TYPE_ACTIVITY')
+  )
+  if (salientes.length === 0) return false
+
+  const admin = createAdminClient()
+  const { data, error } = await admin
+    .from('agente_mensajes_enviados')
+    .select('message_id')
+    .in('message_id', salientes.map(m => m.id))
+  if (error) {
+    console.error('humanoTomoElChat error:', error.message)
+    return false // ante un fallo de lectura, no apagar a Sol por error
+  }
+  const nuestros = new Set((data ?? []).map(r => r.message_id))
+  return salientes.some(m => !nuestros.has(m.id))
 }
 
 export async function esNuestro(messageId?: string): Promise<boolean> {
