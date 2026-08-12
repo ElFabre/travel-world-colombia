@@ -2,6 +2,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { decidir, type Decision } from '@/lib/agente/claude'
 import { agregarTags, enviarMensaje, rutaDeRespuesta, ultimosMensajes, type MensajeGhl } from '@/lib/agente/ghl'
 import { sincronizarCrm } from '@/lib/agente/crm'
+import { extraerFotos } from '@/lib/agente/conocimiento'
 import { ACTIVO_DESDE, AVISO_DATOS, HORARIO, RAFAGA_MS, TAGS, TAG_PRUEBAS } from '@/lib/agente/config'
 
 /** ¿Estamos dentro del horario de atención de la agencia (hora de Colombia)? */
@@ -157,7 +158,10 @@ export async function atender(e: Entrada): Promise<ResultadoTurno> {
       }
     }
 
-    const { messageId } = await enviarMensaje(e.contactId, decision.mensaje.trim(), ruta)
+    // Si Sol puso un marcador [foto:slug], se convierte en imagen adjunta y se
+    // limpia del texto (solo destinos del catálogo; máx. una foto).
+    const { texto, imagenes } = await extraerFotos(decision.mensaje.trim())
+    const { messageId } = await enviarMensaje(e.contactId, texto, ruta, imagenes)
     if (messageId) await registrarEnviado(messageId, e.conversationId, e.contactId)
   }
 

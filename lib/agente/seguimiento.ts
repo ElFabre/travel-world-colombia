@@ -10,6 +10,7 @@ import {
 } from '@/lib/agente/ghl'
 import { enHorario, humanoTomoElChat, registrarEnviado } from '@/lib/agente/conversacion'
 import { fechaBogota, sincronizarCrm } from '@/lib/agente/crm'
+import { extraerFotos } from '@/lib/agente/conocimiento'
 import { registrarEvento } from '@/lib/agente/eventos'
 import {
   CAMPO_IA_NOMBRE,
@@ -139,11 +140,8 @@ async function atenderSeguimiento(fila: FilaSeguimiento): Promise<string> {
 
   if (habla) {
     // Por el mismo canal por el que escribió el cliente (custom provider incluido).
-    const { messageId } = await enviarMensaje(
-      fila.contact_id,
-      decision.mensaje.trim(),
-      rutaDeRespuesta(mensajes)
-    )
+    const { texto, imagenes } = await extraerFotos(decision.mensaje.trim())
+    const { messageId } = await enviarMensaje(fila.contact_id, texto, rutaDeRespuesta(mensajes), imagenes)
     if (messageId) await registrarEnviado(messageId, fila.conversation_id, fila.contact_id)
   }
 

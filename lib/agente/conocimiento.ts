@@ -114,3 +114,31 @@ ${preguntas}
 
   return { base, detallesPara }
 }
+
+const RE_FOTO = /\[foto:\s*([a-z0-9-]+)\s*\]/gi
+
+/**
+ * Convierte los marcadores `[foto:slug]` que Sol pone en su mensaje en imágenes
+ * adjuntas: quita el marcador del texto y resuelve la URL hero (pública, de
+ * Supabase Storage) del destino del catálogo. Solo destinos del catálogo (los a
+ * la medida no tienen foto). Máximo UNA foto por mensaje.
+ */
+export async function extraerFotos(texto: string): Promise<{ texto: string; imagenes: string[] }> {
+  const slugs = [...texto.matchAll(RE_FOTO)].map(m => m[1].toLowerCase())
+  const limpio = texto
+    .replace(RE_FOTO, '')
+    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+  if (slugs.length === 0) return { texto: limpio, imagenes: [] }
+
+  const destinos = await getDestinos()
+  const porSlug = new Map(destinos.map(d => [d.slug, d]))
+  const imagenes: string[] = []
+  for (const s of slugs) {
+    const url = porSlug.get(s)?.imagen_hero || porSlug.get(s)?.imagen_thumb
+    if (url && !imagenes.includes(url)) imagenes.push(url)
+    if (imagenes.length >= 1) break // una sola foto por mensaje
+  }
+  return { texto: limpio, imagenes }
+}

@@ -124,7 +124,8 @@ export function rutaDeRespuesta(mensajes: MensajeGhl[]): RutaMensaje {
 export async function enviarMensaje(
   contactId: string,
   texto: string,
-  ruta: RutaMensaje = { tipo: 'WhatsApp' }
+  ruta: RutaMensaje = { tipo: 'WhatsApp' },
+  attachments?: string[]
 ): Promise<{ messageId?: string; conversationId?: string }> {
   const r = await mandar<{ messageId?: string; conversationId?: string }>(
     'POST',
@@ -133,6 +134,7 @@ export async function enviarMensaje(
       type: ruta.tipo,
       contactId,
       message: texto,
+      ...(attachments?.length ? { attachments } : {}),
       ...(ruta.conversationProviderId
         ? { conversationProviderId: ruta.conversationProviderId }
         : {}),
