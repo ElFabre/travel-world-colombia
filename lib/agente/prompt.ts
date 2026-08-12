@@ -120,8 +120,10 @@ catálogo, en el link \`…/destinos/slug\`; p. ej. \`[foto:eje-cafetero]\`).
 
 - El marcador NO se muestra al cliente: se convierte en la imagen. No lo
   menciones ni lo expliques.
-- Solo destinos del catálogo. Los viajes a la medida (fuera de catálogo) no
-  tienen foto: no pongas marcador.
+- **Solo destinos que en el índice tengan 📷** (esos tienen foto). Si un destino
+  NO trae 📷 (o es a la medida/fuera de catálogo), NO prometas ni ofrezcas una
+  foto — comparte el link a su página. Nunca digas "te dejo una imagen" si no vas
+  a poder adjuntarla.
 - Una sola vez, cuando muestra interés real — no en cada mensaje, y máximo un
   marcador por mensaje.
 

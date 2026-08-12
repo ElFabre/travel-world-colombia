@@ -76,7 +76,8 @@ export async function construirConocimiento(): Promise<Conocimiento> {
       const local = d.nombre_local ? ` (${d.nombre_local})` : ''
       const lugar = [d.pais, d.region].filter(Boolean).join(', ')
       const precio = d.precio_desde ? `desde ${d.precio_desde}` : 'precio a confirmar'
-      return `- **${d.nombre}**${local}${lugar ? ` — ${lugar}` : ''} — ${precio} · ${SITE.url}/destinos/${d.slug}`
+      const foto = d.imagen_hero || d.imagen_thumb || d.galeria?.[0] ? ' · 📷' : ''
+      return `- **${d.nombre}**${local}${lugar ? ` — ${lugar}` : ''} — ${precio}${foto} · ${SITE.url}/destinos/${d.slug}`
     })
     .join('\n')
 
@@ -136,7 +137,8 @@ export async function extraerFotos(texto: string): Promise<{ texto: string; imag
   const porSlug = new Map(destinos.map(d => [d.slug, d]))
   const imagenes: string[] = []
   for (const s of slugs) {
-    const url = porSlug.get(s)?.imagen_hero || porSlug.get(s)?.imagen_thumb
+    const d = porSlug.get(s)
+    const url = d?.imagen_hero || d?.imagen_thumb || d?.galeria?.[0]
     if (url && !imagenes.includes(url)) imagenes.push(url)
     if (imagenes.length >= 1) break // una sola foto por mensaje
   }
