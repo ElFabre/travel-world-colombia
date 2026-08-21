@@ -141,6 +141,12 @@ export async function decidir(
     .filter(Boolean)
     .join(' ')
 
+  // La situación (fecha, nombre, primer contacto, horario) + el detalle bajo
+  // demanda de los destinos mencionados. Variable por turno.
+  const situacionTexto = detalleDestinos
+    ? `${situacion}\n\n## Detalle de los destinos que interesan al cliente\n\n${detalleDestinos}`
+    : situacion
+
   const respuesta = await anthropic().messages.create({
     model: 'claude-opus-5',
     max_tokens: 4000,
@@ -154,16 +160,15 @@ export async function decidir(
       // casi siempre se pagaría la escritura. El detalle pesado NO va aquí: se
       // inyecta fresco por turno (ver detalleDestinos) solo cuando hace falta.
       { type: 'text', text: base, cache_control: { type: 'ephemeral', ttl: '1h' } },
+      // La situación va como TERCER bloque de system, DESPUÉS del breakpoint de
+      // caché: al ser variable por turno no se cachea, pero el prefijo cacheado
+      // queda intacto. Antes iba como un mensaje `role:'system'` al final de
+      // `messages`, lo que rompía con 400 ("role 'system' must follow a 'user'
+      // message…") cuando el último mensaje del historial era saliente
+      // (assistant) — p. ej. una ráfaga procesada tras un envío previo.
+      { type: 'text', text: situacionTexto },
     ],
-    messages: [
-      ...historial,
-      {
-        role: 'system',
-        content: detalleDestinos
-          ? `${situacion}\n\n## Detalle de los destinos que interesan al cliente\n\n${detalleDestinos}`
-          : situacion,
-      },
-    ],
+    messages: historial,
     output_config: {
       effort: 'medium',
       format: { type: 'json_schema', schema: ESQUEMA_DECISION as never },

@@ -48,9 +48,19 @@ export async function enriquecerDesdeContacto(contactId: string): Promise<Evento
 
   // Conversación y último mensaje.
   try {
-    const conv = await conversacionDe(contactId)
+    // Los leads de PRIMER CONTACTO llegan por webhook casi en el mismo instante
+    // en que se crea el contacto, ANTES de que GHL indexe la conversación nueva:
+    // la búsqueda devuelve vacío por una condición de carrera. Sin conversación,
+    // Sol no puede identificar al autor ni responder, y el lead se pierde en
+    // silencio (era una fuga real de leads nuevos). Reintentamos unas pocas veces
+    // con espera corta para darle tiempo a GHL a indexar.
+    let conv = await conversacionDe(contactId)
+    for (let intento = 0; !conv && intento < 3; intento++) {
+      await new Promise(r => setTimeout(r, 2000))
+      conv = await conversacionDe(contactId)
+    }
     if (!conv) {
-      nota.push('el contacto no tiene conversación')
+      nota.push('el contacto no tiene conversación (tras reintentos)')
       return salida
     }
     salida.conversationId = conv.id
