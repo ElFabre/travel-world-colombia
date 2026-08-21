@@ -63,7 +63,7 @@ export interface ConversacionGhl {
   unreadCount?: number
 }
 
-async function mandar<T>(metodo: 'POST' | 'PUT', ruta: string, cuerpo: unknown): Promise<T> {
+async function mandar<T>(metodo: 'POST' | 'PUT' | 'DELETE', ruta: string, cuerpo: unknown): Promise<T> {
   const res = await fetch(`${GHL.api}${ruta}`, {
     method: metodo,
     headers: {
@@ -146,6 +146,11 @@ export async function enviarMensaje(
 /** Agrega tags al contacto (escalada, estado, fuera de alcance). */
 export async function agregarTags(contactId: string, tags: string[]): Promise<void> {
   await mandar('POST', `/contacts/${contactId}/tags`, { tags })
+}
+
+/** Quita tags del contacto (p. ej. re-armar el vigilante cuando ya respondieron). */
+export async function quitarTags(contactId: string, tags: string[]): Promise<void> {
+  await mandar('DELETE', `/contacts/${contactId}/tags`, { tags })
 }
 
 /**

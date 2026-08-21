@@ -84,6 +84,13 @@ export const TAGS = {
    * notifica al asignado. Se pone una sola vez por contacto.
    */
   calificado: 'sol_calificado',
+  /**
+   * NUEVO (creado por Sol): lo pone el vigilante cuando un lead lleva más del SLA
+   * sin que NADIE (ni Sol ni un humano) responda, y solo dentro del horario de
+   * atención. Un workflow de GHL escucha este tag y notifica al usuario asignado.
+   * El propio vigilante lo quita cuando detecta que ya respondieron (re-arma).
+   */
+  sinRespuesta: 'lead_sin_respuesta',
 } as const
 
 /**
