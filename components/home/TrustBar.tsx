@@ -14,7 +14,7 @@ const items = [
   },
   {
     icon: Clock,
-    value: '+5 años',
+    value: '+14 años',
     label: 'de experiencia',
   },
   {

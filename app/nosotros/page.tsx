@@ -15,7 +15,7 @@ export const revalidate = 86400
 export const metadata: Metadata = {
   title: 'Nuestra Historia',
   description:
-    'Conoce a Travel World Colombia — agencia de viajes en Fusagasugá con más de 5 años de experiencia, 126 reseñas ⭐⭐⭐⭐⭐ y RNT 27287. Misión, visión y equipo.',
+    'Conoce a Travel World Colombia — agencia de viajes en Fusagasugá con más de 14 años de experiencia, 126 reseñas ⭐⭐⭐⭐⭐ y RNT 27287. Misión, visión y equipo.',
   alternates: { canonical: '/nosotros' },
 }
 
@@ -23,9 +23,9 @@ export const metadata: Metadata = {
 
 const STATS = [
   { icon: Star,   to: 126, prefix: '',  suffix: '',  label: 'reseñas 5 estrellas' },
-  { icon: Globe,  to: 8,   prefix: '',  suffix: '+', label: 'destinos disponibles' },
-  { icon: Users,  to: 5,   prefix: '+', suffix: '',  label: 'años de experiencia' },
-  { icon: MapPin, to: 3,   prefix: '',  suffix: '',  label: 'centros de operación' },
+  { icon: Globe,  to: 500, prefix: '+', suffix: '',  label: 'destinos disponibles' },
+  { icon: Users,  to: 14,  prefix: '+', suffix: '',  label: 'años de experiencia' },
+  { icon: MapPin, to: 1,   prefix: '',  suffix: '',  label: 'centro de operación' },
 ]
 
 /* ─────────── COMPONENTES INTERNOS ─────────── */

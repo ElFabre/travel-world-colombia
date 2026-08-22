@@ -455,10 +455,10 @@ export default async function DestinoPage({ params }: Props) {
           </h2>
           <div aria-hidden className="mt-5 h-1 w-16 rounded" style={{ background: 'var(--orange)' }} />
           <p className="mt-5 font-inter text-base italic" style={{ color: 'var(--orange)' }}>
-            Más de 15 años cumpliendo sueños
+            Más de 14 años cumpliendo sueños
           </p>
           <p className="mt-6 font-inter text-base leading-relaxed" style={{ color: 'var(--text-dim)' }}>
-            Somos una agencia con más de 15 años de experiencia en el mercado, cumpliendo los
+            Somos una agencia con más de 14 años de experiencia en el mercado, cumpliendo los
             sueños de nuestros pasajeros con viajes a nivel nacional e internacional. Hacemos
             realidad cada destino, con la atención cercana que usted merece.
           </p>

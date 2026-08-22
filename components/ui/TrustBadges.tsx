@@ -5,7 +5,7 @@ interface TrustBadgesProps {
   className?: string
 }
 
-/** Barra de confianza — "126 reseñas ⭐⭐⭐⭐⭐ · RNT 27287 · +5 años". */
+/** Barra de confianza — "126 reseñas ⭐⭐⭐⭐⭐ · RNT 27287 · +14 años". */
 export function TrustBadges({ className = '' }: TrustBadgesProps) {
   return (
     <div
@@ -32,7 +32,7 @@ export function TrustBadges({ className = '' }: TrustBadgesProps) {
       <span aria-hidden style={{ color: 'var(--text-muted)' }}>·</span>
 
       <span>
-        <span style={{ color: 'var(--text-primary)' }}>+5 años</span> de experiencia
+        <span style={{ color: 'var(--text-primary)' }}>+14 años</span> de experiencia
       </span>
     </div>
   )
