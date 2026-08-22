@@ -6,9 +6,11 @@ import { createClient } from '@/lib/supabase/server'
 import { requireEditor, requireAdminRole } from '@/lib/admin/guard'
 import { isApprovedEmail } from '@/lib/admin/allowlist'
 import { registrarActividad } from '@/lib/admin/audit'
+import { SITE } from '@/lib/site'
 
 export type LoginState = { error?: string }
 export type RegisterState = { error?: string; ok?: string }
+export type ResetState = { error?: string; ok?: string }
 
 /** Inicio de sesión del admin. */
 export async function signIn(_prev: LoginState, formData: FormData): Promise<LoginState> {
@@ -75,6 +77,60 @@ export async function signUp(_prev: RegisterState, formData: FormData): Promise<
   return {
     ok: 'Cuenta creada. Te enviamos un correo de confirmación. Cuando la actives, un administrador debe aprobar tu acceso antes de que puedas entrar al panel.',
   }
+}
+
+/**
+ * "Olvidé mi contraseña": envía el correo de restablecimiento nativo de Supabase.
+ *
+ * El enlace del correo pasa por `/auth/confirm` (que crea la sesión de
+ * recuperación con verifyOtp) y de ahí a `/admin/actualizar-password`. Requiere
+ * que la plantilla "Reset Password" del dashboard de Supabase apunte a:
+ *   {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/admin/actualizar-password
+ *
+ * Respuesta SIEMPRE genérica: no revela si el correo está registrado (evita
+ * enumeración de cuentas).
+ */
+export async function solicitarReset(_prev: ResetState, formData: FormData): Promise<ResetState> {
+  const email = String(formData.get('email') ?? '').trim()
+  if (!email) return { error: 'Ingresa tu correo.' }
+
+  const supabase = await createClient()
+  const redirectTo = `${SITE.url}/auth/confirm?next=/admin/actualizar-password`
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo })
+
+  if (error && /rate|too many|seconds|429/i.test(error.message)) {
+    return { error: 'Demasiados intentos. Espera un momento e inténtalo de nuevo.' }
+  }
+  // Cualquier otro caso (incl. correo inexistente) → mismo mensaje.
+  return {
+    ok: 'Si el correo está registrado, te enviamos un enlace para restablecer tu contraseña. Revisa tu bandeja de entrada (y la carpeta de spam).',
+  }
+}
+
+/**
+ * Guarda la nueva contraseña. Corre sobre la sesión de recuperación que dejó
+ * `/auth/confirm` al verificar el enlace del correo.
+ */
+export async function actualizarPassword(_prev: ResetState, formData: FormData): Promise<ResetState> {
+  const password = String(formData.get('password') ?? '')
+  const confirm = String(formData.get('confirm') ?? '')
+  if (password.length < 8) return { error: 'La contraseña debe tener al menos 8 caracteres.' }
+  if (password !== confirm) return { error: 'Las contraseñas no coinciden.' }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: 'El enlace expiró o no es válido. Vuelve a solicitar el restablecimiento desde el login.' }
+  }
+
+  const { error } = await supabase.auth.updateUser({ password })
+  if (error) {
+    if (/different from the old|should be different/i.test(error.message)) {
+      return { error: 'La nueva contraseña debe ser distinta a la anterior.' }
+    }
+    return { error: 'No se pudo actualizar la contraseña. Inténtalo de nuevo.' }
+  }
+  return { ok: 'Tu contraseña se actualizó. Ya puedes iniciar sesión.' }
 }
 
 /** Cierre de sesión. */

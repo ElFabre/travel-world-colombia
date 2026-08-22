@@ -30,10 +30,16 @@ export async function proxy(req: NextRequest) {
   // (más seguro que getSession(), que solo confía en la cookie).
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Páginas de auth públicas: login (entrar) y registro (crear cuenta / ver
-  // estado "pendiente de aprobación"). No deben forzar redirecciones.
+  // Páginas de auth públicas: login (entrar), registro (crear cuenta / ver
+  // estado "pendiente de aprobación") y el flujo de restablecer contraseña
+  // (recuperar = pedir el enlace estando deslogueado; actualizar-password = poner
+  // la nueva con la sesión de recuperación). No deben forzar redirecciones.
   const path = req.nextUrl.pathname
-  const isAuthPage = path.startsWith('/admin/login') || path.startsWith('/admin/registro')
+  const isAuthPage =
+    path.startsWith('/admin/login') ||
+    path.startsWith('/admin/registro') ||
+    path.startsWith('/admin/recuperar') ||
+    path.startsWith('/admin/actualizar-password')
 
   if (!user && !isAuthPage) {
     return NextResponse.redirect(new URL('/admin/login', req.url))

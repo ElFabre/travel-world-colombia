@@ -63,6 +63,10 @@ export default function LoginPage() {
         </button>
 
         <p className="mt-5 text-center font-inter text-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>
+          <Link href="/admin/recuperar" style={{ color: 'var(--orange)' }}>¿Olvidaste tu contraseña?</Link>
+        </p>
+
+        <p className="mt-2 text-center font-inter text-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>
           ¿No tienes cuenta?{' '}
           <Link href="/admin/registro" style={{ color: 'var(--orange)' }}>Crear cuenta</Link>
         </p>
