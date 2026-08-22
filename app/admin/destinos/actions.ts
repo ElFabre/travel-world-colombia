@@ -53,6 +53,8 @@ function construirPayload(formData: FormData) {
     slug,
     pais: String(formData.get('pais') ?? '').trim(),
     region: texto(formData.get('region')),
+    transporte: texto(formData.get('transporte')),
+    salida_fin_ano: formData.get('salida_fin_ano') === 'on',
     activo: formData.get('activo') === 'on',
     destacado: formData.get('destacado') === 'on',
     orden: numEntero(formData.get('orden')) ?? 0,

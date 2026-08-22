@@ -245,7 +245,16 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
         <Campo label="Nombre" name="nombre" defaultValue={d?.nombre} required placeholder="Punta Cana" />
         <Campo label="Slug (URL)" name="slug" defaultValue={d?.slug} required placeholder="punta-cana" hint="Solo minúsculas, números y guiones." />
         <CampoSelect label="País" name="pais" defaultValue={d?.pais} required opciones={PAISES} hint="Define el filtro en /destinos." />
-        <Campo label="Región" name="region" defaultValue={d?.region} placeholder="Caribe" />
+        <Campo label="Región / Continente" name="region" defaultValue={d?.region} placeholder="Caribe" hint="En internacionales agrupa por continente (Europa, Norteamérica…)." />
+        <div>
+          <label className={labelCls} style={labelStyle}>Transporte (solo nacional)</label>
+          <select name="transporte" defaultValue={d?.transporte ?? ''} className={inputCls} style={inputStyle}>
+            <option value="" style={{ background: 'var(--bg-alt)' }}>— No aplica</option>
+            <option value="bus" style={{ background: 'var(--bg-alt)' }}>En bus</option>
+            <option value="avion" style={{ background: 'var(--bg-alt)' }}>En avión</option>
+          </select>
+          <p className="mt-1 font-inter text-xs" style={{ color: 'var(--text-muted)' }}>Agrupa los viajes de Colombia en /destinos.</p>
+        </div>
         <Campo label="Precio desde" name="precio_desde" defaultValue={d?.precio_desde} placeholder="Desde $899 USD" />
         <Campo label="Duración" name="duracion" defaultValue={d?.duracion} placeholder="8 días / 7 noches" />
         <Campo label="Cupos disponibles" name="cupos_disponibles" type="number" defaultValue={d?.cupos_disponibles} placeholder="10" />
@@ -254,7 +263,10 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
           <input type="checkbox" name="activo" defaultChecked={d ? d.activo : true} /> Activo (visible en la web)
         </label>
         <label className="flex items-center gap-2 font-inter text-sm" style={{ color: 'var(--text-dim)' }}>
-          <input type="checkbox" name="destacado" defaultChecked={d?.destacado ?? false} /> Destacado (home)
+          <input type="checkbox" name="destacado" defaultChecked={d?.destacado ?? false} /> Destacado / Favorito
+        </label>
+        <label className="flex items-center gap-2 font-inter text-sm" style={{ color: 'var(--text-dim)' }}>
+          <input type="checkbox" name="salida_fin_ano" defaultChecked={d?.salida_fin_ano ?? false} /> Salida confirmada fin de año
         </label>
       </Seccion>
 

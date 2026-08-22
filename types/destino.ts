@@ -42,6 +42,10 @@ export interface Destino {
   nombre_local?: string
   pais: string
   region?: string
+  /** Solo para nacionales (Colombia): agrupa en "En bus" / "En avión". */
+  transporte?: 'bus' | 'avion'
+  /** Flag de "Salidas confirmadas fin de año" (chip de filtro en /destinos). */
+  salida_fin_ano?: boolean
   frase_hero?: string
   autor_frase?: string
   cargo_autor?: string

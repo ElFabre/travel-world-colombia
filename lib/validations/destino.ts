@@ -9,6 +9,8 @@ export const destinoSchema = z.object({
     .regex(/^[a-z0-9-]+$/, 'Slug: solo minúsculas, números y guiones (ej. punta-cana).'),
   pais: z.string().min(2, 'El país es obligatorio.'),
   region: z.string().optional(),
+  transporte: z.enum(['bus', 'avion']).optional(),
+  salida_fin_ano: z.boolean(),
   activo: z.boolean(),
   destacado: z.boolean(),
   orden: z.number().int().min(0),
