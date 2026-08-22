@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { getDestinos } from '@/lib/destinos'
-import { DestinosLista } from '@/components/destinos/DestinosLista'
+import { DestinosExplorador } from '@/components/destinos/DestinosExplorador'
 import { SectionTag } from '@/components/ui/SectionTag'
 
 export const revalidate = 1800
@@ -64,7 +64,7 @@ export default async function DestinosPage() {
       {/* Lista + filtros */}
       <section className="px-6 py-14">
         <div className="mx-auto max-w-6xl">
-          <DestinosLista destinos={destinos} />
+          <DestinosExplorador destinos={destinos} />
         </div>
       </section>
     </div>
