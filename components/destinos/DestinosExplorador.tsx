@@ -1,11 +1,12 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { MapPin, Globe } from 'lucide-react'
+import { MapPin, Globe, X } from 'lucide-react'
 import type { Destino } from '@/types/destino'
 import { DestinoCard } from './DestinoCard'
+import { MapaDestinos, type SeleccionMapa } from './MapaDestinos'
 
-type Filtro = 'todos' | 'nacional' | 'internacional' | 'favoritos' | 'fin_ano'
+type Filtro = 'todos' | 'nacional' | 'internacional' | 'favoritos' | 'fin_ano' | `region:${string}`
 
 const esNacional = (d: Destino) => d.pais === 'Colombia'
 const minOrden = (ds: Destino[]) => Math.min(...ds.map(d => d.orden))
@@ -119,6 +120,19 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
     finAno: destinos.filter(d => d.salida_fin_ano),
   }), [destinos])
 
+  // Conteo por región (solo internacionales) para el mapa.
+  const conteoRegiones = useMemo(() => {
+    const m = new Map<string, number>()
+    for (const d of internacionales) {
+      const r = d.region ?? 'Otros destinos'
+      m.set(r, (m.get(r) ?? 0) + 1)
+    }
+    return m
+  }, [internacionales])
+
+  const regionSel = filtro.startsWith('region:') ? filtro.slice(7) : null
+  const seleccionMapa: SeleccionMapa = regionSel ?? (filtro === 'nacional' ? 'nacional' : null)
+
   const chips = ([
     { key: 'todos', label: 'Todos', n: destinos.length },
     { key: 'nacional', label: '🇨🇴 Nacionales', n: nacionales.length },
@@ -140,8 +154,30 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
 
   return (
     <div>
+      {/* Mapa interactivo (escritorio; en móvil quedan los chips) */}
+      <div className="mb-8 hidden md:block">
+        <MapaDestinos
+          regiones={conteoRegiones}
+          nacionales={nacionales.length}
+          seleccion={seleccionMapa}
+          onSelect={sel =>
+            setFiltro(sel === null ? 'todos' : sel === 'nacional' ? 'nacional' : `region:${sel}`)
+          }
+        />
+      </div>
+
       {/* Filtros */}
       <div className="mb-10 flex flex-wrap gap-2">
+        {regionSel && (
+          <button
+            type="button"
+            onClick={() => setFiltro('todos')}
+            className="flex items-center gap-1.5 rounded-full px-5 py-2 font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase transition-all duration-200"
+            style={{ background: 'var(--orange)', color: 'var(--orange-contrast)', border: '1px solid var(--orange)' }}
+          >
+            📍 {regionSel} · {conteoRegiones.get(regionSel) ?? 0} <X size={12} />
+          </button>
+        )}
         {chips.map(c => {
           const activo = filtro === c.key
           return (
@@ -165,6 +201,11 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
       <div className="flex flex-col gap-10">
         {filtro === 'favoritos' && <Grid destinos={favoritos} />}
         {filtro === 'fin_ano' && <Grid destinos={finAno} />}
+        {regionSel && (
+          <SeccionInternacional
+            destinos={internacionales.filter(d => (d.region ?? 'Otros destinos') === regionSel)}
+          />
+        )}
         {verNacional && nacionales.length > 0 && <SeccionNacional destinos={nacionales} />}
         {verInternacional && internacionales.length > 0 && <SeccionInternacional destinos={internacionales} />}
       </div>
