@@ -83,7 +83,12 @@ function SeccionNacional({ destinos }: { destinos: Destino[] }) {
   )
 }
 
-/** Internacional: una caja por región/continente, sub-grupos por país. */
+/**
+ * Internacional: una caja por región/continente, con TODAS sus tarjetas en una
+ * sola grilla (3 por fila) para agruparlas horizontalmente. Se ordenan por país
+ * (mismo país queda adyacente) respetando el orden del panel; el país se ve en
+ * cada tarjeta.
+ */
 function SeccionInternacional({ destinos }: { destinos: Destino[] }) {
   const regiones = agrupar(destinos, d => d.region ?? 'Otros destinos').sort(
     (a, b) => minOrden(a[1]) - minOrden(b[1])
@@ -91,12 +96,12 @@ function SeccionInternacional({ destinos }: { destinos: Destino[] }) {
   return (
     <>
       {regiones.map(([region, lista]) => {
-        const paises = agrupar(lista, d => d.pais).sort((a, b) => minOrden(a[1]) - minOrden(b[1]))
+        const ordenados = agrupar(lista, d => d.pais)
+          .sort((a, b) => minOrden(a[1]) - minOrden(b[1]))
+          .flatMap(([, ds]) => [...ds].sort((a, b) => a.orden - b.orden))
         return (
           <Caja key={region} icon={<Globe size={18} />} titulo={region} total={lista.length}>
-            {paises.length <= 1
-              ? <Grid destinos={lista} />
-              : paises.map(([pais, ds]) => <SubGrupo key={pais} titulo={pais} destinos={ds} />)}
+            <Grid destinos={ordenados} />
           </Caja>
         )
       })}

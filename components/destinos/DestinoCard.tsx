@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Clock, ChevronRight, Star } from 'lucide-react'
+import { Clock, ChevronRight, Star, MapPin } from 'lucide-react'
 import type { Destino } from '@/types/destino'
 import { destinoCardImg } from '@/lib/hero'
 
@@ -67,6 +67,9 @@ export function DestinoCard({ d, i = 0 }: { d: Destino; i?: number }) {
         </div>
 
         <div className="flex flex-1 flex-col gap-2 p-4">
+          <span className="flex items-center gap-1 font-inter text-[11px] font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
+            <MapPin size={11} /> {d.pais}
+          </span>
           <h3 className="font-plus-jakarta text-base font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>
             {d.nombre}
           </h3>
