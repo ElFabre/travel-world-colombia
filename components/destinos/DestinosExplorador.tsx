@@ -133,13 +133,20 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
   const regionSel = filtro.startsWith('region:') ? filtro.slice(7) : null
   const seleccionMapa: SeleccionMapa = regionSel ?? (filtro === 'nacional' ? 'nacional' : null)
 
+  // La geografía (Todos/Nacionales/Internacionales) ya la cubre el mapa; los
+  // chips quedan solo para las facetas transversales que el mapa NO puede
+  // expresar. Cada uno es un toggle (clic estando activo → volver a todos).
   const chips = ([
-    { key: 'todos', label: 'Todos', n: destinos.length },
-    { key: 'nacional', label: '🇨🇴 Nacionales', n: nacionales.length },
-    { key: 'internacional', label: '🌎 Internacionales', n: internacionales.length },
     { key: 'favoritos', label: '⭐ Favoritos', n: favoritos.length },
     { key: 'fin_ano', label: '🎄 Salidas fin de año', n: finAno.length },
-  ] as const).filter(c => c.n > 0 || c.key === 'todos')
+  ] as const).filter(c => c.n > 0)
+
+  // Etiqueta del chip "limpiar filtro" cuando la selección vino del mapa.
+  const etiquetaLimpiar = regionSel
+    ? `📍 ${regionSel} · ${conteoRegiones.get(regionSel) ?? 0}`
+    : filtro === 'nacional'
+      ? `🇨🇴 Colombia · ${nacionales.length}`
+      : null
 
   if (destinos.length === 0) {
     return (
@@ -167,16 +174,16 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
         />
       </div>
 
-      {/* Filtros */}
-      <div className="mb-10 flex flex-wrap gap-2">
-        {regionSel && (
+      {/* Facetas transversales + chip para limpiar la selección del mapa */}
+      <div className="mb-10 flex flex-wrap justify-center gap-2">
+        {etiquetaLimpiar && (
           <button
             type="button"
             onClick={() => setFiltro('todos')}
             className="flex items-center gap-1.5 rounded-full px-5 py-2 font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase transition-all duration-200"
             style={{ background: 'var(--orange)', color: 'var(--orange-contrast)', border: '1px solid var(--orange)' }}
           >
-            📍 {regionSel} · {conteoRegiones.get(regionSel) ?? 0} <X size={12} />
+            {etiquetaLimpiar} <X size={12} />
           </button>
         )}
         {chips.map(c => {
@@ -185,15 +192,15 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
             <button
               key={c.key}
               type="button"
-              onClick={() => setFiltro(c.key)}
-              className="rounded-full px-5 py-2 font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase transition-all duration-200"
+              onClick={() => setFiltro(activo ? 'todos' : c.key)}
+              className="flex items-center gap-1.5 rounded-full px-5 py-2 font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase transition-all duration-200"
               style={
                 activo
                   ? { background: 'var(--orange)', color: 'var(--orange-contrast)', border: '1px solid var(--orange)' }
                   : { background: 'var(--bg-alt)', color: 'var(--text-dim)', border: '1px solid var(--border)' }
               }
             >
-              {c.label} · {c.n}
+              {c.label} · {c.n} {activo && <X size={12} />}
             </button>
           )
         })}
