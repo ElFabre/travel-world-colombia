@@ -55,6 +55,7 @@ function construirPayload(formData: FormData) {
     region: texto(formData.get('region')),
     transporte: texto(formData.get('transporte')),
     salida_fin_ano: formData.get('salida_fin_ano') === 'on',
+    es_crucero: formData.get('es_crucero') === 'on',
     activo: formData.get('activo') === 'on',
     destacado: formData.get('destacado') === 'on',
     orden: numEntero(formData.get('orden')) ?? 0,
@@ -102,6 +103,7 @@ function construirPayload(formData: FormData) {
 function revalidar(slug?: string) {
   revalidatePath('/')
   revalidatePath('/destinos')
+  revalidatePath('/cruceros')
   if (slug) revalidatePath(`/destinos/${slug}`)
   revalidatePath('/admin')
   revalidatePath('/admin/viajes')

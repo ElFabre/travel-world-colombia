@@ -11,6 +11,7 @@ export const destinoSchema = z.object({
   region: z.string().optional(),
   transporte: z.enum(['bus', 'avion']).optional(),
   salida_fin_ano: z.boolean(),
+  es_crucero: z.boolean(),
   activo: z.boolean(),
   destacado: z.boolean(),
   orden: z.number().int().min(0),

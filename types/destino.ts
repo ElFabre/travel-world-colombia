@@ -46,6 +46,8 @@ export interface Destino {
   transporte?: 'bus' | 'avion'
   /** Flag de "Salidas confirmadas fin de año" (chip de filtro en /destinos). */
   salida_fin_ano?: boolean
+  /** Es un crucero: se lista en /cruceros y se excluye de /destinos. */
+  es_crucero?: boolean
   frase_hero?: string
   autor_frase?: string
   cargo_autor?: string

@@ -14,7 +14,8 @@ export const metadata: Metadata = {
 }
 
 export default async function DestinosPage() {
-  const destinos = await getDestinos()
+  // Los cruceros tienen su propia página (/cruceros); aquí solo destinos.
+  const destinos = (await getDestinos()).filter(d => !d.es_crucero)
 
   return (
     <div className="tema-claro">

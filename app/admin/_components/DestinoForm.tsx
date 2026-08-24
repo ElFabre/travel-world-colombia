@@ -268,6 +268,9 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
         <label className="flex items-center gap-2 font-inter text-sm" style={{ color: 'var(--text-dim)' }}>
           <input type="checkbox" name="salida_fin_ano" defaultChecked={d?.salida_fin_ano ?? false} /> Salida confirmada fin de año
         </label>
+        <label className="flex items-center gap-2 font-inter text-sm" style={{ color: 'var(--text-dim)' }}>
+          <input type="checkbox" name="es_crucero" defaultChecked={d?.es_crucero ?? false} /> Es crucero (va en /cruceros)
+        </label>
       </Seccion>
 
       <Seccion
