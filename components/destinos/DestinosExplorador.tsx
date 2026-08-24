@@ -155,7 +155,7 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
   return (
     <div>
       {/* Mapa interactivo (escritorio; en móvil quedan los chips) */}
-      <div className="mb-8 hidden md:block">
+      <div className="mx-auto mb-8 hidden max-w-3xl md:block">
         <MapaDestinos
           regiones={conteoRegiones}
           nacionales={nacionales.length}

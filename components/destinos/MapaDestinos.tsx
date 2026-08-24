@@ -41,21 +41,23 @@ const REGIONES: { nombre: string; dx: number; dy: number }[] = [
 function Pill({
   x, y, texto, activo, tenue,
 }: { x: number; y: number; texto: string; activo: boolean; tenue?: boolean }) {
-  const w = texto.length * 6.6 + 20
+  // El mapa se muestra compacto (max-w-3xl ≈ escala 0.8), así que la pastilla
+  // es un poco más grande en unidades SVG para que quede legible en pantalla.
+  const w = texto.length * 7.4 + 22
   return (
-    <g transform={`translate(${x - w / 2}, ${y - 11})`} style={{ pointerEvents: 'none' }}>
+    <g transform={`translate(${x - w / 2}, ${y - 13})`} style={{ pointerEvents: 'none' }}>
       <rect
         width={w}
-        height={22}
-        rx={11}
+        height={26}
+        rx={13}
         fill={activo ? 'var(--orange)' : 'rgba(13, 30, 60, 0.72)'}
         stroke={activo ? 'var(--orange)' : 'rgba(255,255,255,0.22)'}
       />
       <text
         x={w / 2}
-        y={15}
+        y={18}
         textAnchor="middle"
-        fontSize={11}
+        fontSize={13}
         fontWeight={700}
         fill={activo ? 'var(--orange-contrast)' : tenue ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.9)'}
         style={{ fontFamily: 'var(--font-inter, Inter), sans-serif' }}
@@ -74,7 +76,7 @@ export function MapaDestinos({ regiones, nacionales, seleccion, onSelect }: Mapa
 
   return (
     <div
-      className="tema-oscuro relative overflow-hidden rounded-2xl p-4 sm:p-6"
+      className="tema-oscuro relative overflow-hidden rounded-2xl p-3 sm:p-5"
       style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}
     >
       <p className="mb-1 px-2 font-plus-jakarta text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
