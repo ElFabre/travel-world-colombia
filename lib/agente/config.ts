@@ -9,18 +9,39 @@ export const GHL = {
   locationId: 'RMFUo0i4KOVl7eZHEn7s',
 } as const
 
-/** Pipeline principal de ventas y las etapas que Sol puede tocar. */
+/**
+ * Pipeline comercial "🎯 Leads (venta)" y las etapas que Sol puede tocar.
+ * Migración 2026-08-25 (ver `docs/migracion-campos-oportunidad.md`): los leads
+ * nuevos nacen aquí; el "✅ PIPELINE PRINCIPAL" viejo queda en solo-lectura
+ * hasta agotar sus reservas (ver PIPELINE_LEGACY).
+ */
 export const PIPELINE = {
-  id: 'G9XH0U9dIBl7Jvd7hyvE',
+  id: 'MLoZOGIYvCBRUgQdYRA8',
   etapas: {
-    leadNuevo: '31100b3a-0c8c-4b44-a717-0642177bdd6b',
-    calificadoPorBot: 'df98abba-b57c-45d5-8a8f-4c5ff82d1b45',
-    asignadoAAgente: 'f049d236-3d2e-48ae-ae61-99653b33f131',
+    leadNuevo: '369a3d70-ec39-4a88-9289-5d578fe63180', // 🆕 Lead Nuevo
+    calificadoPorBot: '311ed363-2809-4443-8849-73a444bec6df', // 🤖 Calificado por Bot
+    asignadoAAgente: '24cc9101-80ec-4478-910e-bf253d0f206d', // 👤 Asignado a Agente
   },
   /**
    * A partir de aquí manda un humano: si la oportunidad ya está en cotización o
    * más allá, Sol no interviene aunque no tenga `stop_bot`.
    */
+  etapasVedadas: [
+    'faa05280-9bb8-477e-9dfb-b8448bdee719', // 📞 Contactado
+    'f34e7cd3-673f-4405-b608-4a031eac04e8', // 📋 Cotización Enviada
+    '202714ba-4a61-457d-b648-f5f7c99dc0ae', // 🔄 En Seguimiento
+    '2ff59f80-0b8a-4dde-9419-0f4b97b701f0', // ✅ Ganada
+    'c9bb7c35-ee9b-4ae2-97b6-791f526af2d7', // ❌ Perdida / Abandonado
+  ],
+} as const
+
+/**
+ * Pipeline viejo "✅ PIPELINE PRINCIPAL", vivo durante la transición: sus leads
+ * en etapas humanas siguen siendo territorio humano para el seguimiento.
+ * Retirar cuando el pipeline se vacíe.
+ */
+export const PIPELINE_LEGACY = {
+  id: 'G9XH0U9dIBl7Jvd7hyvE',
   etapasVedadas: [
     '581e66d0-f2e2-407a-b2ec-04d1ba644b59', // Contactado
     '17fc06db-e871-465d-bd13-beddf574f967', // Cotización en proceso
@@ -33,8 +54,14 @@ export const PIPELINE = {
   ],
 } as const
 
-/** Pipeline de post-venta: territorio 100% humano. */
-export const PIPELINE_POSTVENTA = 'X2FPIf6vQa6E5VSNE922'
+/**
+ * Pipelines 100% humanos: "🗂️ Reservaciones (operación)" (nuevo, post-venta) y
+ * "🛫 Clientes Viajando" (viejo, en retiro).
+ */
+export const PIPELINES_POSTVENTA = [
+  'Jq7CxjuirY9Gu44el0bs', // 🗂️ Reservaciones (operación)
+  'X2FPIf6vQa6E5VSNE922', // 🛫 Clientes Viajando (legacy)
+] as const
 
 /**
  * Campos de calificación que YA existen en la subcuenta (folder ⭐

@@ -1,0 +1,1018 @@
+[
+ {
+  "folder": "Generales del Viaje",
+  "name": "Fecha confirmada de salida",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.fecha_de_ida"
+ },
+ {
+  "folder": "Generales del Viaje",
+  "name": "Fecha confirmada de regreso",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.fecha_regreso"
+ },
+ {
+  "folder": "Generales del Viaje",
+  "name": "Numero de noches",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.cpa__noches"
+ },
+ {
+  "folder": "Generales del Viaje",
+  "name": "Pax total",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.cpa__total_perosnas"
+ },
+ {
+  "folder": "Generales del Viaje",
+  "name": "Hotel o producto",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.cpa__hotel"
+ },
+ {
+  "folder": "Generales del Viaje",
+  "name": "Peticiones especiales",
+  "dataType": "LARGE_TEXT",
+  "sourceContactKey": "contact.cpa__observaciones"
+ },
+ {
+  "folder": "Generales del Viaje",
+  "name": "Tipo de paquete",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.cpa__plan"
+ },
+ {
+  "folder": "Generales del Viaje",
+  "name": "Destino de interés",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.c__destino"
+ },
+ {
+  "folder": "Generales del Viaje",
+  "name": "Moneda de operacion",
+  "dataType": "TEXT",
+  "note": "nuevo (catálogo TMS)"
+ },
+ {
+  "folder": "Generales del Viaje",
+  "name": "Proveedor principal",
+  "dataType": "TEXT",
+  "note": "nuevo (catálogo TMS)"
+ },
+ {
+  "folder": "Generales del Viaje",
+  "name": "Numero de reservacion del proveedor",
+  "dataType": "TEXT",
+  "note": "nuevo (catálogo TMS)"
+ },
+ {
+  "folder": "Generales del Viaje",
+  "name": "Motivo del viaje",
+  "dataType": "TEXT",
+  "note": "nuevo (catálogo TMS)"
+ },
+ {
+  "folder": "Generales del Viaje",
+  "name": "Forma de pago",
+  "dataType": "TEXT",
+  "note": "nuevo (catálogo TMS)"
+ },
+ {
+  "folder": "Generales del Viaje",
+  "name": "Pasajeros",
+  "dataType": "LARGE_TEXT",
+  "note": "nuevo (catálogo TMS, resumen texto opcional)"
+ },
+ {
+  "folder": "Generales del Viaje",
+  "name": "Presupuesto estimado",
+  "dataType": "TEXT",
+  "note": "nuevo (catálogo TMS; copiar de calificación al convertir)"
+ },
+ {
+  "folder": "Contrato",
+  "name": "Tipo de Contrato",
+  "dataType": "SINGLE_OPTIONS",
+  "options": [
+   "Ticketes Aéreos",
+   "Plan Todo Incluido",
+   "Solo Asistencia",
+   "Solo Excursiones",
+   "Ticketes & Asistencia"
+  ],
+  "sourceContactKey": "contact.tipo_de_contrato"
+ },
+ {
+  "folder": "Contrato",
+  "name": "Fecha del contrato",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.c__fecha_destino"
+ },
+ {
+  "folder": "Contrato",
+  "name": "Contrato - Numero de Pasajeros",
+  "dataType": "SINGLE_OPTIONS",
+  "options": [
+   "1",
+   "2",
+   "3",
+   "4",
+   "5",
+   "6",
+   "7",
+   "8"
+  ],
+  "sourceContactKey": "contact.c__numero_de_pasajeros"
+ },
+ {
+  "folder": "Contrato",
+  "name": "Contrato - Numero de Trayectos",
+  "dataType": "SINGLE_OPTIONS",
+  "options": [
+   "1",
+   "2",
+   "3",
+   "4"
+  ],
+  "sourceContactKey": "contact.c_numero_de_trayectos"
+ },
+ {
+  "folder": "Contrato",
+  "name": "TWC",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.twc"
+ },
+ {
+  "folder": "Contrato",
+  "name": "Acomodacion",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.cpa__acomodacion"
+ },
+ {
+  "folder": "Contrato",
+  "name": "Cantidad de Habitaciones",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.cpa__cant_hab"
+ },
+ {
+  "folder": "Contrato",
+  "name": "ENVIAR CONTRATO?",
+  "dataType": "MULTIPLE_OPTIONS",
+  "options": [
+   "Enviar contrato",
+   "Reenviar contrato",
+   "Preview Documento"
+  ],
+  "sourceContactKey": "contact.enviar_contrato"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P1 - Nombre y Apellido",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p1__nombre_y_apellido"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P1 - Documento",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p1__documento"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P1 - Fecha de Nacimiento",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.p1__fecha_de_nacimiento"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P1 - Pasaporte",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p1__pasaporte"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P1 - Vencimiento Pasaporte",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.p1__vencimiento_pasaporte"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P1 - Telefono",
+  "dataType": "PHONE",
+  "sourceContactKey": "contact.p1__telefono"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P2 - Nombre y Apellido",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p2__nombre_y_apellido"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P2 - Documento",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p2__documento"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P2 - Fecha de Nacimiento",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.p2__fecha_de_nacimiento"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P2 - Pasaporte",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p2__paasaporte"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P2 - Vencimiento Pasaporte",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.p2__vencimiento_pasaporte"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P2 - Telefono",
+  "dataType": "PHONE",
+  "sourceContactKey": "contact.p2__telefono"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P3 - Nombre y Apellido",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p3__nombre_y_apellido"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P3 - Documento",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p3__dcoumento"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P3 - Fecha de Nacimiento",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.p3__fecha_de_nacimiento"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P3 - Pasaporte",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p3__pasaporte"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P3 - Vencimiento Pasaporte",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.p3__vencimiento_pasaporte"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P3 - Telefono",
+  "dataType": "PHONE",
+  "sourceContactKey": "contact.p3__telfono"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P4 - Nombre y Apellido",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p4__nombre_y_apellido"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P4 - Documento",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p4__docuemnto"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P4 - Fecha de Nacimiento",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.p4__fecha_de_nacimiento"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P4 - Pasaporte",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p4__pasaporte"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P4 - Vencimiento Pasaporte",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.p4__vencimiento_pasaporte"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P4 - Telefono",
+  "dataType": "PHONE",
+  "sourceContactKey": "contact.p4__telefono"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P5 - Nombre y Apellido",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p5__nombre_y_apellido"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P5 - Documento",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p5__documento"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P5 - Fecha de Nacimiento",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.p5__fecha_de_nacimiento"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P5 - Pasaporte",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p5__pasaporte"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P5 - Vencimiento Pasaporte",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.p5__vencimiento_pasaporte"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P5 - Telefono",
+  "dataType": "PHONE",
+  "sourceContactKey": "contact.p5__telfono"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P6 - Nombre y Apellido",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p6__nombre_y_apellido"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P6 - Documento",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p6__documento"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P6 - Fecha de Nacimiento",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.p6__fecha_de_nacimiento"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P6 - Pasaporte",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p6__pasaporte"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P6 - Vencimiento Pasaporte",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.p6__vencimiento_pasaporte"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P6 - Telefono",
+  "dataType": "PHONE",
+  "sourceContactKey": "contact.p6__telfono"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P7 - Nombre y Apellido",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p7__nombre_y_apellido"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P7 - Documento",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p7__documento"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P7 - Fecha de Nacimiento",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.p7__fecha_de_nacimiento"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P7 - Pasaporte",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p7__pasaporte"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P7 - Vencimiento Pasaporte",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.p7__vencimiento_pasaporte"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P7 - Telefono",
+  "dataType": "PHONE",
+  "sourceContactKey": "contact.p7__telfono"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P8 - Nombre y Apellido",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p8__nombre_y_apellido"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P8 - Documento",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p8__documento"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P8 - Fecha de Nacimiento",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.p8__fecha_de_nacimiento"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P8 - Pasaporte",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p8__pasaporte"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P8 - Vencimiento Pasaporte",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.p8__vencimiento_pasaporte"
+ },
+ {
+  "folder": "Pasajeros",
+  "name": "P8 - Telefono",
+  "dataType": "PHONE",
+  "sourceContactKey": "contact.p8__telfono"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T1 - Ruta",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.t1__ruta"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T1 - Fecha de salida",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.t1__fecha"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T1 - Hora de Salida",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.t1__salida"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T1 - Hora de Llegada",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.t1__llegada"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T1 - Vuelo",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.t1__vuelo"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T1 - Aerolinea",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.t1__aerolinea"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T2 - Ruta",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.t2__ruta"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T2 - Fecha de salida",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.t2__fecha"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T2 - Hora de Salida",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.t2__salida"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T2 - Hora de Llegada",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.t2__llegada"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T2 - Vuelo",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.t2__vuelo"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T2 - Aerolinea",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.t2__aerolinea"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T3 - Ruta",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.t3__ruta"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T3 - Fecha de salida",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.t3__fecha"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T3 - Hora de Salida",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.t3__salida"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T3 - Hora de Llegada",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.t3__llegada"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T3 - Vuelo",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.t3__vuelo"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T3 - Aerolinea",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.t3__aerolinea"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T4 - Ruta",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.t4__ruta"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T4 - Fecha de salida",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.t4__fecha"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T4 - Hora de Salida",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.t4__salida"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T4 - Hora de Llegada",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.t4__llegada"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T4 - Vuelo",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.t4__vuelo"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "T4 - Aerolinea",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.t4__aerolinea"
+ },
+ {
+  "folder": "Vuelos",
+  "name": "Notas Importantes",
+  "dataType": "LARGE_TEXT",
+  "sourceContactKey": "contact.notas_importantes"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "Valor Adulto Vuelos",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.valor_adulto"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "Valor Niño Vuelos",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.valor_nio"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "Cantidad Adultos Vuelos",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.cantidad"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "Cantidad Niños Vuelos",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.cantidad_nios_vuelos"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "Valor total Adultos Vuelos",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.valor_total_adultos_vuelos"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "Valor total Niños Vuelos",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.valor_total_nios_vuelos"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "ADL Sencillo - Tarifa por pax",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.as__tarifa_por_pax"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "ADL Sencillo - Cantidad",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.as__cantidad"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "ADL Sencillo - Valor Plan",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.as__valor_plan"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "ADL Sencillo - Valor Total",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.as__valor_total"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "ADL Doble - Tarifa por pax",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.ad__tarifa_por_pax"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "ADL Doble - Cantidad",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.ad__cantidad"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "ADL Doble - Valor Plan",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.ad__valor_plan"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "ADL Doble - Valor Total",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.ad__valor_total"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "ADL Multiple - Tarifa por pax",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.am__tarifa_por_pax"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "ADL Multiple - Cantidad",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.am__cantidad"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "ADL Multiple - Valor Plan",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.am__valor_plan"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "ADL Multiple - Valor Total",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.am__valor_total"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "Valor Niño - Tarifa por pax",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.vn__tarifa_por_pax"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "Valor Niño - Cantidad",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.vn__cantidad"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "Valor Niño - Valor Plan",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.vn__valor_plan"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "Valor Niño - Valor Total",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.vn__valor_total"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "Valor Infante - Tarifa por pax",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.vi__tarifa_por_pax"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "Valor Infante - Cantidad",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.vi__cantidad"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "Valor Infante - Valor Plan",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.vi__valor_plan"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "Valor Infante - Valor Total",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.vi__valor_total"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "TRM - Tarifa por pax",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.trm__tarifa_por_pax"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "TRM - Cantidad",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.trm__cantidad"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "TRM - Valor Plan",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.trm__valor_plan"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "TRM - Valor Total",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.trm__valor_total"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "TRM - T/C",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.trm__tc"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "TRM - Tiquetes Aereos",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.trm__tiquetes_aereos"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "Total Pasajeros - Cantidad",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.total_pasajeros",
+  "note": "unifica total_pasajeros + total_pasajeros__cantidad"
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "Total Pasajeros - Valor Plan",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.tp__valor_plan",
+  "note": "corrige \"Toltal\""
+ },
+ {
+  "folder": "Liquidacion",
+  "name": "Total Pasajeros - Valor Total",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.tp__valor_total",
+  "note": "unifica tp__valor_total + total_pasajeros__valor_total"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 1 - Fecha de Pago",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.p1_fecha_de_pago"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 1 - Medio de Pago",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p1_mtodo_de_pagos"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 1 - TRM",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.pago_1__trm"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 1 - Total Plan",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.p1__valor_pago"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 1 - Abono",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.p1__recibido"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 1 - Saldo en Pesos",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.p1__saldo_en_pesos"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 2 - Fecha de Pago",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.p2_fecha_de_pago"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 2 - Medio de Pago",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p2_mtodo_de_pagos"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 2 - TRM",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.pago_2__trm"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 2 - Total Plan",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.p2__valor_pago"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 2 - Abono",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.p2__recibido"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 2 - Saldo en Pesos",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.p2__saldo_en_pesos"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 3 - Fecha de Pago",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.p3_fecha_de_pago"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 3 - Medio de Pago",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p3_mtodo_de_pagos"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 3 - TRM",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.pago_3__trm"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 3 - Total Plan",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.p3__valor_pago"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 3 - Abono",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.p3__recibido"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 3 - Saldo en Pesos",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.p3__saldo_en_pesos"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 4 - Fecha de Pago",
+  "dataType": "DATE",
+  "sourceContactKey": "contact.p4__fecha_de_pago"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 4 - Medio de Pago",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p4_mtodo_de_pagos"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 4 - TRM",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.pago_4__trm"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 4 - Total Plan",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.p4__valor_pago"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 4 - Abono",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.p4__recibido"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 4 - Saldo en Pesos",
+  "dataType": "NUMERICAL",
+  "sourceContactKey": "contact.p4__saldo_en_pesos"
+ },
+ {
+  "folder": "Plan de Pagos",
+  "name": "Pago 1 - Tipo de Pago",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.p1__tipo_de_pago"
+ },
+ {
+  "folder": "Inclusiones",
+  "name": "Inclusiones",
+  "dataType": "MULTIPLE_OPTIONS",
+  "options": [
+   "✈️ boleto aéreo",
+   "💺asignación de sillas de manera aleatoria por la aerolínea",
+   "💺asignación de sillas preferida para cada pasajero",
+   "💺asignación de sillas preferida",
+   "🎒  Un Articulo perssonal que no exeda las medidas 35 x 45 x 20",
+   "🧳 Equipaje de mano con ruedas que no exceda las medidas 45 x 35 x 25 cm",
+   "🧳  Maleta para enviar por Bodega de 23 Kg. que lo exceda 158 cm lineales.",
+   "🚑 Seguro de asistencia en médica en viajes",
+   "🚑 Seguro de cancelación de viaje",
+   "📄Impuestos y tasas."
+  ],
+  "sourceContactKey": "contact.inclusiones"
+ },
+ {
+  "folder": "Inclusiones",
+  "name": "No incluye",
+  "dataType": "MULTIPLE_OPTIONS",
+  "options": [
+   "💺asignación de sillas preferida para cada pasajero",
+   "🧳 Equipaje de mano con ruedas que no exceda las medidas 45 x 35 x 25 cm",
+   "🧳  Maleta para enviar por Bodega de 23 Kg. que lo exceda 158 cm lineales.",
+   "🚑 Seguro de asistencia en médica en viajes",
+   "🚑 Seguro de cancelación de viaje"
+  ],
+  "sourceContactKey": "contact.no_incluye"
+ },
+ {
+  "folder": "Inclusiones",
+  "name": "Observaciones",
+  "dataType": "LARGE_TEXT",
+  "sourceContactKey": "contact.observaciones"
+ },
+ {
+  "folder": "Facturacion",
+  "name": "Titular de la Reserva",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.datos_de_facturacion__titular_dreserva"
+ },
+ {
+  "folder": "Facturacion",
+  "name": "Telefono del Titular",
+  "dataType": "TEXT",
+  "sourceContactKey": "contact.datos_de_facturacion__telefono_del_titular"
+ }
+]
