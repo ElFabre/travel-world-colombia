@@ -132,3 +132,25 @@ la ventana · `ec4d2f3` no re-avisar en convos iniciadas · `60bfb71` catálogo 
 
 Diseño funcional completo en `docs/agente-sol-diseno.md`; mapa de la cuenta GHL en
 `docs/ghl-twc-mapa.md`.
+
+---
+
+## Actualización 2026-08-25 (ver HANDOFF.md raíz para el detalle completo)
+
+- **Sol responde a TODOS** los contactos (sin tag de prueba) y el auto-saludo del
+  dispositivo WhatsApp `+57 320 489 1930` — que lo apagaba en cadena vía `stop_bot`
+  (153/191 contactos) — **ya fue apagado por el cliente**. No reactivarlo.
+- **Fixes en producción:** error 400 del prompt (`claude.ts`: la "situación" ahora es
+  3er bloque de `system`, no un mensaje `role:'system'`) y carrera de leads de primer
+  contacto (`enriquecer.ts`: reintentos de `conversacionDe`).
+- **Nuevo vigilante** (`lib/agente/vigilante.ts` + `/api/agente/vigilante`): marca con
+  el tag `lead_sin_respuesta` los leads >60 min sin respuesta de nadie, solo en horario.
+  Desplegado pero **inactivo**: falta el workflow de GHL sobre ese tag y un cron externo
+  (Vercel Hobby no tiene crons horarios). `?dry=1` simula sin escribir.
+- **`CRON_SECRET` sigue sin existir en Vercel** → los 2 crons de seguimiento dan 401;
+  el seguimiento dinámico probablemente nunca ha corrido en vivo.
+- **`sol_calificado` confirmado**: dispara "2.-Calificado por Bot", que asigna asesora sola.
+- Limpieza de pipeline: "Lead Nuevo" 519→8 por API (309 movidas, 169 lost, 33 B2B);
+  quedan 7 ventas activas por reubicar a mano.
+- Cuellos de canal vigentes: ventana 24 h de IG/FB y contactos sin teléfono del custom
+  provider `6a22bfc4…` (422 al enviar) — esos requieren humano.
