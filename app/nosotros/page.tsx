@@ -98,9 +98,8 @@ export default function NosotrosPage() {
             className="mt-6 font-inter text-base leading-relaxed sm:text-lg"
             style={{ color: 'var(--text-primary)', opacity: 0.92, lineHeight: '1.75', textShadow: '0 1px 10px rgba(0,0,0,0.4)' }}
           >
-            Nacimos en Fusagasugá con un propósito claro: hacer que viajar sea
-            accesible, seguro y memorable para cada familia colombiana.
-            Hoy somos una de las agencias de mayor confianza en el Sumapaz.
+            Hace más de 14 años nacimos en Fusagasugá con un sueño:
+            ayudar a más personas a descubrir el mundo.
           </p>
         </div>
       </section>
@@ -128,6 +127,53 @@ export default function NosotrosPage() {
             </li>
           ))}
         </ul>
+      </section>
+
+      {/* ── HISTORIA ── */}
+      <section className="px-6 py-20">
+        <div className="mx-auto max-w-3xl">
+          <div className="mb-10 text-center">
+            <SectionTag className="mb-3">Más de 14 años</SectionTag>
+            <h2
+              className="font-plus-jakarta text-3xl font-bold sm:text-4xl"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              Un sueño que sigue creciendo
+            </h2>
+          </div>
+
+          <div
+            className="space-y-6 font-inter text-base leading-relaxed sm:text-lg"
+            style={{ color: 'rgba(13, 30, 60,0.82)', lineHeight: '1.8' }}
+          >
+            <p>
+              Lo que comenzó como una agencia local, hoy nos ha permitido acompañar
+              a miles de viajeros en experiencias por Colombia y destinos alrededor
+              del mundo. Cada viaje ha sido una oportunidad para crecer, aprender y
+              confirmar algo que seguimos creyendo: detrás de cada reserva hay una
+              historia, un sueño y alguien que ha depositado su confianza en nosotros.
+            </p>
+            <p>
+              Por eso, durante todos estos años hemos trabajado con un compromiso
+              claro: crear experiencias de calidad, con cercanía, cumplimiento y el
+              respaldo de un equipo que acompaña a cada viajero antes, durante y
+              después de su aventura.
+            </p>
+            <p>
+              Hoy seguimos creciendo desde el corazón del Sumapaz, con la misma
+              emoción de nuestros primeros viajes y la mirada puesta en nuevos
+              destinos, nuevas historias y muchos más sueños por cumplir.
+            </p>
+          </div>
+
+          <p
+            className="mt-10 text-center font-plus-jakarta text-xl font-extrabold sm:text-2xl"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            Más de 14 años. Miles de viajeros.{' '}
+            <span style={{ color: 'var(--orange)' }}>Un mundo entero por descubrir.</span>
+          </p>
+        </div>
       </section>
 
       {/* ── MISIÓN Y VISIÓN ── */}
