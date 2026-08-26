@@ -1,24 +1,101 @@
 # HANDOFF — Travel World Colombia
 
-> Punto de entrada para una **sesión nueva**. Actualizado **2026-08-25**.
+> Punto de entrada para una **sesión nueva**. Actualizado **2026-08-26**.
 > Lee también `AGENTS.md` (esta versión de Next tiene cambios de API: consulta
 > `node_modules/next/dist/docs/` antes de escribir código nuevo) y la memoria
 > persistente del proyecto (se carga sola; `MEMORY.md` es el índice).
 
 ---
 
-## 🎯 DOS FRENTES ACTIVOS
+## ⏭️ PRÓXIMA SESIÓN: curso de inducción GHL para agentes de viajes
 
-1. **Sol** — el agente conversacional de IA (WhatsApp/IG/FB vía GoHighLevel).
-   **Encendido en producción para TODOS los contactos** (ya no hay tag de prueba).
-2. **La web** — rediseño de `/destinos` con taxonomía + mapa interactivo,
+Pedido del usuario (2026-08-26, aún NO diseñado — la próxima sesión ARRANCA
+conversando esto): **un curso de cero a cien de GoHighLevel para los
+representantes/operadores de la agencia**. Objetivo: que sepan usar la
+plataforma con eficiencia — agendar tareas, modificar oportunidades, operar los
+pipelines nuevos, "sacarle el máximo provecho" — porque un equipo que domina la
+plataforma es lo que le permite al usuario automatizar procesos encima.
+Contexto clave: la guía visual del embudo nuevo ya existe como Artifact
+(**"Embudo TWC"** — https://claude.ai/code/artifact/2868f34c-d7a6-421c-bbc2-6a2704b127a5)
+y puede ser el módulo semilla del curso. El curso es TAMBIÉN el prerequisito de
+la Fase 5 de la migración (los campos viejos no se borran hasta capacitar).
+
+---
+
+## 🎯 TRES FRENTES ACTIVOS
+
+1. **Migración CRM contacto→oportunidad + TMS** — ver sección propia abajo.
+   Circuito nuevo EN PRODUCCIÓN y probado punta a punta (2026-08-26).
+2. **Sol** — el agente conversacional de IA (WhatsApp/IG/FB vía GoHighLevel).
+   **Encendido en producción para TODOS los contactos** — y **repuntada a los
+   pipelines nuevos** (commit `ef5cc31`).
+3. **La web** — rediseño de `/destinos` con taxonomía + mapa interactivo,
    páginas `/servicios` y `/cruceros`, flujo "olvidé mi contraseña" del panel.
 
 **Documentos de referencia (en el repo):**
+- `docs/migracion-campos-oportunidad.md` — **diseño completo de la migración**
+  (gobernanza, catálogo, fases, §8b checklist Fase 0, §8c criterio de borrado).
 - `docs/agente-sol-diseno.md` — diseño funcional de Sol.
 - `docs/handoff-sol-interaccion.md` — hand-off del pulido de interacción.
 - `docs/ghl-twc-mapa.md` — IDs de la subcuenta GHL (pipeline, etapas, campos, tags).
 - `docs/ghl-twc-auditoria.md` · `docs/auditoria-2026-08.md` — auditorías.
+
+---
+
+## 🔀 MIGRACIÓN CRM — estado al 2026-08-26 (todo verificado en producción)
+
+**Modelo:** contacto = persona; oportunidad = viaje (1 tarjeta por reserva).
+Detalle en `docs/migracion-campos-oportunidad.md` y en la memoria
+`migracion-campos-oportunidad-ghl`.
+
+**Hecho y probado:**
+- **161 campos de oportunidad** creados en 8 carpetas (catálogo:
+  `scripts/ghl-campos-oportunidad.catalog.json`, script idempotente:
+  `scripts/ghl-crear-campos-oportunidad.mjs`, carpetas:
+  `scripts/ghl-carpetas-oportunidad.json`). Los ~15 solapados con el TMS llevan
+  sus nombres EXACTOS (el TMS resuelve por nombre).
+- **Pipelines nuevos:** 🎯 Leads (venta) `MLoZOGIYvCBRUgQdYRA8` y
+  🗂️ Reservaciones (operación) `Jq7CxjuirY9Gu44el0bs` (etapas mapeadas a
+  estados del TMS). El PRINCIPAL viejo agoniza; "🛫 Clientes Viajando"
+  **congelado** (nada nuevo entra).
+- **Circuito probado en los 6 eslabones**: creación automática de tarjeta (wf
+  "1.-Lead nuevo → crear oportunidad") · Sol repuntada · Ganada→Reservaciones
+  vía webhook · cierres del pipeline viejo convergen · **cliente repetidor** (2
+  won en el mismo pipeline) · copia de fecha a CPA-Fecha de Ida (wf "4.- fecha
+  de viaje", dispara en 📤 Contrato Enviado).
+- **Endpoint `/api/agente/reservacion`** (POST, auth `AGENTE_WEBHOOK_SECRET`,
+  espera `customData.contact_id`): muda la MISMA tarjeta a Reservaciones + won
+  y copia la fecha. Existe porque la acción nativa de GHL **crea duplicados**
+  al cruzar pipelines (verificado). Regla nueva en §8c: eventos de negocio se
+  disparan por etapa, nunca por "Contacto Modificado".
+- **`allowDuplicateOpportunity: true`** activado por API (requisito del
+  sistema: sin él no hay cliente repetidor). No hay UI en la marca blanca; se
+  usó un PIT de AGENCIA guardado como `GHL_AGENCY_PIT` en `.env.local`.
+- Workflow legacy **"Compro" despublicado** (creaba tarjetas en Viajando
+  disparando por campo de contacto).
+- **Guía de capacitación publicada** (Artifact "Embudo TWC", link arriba).
+
+**Pendientes de la migración (en orden):**
+1. **Auditar la carpeta de workflows "Clientes en Viaje"** (45/30/15/2 días,
+   4.-En Viaje, 5.-Termino su viaje, 6.-Solicitar Review): los triggers por
+   CPA-Fecha de Ida están BIEN (la copia los mantiene vivos); lo que hay que
+   revisar son las ACCIONES que creen/muevan tarjetas en Viajando (quitarlas,
+   conservar mensajes/notificaciones). El usuario iba a mandar capturas.
+   También revisar "Ganado / Abonado" y "8.- Cierre Ganado" (siguen published).
+2. **Capacitar al equipo** (→ el curso de arriba). Hasta entonces NO se borran
+   campos viejos.
+3. **Contrato v2** (`{{opportunity.*}}` + disparo por etapa 📤 Contrato
+   Enviado): **EN PAUSA a pedido del usuario hasta después de la capacitación.**
+   El mapeo de los 128 tags sale de `sourceContactKey` en el catálogo. Los
+   merge tags de oportunidad YA están verificados (resuelven en workflows por
+   etapa). Plantillas actuales: "🌎4-"/"🌎8-" (API `/proposals/`).
+4. **Fase 4 ∥: alta de TWC en el TMS** (repo `tms-agencias`): fila en
+   `agencies` + extender `getTokenForLocation` + scripts de campos puente +
+   Custom Menu Link. El informe técnico del TMS está en la conversación de la
+   memoria (2026-08-25).
+5. Limpieza de tarjetas de prueba: contacto `wcTyG99DQ8J22fG9AmvK` (creado por
+   Claude, borrable con sus 2 won de prueba) y la won de prueba del contacto
+   real de Fabrizio `uw120Td4Hyo4an1K4S0L`.
 
 ---
 
@@ -188,12 +265,16 @@ esa es la fuente de verdad.
    protección HaveIBeenPwned, precio de "Perú de Colores", fotos del
    itinerario perdidas, fotos de los 7 paquetes ocultos de Drive.
 
-## ⏭️ CANDIDATOS PARA LA PRÓXIMA SESIÓN
+## ⏭️ CANDIDATOS PARA SESIONES FUTURAS
 
+- **El curso de inducción GHL** (prioridad — ver sección al inicio).
+- Auditoría de la carpeta "Clientes en Viaje" (si el usuario trae capturas).
+- Alta de TWC en el TMS (sesión con el repo `tms-agencias`).
 - Fase 4 de la web: menú con dropdowns.
 - Botón "Editar" en el panel de FAQs.
 - Probar un seguimiento real de punta a punta (tras resolver el cron).
-- Diseñar el workflow de progresión de pipeline al asignar.
+- ~~Workflow de progresión de pipeline al asignar~~ → resuelto por el circuito
+  nuevo (la asignación mueve a "Asignado a Agente" en el pipeline nuevo).
 
 ---
 
