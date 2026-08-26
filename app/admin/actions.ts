@@ -176,7 +176,9 @@ export async function toggleCampo(
     nombre: destino?.nombre,
   })
 
-  revalidarDestinos()
+  // Sin el slug, el detalle /destinos/[slug] conserva hasta 30 min el 404 (o la
+  // página vieja) cacheado por ISR aunque el destino ya esté activo/oculto.
+  revalidarDestinos(destino?.slug)
   revalidatePath('/admin')
   revalidatePath('/admin/viajes')
 }
@@ -201,7 +203,8 @@ export async function eliminarDestino(id: string): Promise<void> {
     nombre: destino?.nombre,
   })
 
-  revalidarDestinos()
+  // El slug purga la página del destino borrado; si no, sigue viva en caché.
+  revalidarDestinos(destino?.slug)
   revalidatePath('/admin')
   revalidatePath('/admin/viajes')
 }
