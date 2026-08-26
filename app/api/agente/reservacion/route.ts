@@ -74,8 +74,10 @@ export async function POST(req: NextRequest) {
   try {
     const oportunidades = await oportunidadesDe(contactId)
     const enLeads = oportunidades.filter(o => o.pipelineId === PIPELINE.id && o.status === 'open')
+    // En el pipeline viejo, los workflows legacy marcan won al entrar al cierre
+    // (a veces antes de que llegue el webhook): open Y won son válidos aquí.
     const enLegacy = oportunidades.filter(
-      o => o.pipelineId === PIPELINE_LEGACY.id && o.status === 'open'
+      o => o.pipelineId === PIPELINE_LEGACY.id && (o.status === 'open' || o.status === 'won')
     )
     // Prioridad: la Ganada del pipeline nuevo → un cierre ganado del pipeline
     // viejo (transición: esos también convergen a Reservaciones) → si no,
