@@ -140,6 +140,8 @@ Plan Fase 3:
 
 **Regla para todo workflow nuevo o editado:** prohibido leer/escribir campos viejos de reserva del contacto (única excepción: la copia de fecha). En el selector, ante "CPA - Hotel" (contacto) vs "Hotel o producto" (oportunidad), siempre el de oportunidad. Un workflow que "necesite" un campo viejo es una alerta de diseño — revisarlo antes de cablearlo.
 
+**Regla de disparadores (2026-08-26):** los eventos de negocio ("se vendió", "hay que enviar contrato") se disparan por **cambio de etapa de la oportunidad**, nunca por "Contacto Modificado" sobre un campo — ese patrón es frágil (dispara sin contexto y ante cambios ajenos, verificado con el workflow legacy "Compro") y ata el negocio a campos que queremos borrar. Consecuencias aplicadas: "Compro" se retira (despublicado, no filtrado); "🛫 Clientes Viajando" queda congelado (nada nuevo entra; sus tarjetas terminan su viaje ahí); los cierres del pipeline VIEJO convergen a 🗂️ Reservaciones vía el mismo webhook (el endpoint acepta tarjetas en Cerrado Ganado / Ganado-Abonado del legacy — commit `16dc63a`), con un workflow espejo del 3 sobre esas etapas.
+
 ### 8b. Fase 0 — checklist de inventario (manual, en la UI de GHL)
 
 Inventario por API del 2026-08-25: **40 workflows** (34 published) y **5 formularios**. Los que hay que abrir y auditar (Automation → Workflows), anotando *disparador* y *campos que lee/escribe*:
