@@ -44,8 +44,15 @@ function anthropic(): Anthropic {
 
 /** El historial de GHL viene del más reciente al más antiguo. */
 function aHistorial(mensajes: MensajeGhl[]): Anthropic.MessageParam[] {
-  return [...mensajes]
+  const historial = [...mensajes]
     .reverse()
+    // Los registros de actividad (TYPE_ACTIVITY_*: "Opportunity created",
+    // citas…) son "salientes" con cuerpo no vacío, pero no los escribió nadie:
+    // no son conversación. Colados como assistant además rompían la llamada con
+    // 400 cuando quedaban de últimos (la API exige terminar en turno del
+    // usuario), p. ej. cuando la automatización crea la oportunidad justo
+    // después del primer mensaje del lead (visto el 2026-08-26).
+    .filter(m => !m.messageType?.startsWith('TYPE_ACTIVITY'))
     .filter(m => (m.body ?? '').trim() !== '')
     .map(m => ({
       role: m.direction === 'inbound' ? ('user' as const) : ('assistant' as const),
@@ -64,6 +71,17 @@ function aHistorial(mensajes: MensajeGhl[]): Anthropic.MessageParam[] {
       acc.push(msg)
       return acc
     }, [])
+
+  // La API también exige terminar en turno del usuario. El historial puede
+  // acabar en assistant de forma legítima: un seguimiento programado (el
+  // cliente no ha vuelto a escribir) o una carrera donde el envío de Sol entra
+  // antes de procesar el evento del cliente (400 real del 2026-08-26).
+  const ultimo = historial[historial.length - 1]
+  if (ultimo && ultimo.role === 'assistant') {
+    historial.push({ role: 'user', content: '[el cliente no ha escrito nada nuevo]' })
+  }
+
+  return historial
 }
 
 /**
