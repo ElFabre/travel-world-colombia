@@ -10,6 +10,8 @@ export interface Highlight {
   imagen?: string
   /** Valor de la actividad cuando es opcional (texto libre, ej. "$180.000"). */
   precio?: string
+  /** Duración de la actividad (texto libre, ej. "4 horas" o "Día completo"). */
+  duracion?: string
 }
 
 export interface InfoClave {

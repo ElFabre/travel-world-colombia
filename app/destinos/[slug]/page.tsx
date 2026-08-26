@@ -335,6 +335,12 @@ export default async function DestinoPage({ params }: Props) {
                   <div className="flex flex-col gap-2 p-6">
                     <h3 className="font-plus-jakarta text-lg font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>{h.titulo}</h3>
                     <p className="font-inter text-sm leading-relaxed" style={{ color: 'var(--text-dim)' }}>{h.descripcion}</p>
+                    {h.duracion && (
+                      <span className="mt-1 inline-flex w-fit items-center gap-1.5 rounded-lg px-2.5 py-1.5 font-inter text-xs font-semibold" style={{ background: 'var(--bg-alt)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
+                        <Clock size={13} style={{ color: 'var(--orange)' }} />
+                        {h.duracion}
+                      </span>
+                    )}
                   </div>
                 </li>
               ))}

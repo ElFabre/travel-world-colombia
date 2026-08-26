@@ -54,7 +54,7 @@ function bloqueDetalle(d: Destino): string {
       ? `- itinerario: ${d.itinerario.map((x, i) => `D${i + 1} ${x.titulo}`).join(' | ')}`
       : null,
     d.highlights?.length
-      ? `- experiencias: ${d.highlights.map(h => h.titulo.trim() + (h.precio ? ` (${h.precio})` : '')).join(' · ')}`
+      ? `- experiencias: ${d.highlights.map(h => h.titulo.trim() + (h.duracion ? `, ${h.duracion}` : '') + (h.precio ? ` (${h.precio})` : '')).join(' · ')}`
       : null,
     `- página: ${SITE.url}/destinos/${d.slug}`,
   ]

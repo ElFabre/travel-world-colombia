@@ -4,9 +4,9 @@ import { useState, useTransition } from 'react'
 import { Plus, X, ImagePlus, Loader2 } from 'lucide-react'
 import { BUCKET_DESTINOS, subirAStorage, validarImagen, slugDelFormulario } from '@/lib/supabase/upload-cliente'
 
-interface Highlight { icono: string; titulo: string; descripcion: string; imagen?: string; precio?: string }
+interface Highlight { icono: string; titulo: string; descripcion: string; imagen?: string; precio?: string; duracion?: string }
 
-const vacio = (): Highlight => ({ icono: '', titulo: '', descripcion: '', imagen: '', precio: '' })
+const vacio = (): Highlight => ({ icono: '', titulo: '', descripcion: '', imagen: '', precio: '', duracion: '' })
 
 const inputStyle = { background: 'var(--card-bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' } as const
 
@@ -72,7 +72,10 @@ export function HighlightsEditor({ name, inicial }: { name: string; inicial?: Hi
                 <input value={f.titulo} onChange={e => set(i, 'titulo', e.target.value)} placeholder="Título" className="min-w-0 flex-1 rounded px-2 py-2 font-inter text-base outline-none" style={inputStyle} />
               </div>
               <textarea value={f.descripcion} onChange={e => set(i, 'descripcion', e.target.value)} placeholder="Descripción" rows={2} className="w-full rounded px-2 py-2 font-inter text-base outline-none" style={inputStyle} />
-              <input value={f.precio ?? ''} onChange={e => set(i, 'precio', e.target.value)} placeholder="Valor si es opcional (ej. $180.000) — dejar vacío si está incluida" className="w-full rounded px-2 py-2 font-inter text-sm outline-none" style={inputStyle} />
+              <div className="flex flex-wrap gap-2">
+                <input value={f.precio ?? ''} onChange={e => set(i, 'precio', e.target.value)} placeholder="Valor si es opcional (ej. $180.000) — dejar vacío si está incluida" className="min-w-[14rem] flex-1 rounded px-2 py-2 font-inter text-sm outline-none" style={inputStyle} />
+                <input value={f.duracion ?? ''} onChange={e => set(i, 'duracion', e.target.value)} placeholder="Duración (ej. 4 horas)" className="w-44 rounded px-2 py-2 font-inter text-sm outline-none" style={inputStyle} />
+              </div>
             </div>
 
             <button type="button" onClick={() => quitar(i)} className="flex h-7 w-7 shrink-0 items-center justify-center rounded" style={{ color: '#ef4444', border: '1px solid var(--border)' }} aria-label="Quitar">
@@ -89,7 +92,8 @@ export function HighlightsEditor({ name, inicial }: { name: string; inicial?: Hi
       </button>
       <p className="mt-2 font-inter text-xs" style={{ color: 'var(--text-muted)' }}>
         Define el slug arriba antes de subir fotos. Se muestran todas en la web; si la actividad
-        es opcional, escribe su valor y aparecerá como etiqueta sobre la tarjeta.
+        es opcional, escribe su valor y aparecerá como etiqueta sobre la tarjeta. La duración
+        (si la escribes) sale como un cuadrito con reloj dentro de la tarjeta.
       </p>
     </div>
   )
