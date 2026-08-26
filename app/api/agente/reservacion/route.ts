@@ -3,7 +3,9 @@ import { timingSafeEqual } from 'node:crypto'
 import {
   CAMPOS_RESERVA,
   ETAPA_GANADA,
+  ETAPAS_GANADA_LEGACY,
   PIPELINE,
+  PIPELINE_LEGACY,
   PIPELINE_RESERVACIONES,
 } from '@/lib/agente/config'
 import {
@@ -72,9 +74,17 @@ export async function POST(req: NextRequest) {
   try {
     const oportunidades = await oportunidadesDe(contactId)
     const enLeads = oportunidades.filter(o => o.pipelineId === PIPELINE.id && o.status === 'open')
-    // La que está en Ganada; si no (reintento tras un fallo a medias), la única abierta.
+    const enLegacy = oportunidades.filter(
+      o => o.pipelineId === PIPELINE_LEGACY.id && o.status === 'open'
+    )
+    // Prioridad: la Ganada del pipeline nuevo → un cierre ganado del pipeline
+    // viejo (transición: esos también convergen a Reservaciones) → si no,
+    // la única abierta del pipeline nuevo (reintento tras un fallo a medias).
     const objetivo =
       enLeads.find(o => o.pipelineStageId === ETAPA_GANADA) ??
+      enLegacy.find(o =>
+        (ETAPAS_GANADA_LEGACY as readonly string[]).includes(o.pipelineStageId ?? '')
+      ) ??
       (enLeads.length === 1 ? enLeads[0] : undefined)
 
     if (!objetivo) {

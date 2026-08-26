@@ -72,6 +72,16 @@ export const PIPELINE_RESERVACIONES = {
 export const ETAPA_GANADA = '2ff59f80-0b8a-4dde-9419-0f4b97b701f0'
 
 /**
+ * Etapas de cierre ganado del pipeline VIEJO. Durante la transición, los leads
+ * en vuelo que se ganen ahí también se mudan a Reservaciones (misma tarjeta):
+ * "🛫 Clientes Viajando" queda congelado — nada nuevo entra.
+ */
+export const ETAPAS_GANADA_LEGACY = [
+  'be026e44-bd85-40d9-99ec-db7b4f03e44b', // Cerrado Ganado
+  '6f0678b9-4f06-43ee-9e45-e4f40699fe6d', // Ganado / Abonado
+] as const
+
+/**
  * Campos de la migración a oportunidad que el código toca directamente
  * (catálogo completo en scripts/ghl-campos-oportunidad.catalog.json).
  */
