@@ -65,10 +65,18 @@ export async function enriquecerDesdeContacto(contactId: string): Promise<Evento
     }
     salida.conversationId = conv.id
 
-    const mensajes = await ultimosMensajes(conv.id, 1)
-    const ultimo = mensajes[0]
+    // GHL mete en la conversación mensajes de actividad (TYPE_ACTIVITY_*:
+    // oportunidad creada, citas…) como SALIENTES. En el primer contacto, la
+    // automatización crea la oportunidad ~1 s después del mensaje del lead, así
+    // que "el último mensaje" puede ser la actividad y no lo que escribió el
+    // cliente: Sol lo leía como "un humano tomó la conversación" y se callaba
+    // (lead perdido en silencio, visto el 2026-08-26). Se saltan.
+    const mensajes = await ultimosMensajes(conv.id, 5)
+    const ultimo = mensajes.find(m => !m.messageType?.startsWith('TYPE_ACTIVITY'))
     if (!ultimo) {
-      nota.push('conversación sin mensajes')
+      nota.push(
+        mensajes.length ? 'conversación solo con mensajes de actividad' : 'conversación sin mensajes'
+      )
       return salida
     }
 
