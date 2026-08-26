@@ -124,6 +124,22 @@ Plan Fase 3:
 | 4 | **En paralelo con la Fase 2** (no después de la 3): onboarding TWC al TMS en cuanto el pipeline nuevo tenga oportunidades reales — fila en `agencies` + extender `getTokenForLocation` en tms-agencias (hoy solo reconoce el tenant Travelto) + scripts de campos puente + Custom Menu Link + webhook. Cuanto antes entre, antes los abonos reales dejan de registrarse en Pago 1–4 y menos hábito hay que desaprender | Bajo-medio (cambio de código en TMS, ~1 tarde) |
 | 5 | Histórico (opcional, script) + retirar carpetas viejas (`ZZ obsoleto` 1 mes → borrar) | Bajo |
 
+### 8c. Fase 5 — criterio de borrado de los campos viejos de contacto
+
+**El objetivo final ES borrar** las 10 carpetas de reserva del contacto (~163 campos). Registro de dependencias que lo bloquean, cada una con su fecha de muerte:
+
+| Dependencia sobre campos viejos | Muere cuando |
+|---|---|
+| Plantillas de contrato viejas (`{{contact.*}}`, 128 tags) | Fase 3: plantilla v2 activa; las reservas del pipeline viejo terminan su ciclo con la vieja |
+| 7 workflows de recordatorio disparan con `CPA-Fecha de Ida` (contacto) | El TMS asume recordatorios, o se reconstruyen los 7 workflows. **Única dependencia NUEVA creada a propósito**: la "copia de fecha" (workflow 4 + `/api/agente/reservacion`) escribe ese campo viejo como puente transicional |
+| Reservas en vuelo del pipeline viejo | El pipeline viejo se vacía |
+
+**Checklist para ejecutar la Fase 5** (las tres cosas a la vez): ① pipeline viejo vacío, ② plantillas v2 en uso, ③ recordatorios migrados. Entonces: renombrar carpetas a `ZZ (obsoleto) …` → 1 mes de cuarentena → borrar.
+
+**NO se borran nunca** (no son duplicados, son de la persona): Calificación (Sol), facturación estable, buzones de pasaportes (los forms de GHL solo escriben contacto), y los 4 campos puente del TMS.
+
+**Regla para todo workflow nuevo o editado:** prohibido leer/escribir campos viejos de reserva del contacto (única excepción: la copia de fecha). En el selector, ante "CPA - Hotel" (contacto) vs "Hotel o producto" (oportunidad), siempre el de oportunidad. Un workflow que "necesite" un campo viejo es una alerta de diseño — revisarlo antes de cablearlo.
+
 ### 8b. Fase 0 — checklist de inventario (manual, en la UI de GHL)
 
 Inventario por API del 2026-08-25: **40 workflows** (34 published) y **5 formularios**. Los que hay que abrir y auditar (Automation → Workflows), anotando *disparador* y *campos que lee/escribe*:
