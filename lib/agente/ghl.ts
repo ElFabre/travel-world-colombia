@@ -200,13 +200,47 @@ export async function oportunidadesDe(contactId: string): Promise<OportunidadGhl
   return r.opportunities ?? []
 }
 
-/** Mueve una oportunidad de etapa dentro de un pipeline. */
+/**
+ * Mueve una oportunidad de etapa (y opcionalmente de pipeline y estado).
+ * La API sí permite cruzar pipelines con la MISMA tarjeta — a diferencia de la
+ * acción de workflow de GHL, que crea un duplicado en el pipeline destino.
+ */
 export async function moverOportunidad(
   opportunityId: string,
   pipelineId: string,
-  pipelineStageId: string
+  pipelineStageId: string,
+  status?: 'open' | 'won' | 'lost' | 'abandoned'
 ): Promise<void> {
-  await mandar('PUT', `/opportunities/${opportunityId}`, { pipelineId, pipelineStageId })
+  await mandar('PUT', `/opportunities/${opportunityId}`, {
+    pipelineId,
+    pipelineStageId,
+    ...(status ? { status } : {}),
+  })
+}
+
+export interface OportunidadDetalleGhl extends OportunidadGhl {
+  /**
+   * OJO: el GET por id devuelve los custom fields en un formato distinto al
+   * search (`fieldValue` vs `fieldValueString`/`fieldValueDate`, fechas a veces
+   * en epoch ms). Tratar el valor como unknown y normalizar al usarlo.
+   */
+  customFields?: {
+    id: string
+    fieldValue?: unknown
+    field_value?: unknown
+    fieldValueString?: string
+    fieldValueDate?: string | number
+  }[]
+}
+
+/** Una oportunidad con sus campos personalizados (GET por id). */
+export async function obtenerOportunidad(
+  opportunityId: string
+): Promise<OportunidadDetalleGhl | null> {
+  const r = await pedir<{ opportunity?: OportunidadDetalleGhl }>(
+    `/opportunities/${opportunityId}`
+  )
+  return r.opportunity ?? null
 }
 
 export async function obtenerContacto(contactId: string): Promise<ContactoGhl | null> {

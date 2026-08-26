@@ -55,11 +55,42 @@ export const PIPELINE_LEGACY = {
 } as const
 
 /**
+ * Pipeline post-venta "🗂️ Reservaciones (operación)": la oportunidad ganada se
+ * MUDA aquí (misma tarjeta, nunca una nueva — duplicaría reservas en el TMS).
+ * La mudanza la hace /api/agente/reservacion porque la acción nativa de GHL
+ * "Create/Update Opportunity" crea duplicados al cruzar pipelines (verificado
+ * 2026-08-26 en prueba real).
+ */
+export const PIPELINE_RESERVACIONES = {
+  id: 'Jq7CxjuirY9Gu44el0bs',
+  etapas: {
+    reservaCreada: 'b2b106ba-7431-4c10-bc4b-ad91365f28fd', // 📋 Reserva Creada
+  },
+} as const
+
+/** Etapa "✅ Ganada" del pipeline de Leads: desde aquí se muda a Reservaciones. */
+export const ETAPA_GANADA = '2ff59f80-0b8a-4dde-9419-0f4b97b701f0'
+
+/**
+ * Campos de la migración a oportunidad que el código toca directamente
+ * (catálogo completo en scripts/ghl-campos-oportunidad.catalog.json).
+ */
+export const CAMPOS_RESERVA = {
+  /** opportunity.fecha_confirmada_de_salida (DATE) */
+  oppFechaSalida: 'jo2GTriNmRltzHrzaAW9',
+  /**
+   * contact.fecha_de_ida ("CPA-Fecha de Ida", DATE): copia transicional para
+   * que los workflows viejos "X días antes de viaje" sigan disparando.
+   */
+  contactoCpaFechaIda: '4xDv78whz7Rcd9LNKkDF',
+} as const
+
+/**
  * Pipelines 100% humanos: "🗂️ Reservaciones (operación)" (nuevo, post-venta) y
  * "🛫 Clientes Viajando" (viejo, en retiro).
  */
 export const PIPELINES_POSTVENTA = [
-  'Jq7CxjuirY9Gu44el0bs', // 🗂️ Reservaciones (operación)
+  PIPELINE_RESERVACIONES.id,
   'X2FPIf6vQa6E5VSNE922', // 🛫 Clientes Viajando (legacy)
 ] as const
 
