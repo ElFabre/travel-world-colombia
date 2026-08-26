@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useActionState, useState, useTransition } from 'react'
+import { startTransition, useActionState, useEffect, useRef, useState, useTransition } from 'react'
 import { ArrowLeft, HelpCircle, ExternalLink, Loader2, ImagePlus } from 'lucide-react'
 import type { Destino } from '@/types/destino'
 import type { FormState } from '../destinos/actions'
@@ -47,9 +47,10 @@ function Seccion({ titulo, ayuda, children }: { titulo: string; ayuda?: string; 
 }
 
 function Campo({
-  label, name, defaultValue, type = 'text', required, placeholder, hint, full,
+  label, name, defaultValue, value, onChange, onBlur, type = 'text', required, placeholder, hint, full,
 }: {
   label: string; name: string; defaultValue?: string | number; type?: string
+  value?: string; onChange?: (v: string) => void; onBlur?: () => void
   required?: boolean; placeholder?: string; hint?: string; full?: boolean
 }) {
   return (
@@ -59,6 +60,9 @@ function Campo({
         name={name}
         type={type}
         defaultValue={defaultValue}
+        value={value}
+        onChange={onChange ? e => onChange(e.target.value) : undefined}
+        onBlur={onBlur}
         required={required}
         placeholder={placeholder}
         className={inputCls}
@@ -67,6 +71,17 @@ function Campo({
       {hint && <p className="mt-1 font-inter text-xs" style={{ color: 'var(--text-muted)' }}>{hint}</p>}
     </div>
   )
+}
+
+/** "Tolú & Coveñas 2026" → "tolu-covenas-2026" (lo que exige la validación del slug). */
+function slugificar(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-{2,}/g, '-')
+    .replace(/^-+/, '')
 }
 
 function CampoSelect({
@@ -174,8 +189,33 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
   const [state, formAction, pending] = useActionState(action, {})
   const d = destino
 
+  // Nombre y slug controlados: el slug se genera solo desde el nombre (hasta que
+  // el usuario lo toque a mano) y siempre se normaliza a minúsculas-sin-tildes,
+  // para que la validación del servidor no lo rechace.
+  const [nombre, setNombre] = useState(d?.nombre ?? '')
+  const [slug, setSlug] = useState(d?.slug ?? '')
+  const [slugManual, setSlugManual] = useState(Boolean(d))
+
+  // Si el servidor devuelve un error, lo llevamos a la vista: el mensaje sale
+  // junto al botón Guardar y el usuario puede estar en cualquier parte de la página.
+  const errorRef = useRef<HTMLParagraphElement>(null)
+  useEffect(() => {
+    if (state.error) errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [state])
+
   return (
-    <form action={formAction} className="flex flex-col gap-5">
+    <form
+      action={formAction}
+      // Enviamos dentro de una transición en vez del action nativo: React 19
+      // resetea el formulario tras un action de <form>, y si la validación
+      // falla el usuario perdería todo lo escrito.
+      onSubmit={e => {
+        e.preventDefault()
+        const fd = new FormData(e.currentTarget)
+        startTransition(() => formAction(fd))
+      }}
+      className="flex flex-col gap-5"
+    >
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Link href="/admin/viajes" className="flex h-9 w-9 items-center justify-center rounded-md" style={{ border: '1px solid var(--border)', color: 'var(--text-dim)' }}>
@@ -242,8 +282,30 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
         titulo="Básico"
         ayuda="Datos principales: nombre, slug (la URL), país (define el filtro de /destinos), precio, duración, cupos y orden. 'Activo' lo muestra en la web; 'Destacado' lo lleva al home."
       >
-        <Campo label="Nombre" name="nombre" defaultValue={d?.nombre} required placeholder="Punta Cana" />
-        <Campo label="Slug (URL)" name="slug" defaultValue={d?.slug} required placeholder="punta-cana" hint="Solo minúsculas, números y guiones." />
+        <Campo
+          label="Nombre"
+          name="nombre"
+          value={nombre}
+          onChange={v => {
+            setNombre(v)
+            if (!slugManual) setSlug(slugificar(v))
+          }}
+          required
+          placeholder="Punta Cana"
+        />
+        <Campo
+          label="Slug (URL)"
+          name="slug"
+          value={slug}
+          onChange={v => {
+            setSlugManual(true)
+            setSlug(slugificar(v))
+          }}
+          onBlur={() => setSlug(s => s.replace(/-+$/, ''))}
+          required
+          placeholder="punta-cana"
+          hint="Se genera solo desde el nombre; puedes ajustarlo. Solo minúsculas, números y guiones."
+        />
         <CampoSelect label="País" name="pais" defaultValue={d?.pais} required opciones={PAISES} hint="Define el filtro en /destinos." />
         <Campo label="Región / Continente" name="region" defaultValue={d?.region} placeholder="Caribe" hint="En internacionales agrupa por continente (Europa, Norteamérica…)." />
         <div>
@@ -347,7 +409,7 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
       </Seccion>
 
       {state.error && (
-        <p className="rounded-md p-3 font-inter text-sm" style={{ background: 'rgba(239,68,68,0.1)', color: '#fca5a5' }}>
+        <p ref={errorRef} className="rounded-md p-3 font-inter text-sm" style={{ background: 'rgba(239,68,68,0.1)', color: '#fca5a5' }}>
           {state.error}
         </p>
       )}
