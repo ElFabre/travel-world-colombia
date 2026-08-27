@@ -119,12 +119,16 @@ function pasoDe(c: CampoCatalogo): string {
 }
 
 /**
- * Campos que el wizard NO muestra. El grupo TRM estuvo aquí un rato, pero la
- * plantilla imprime trm__valor_plan/valor_total y el equipo sí los llena
- * (verificado 2026-08-27) → se recuperaron; el grupo se titula "Tasa de
- * cambio (TRM)" en el wizard. La lista queda como mecanismo.
+ * Campos que el wizard NO muestra. El grupo "Tasa de cambio (TRM)" queda con
+ * exactamente los 3 que la plantilla imprime (T/C, Valor Plan, Valor Total —
+ * decisión del usuario 2026-08-27); tarifa/cantidad/tiquetes no aplican a una
+ * tasa de cambio y el contrato no los imprime.
  */
-const CAMPOS_OCULTOS = new Set<string>([])
+const CAMPOS_OCULTOS = new Set<string>([
+  'TRM - Tarifa por pax',
+  'TRM - Cantidad',
+  'TRM - Tiquetes Aereos',
+])
 
 /**
  * Orden de los campos de Generales del Viaje calcando el recuadro del
