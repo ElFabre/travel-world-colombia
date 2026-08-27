@@ -129,6 +129,21 @@ const ORDEN_GENERALES = [
   'Peticiones especiales',
 ]
 
+/**
+ * Orden de las columnas del "Registro de Pagos" tal como las imprime el
+ * contrato: TRM, fecha, medio, total, abono, saldo. Tipo de Pago (solo existe
+ * en Pago 1 y el contrato no lo tabula) va al final.
+ */
+const ORDEN_PAGO = [
+  'TRM',
+  'Fecha de Pago',
+  'Medio de Pago',
+  'Total Plan',
+  'Abono',
+  'Saldo en Pesos',
+  'Tipo de Pago',
+]
+
 // Los campos de la subcuenta cambian poco: cache en memoria del proceso con
 // TTL corto. Si el proceso es nuevo (serverless frío) simplemente se re-pide.
 let cacheCampos: { campos: CampoPersonalizadoGhl[]; vence: number } | null = null
@@ -203,9 +218,18 @@ export async function catalogoResuelto(): Promise<{
 
   // Orden final: por paso y, dentro de Generales, calcando el contrato.
   const prioridad = (c: CampoReserva) => {
-    if (c.folder !== 'Generales del Viaje') return 0
-    const i = ORDEN_GENERALES.indexOf(c.name)
-    return i === -1 ? ORDEN_GENERALES.length : i
+    if (c.folder === 'Generales del Viaje') {
+      const i = ORDEN_GENERALES.indexOf(c.name)
+      return i === -1 ? ORDEN_GENERALES.length : i
+    }
+    if (c.folder === 'Plan de Pagos') {
+      // El sort es estable: a igual sufijo, Pago 1 < Pago 2 < … se conserva,
+      // así que los grupos quedan en orden y cada uno con sus columnas
+      // calcando la tabla del contrato.
+      const i = ORDEN_PAGO.indexOf(c.name.replace(/^.+? - /, ''))
+      return i === -1 ? ORDEN_PAGO.length : i
+    }
+    return 0
   }
   campos.sort(
     (a, b) =>
