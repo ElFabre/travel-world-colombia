@@ -65,8 +65,21 @@ export function Wizard({ opportunityId, campos, valoresIniciales, prefill }: Pro
   const [guardando, setGuardando] = useState(false)
   const [aviso, setAviso] = useState<{ ok: boolean; texto: string } | null>(null)
 
-  // Cuántos pasajeros/trayectos/pagos se muestran: arranca en el mayor con datos.
-  const [cuenta, setCuenta] = useState<Record<'P' | 'T' | 'Pago', number>>(() => {
+  // Los contadores de pasajeros y trayectos NO son controles sueltos: son los
+  // campos reales del contrato ("Contrato - Numero de Pasajeros/Trayectos").
+  // Cambiarlos aquí o en el paso Contrato es lo mismo, y se guardan con
+  // cualquier paso. Pagos no tiene campo equivalente → contador local.
+  const idNumPasajeros = useMemo(
+    () => campos.find(c => c.name === 'Contrato - Numero de Pasajeros')?.ghlId,
+    [campos]
+  )
+  const idNumTrayectos = useMemo(
+    () => campos.find(c => c.name === 'Contrato - Numero de Trayectos')?.ghlId,
+    [campos]
+  )
+
+  // Mayor grupo con datos: el piso de cada contador cuando el campo está vacío.
+  const conDatos = useMemo(() => {
     const con = { P: 1, T: 1, Pago: 1 }
     for (const c of campos) {
       const rep = prefijoDe(c.name) ? numeroRepetible(prefijoDe(c.name)!) : null
@@ -75,7 +88,28 @@ export function Wizard({ opportunityId, campos, valoresIniciales, prefill }: Pro
       }
     }
     return con
-  })
+  }, [campos, valoresIniciales, prefill])
+
+  const [cuentaPago, setCuentaPago] = useState(() => conDatos.Pago)
+
+  function leerCuenta(id: string | undefined, tope: number, piso: number): number {
+    const v = id ? valores[id] : undefined
+    const n = typeof v === 'string' ? Number(v) : NaN
+    const base = Number.isInteger(n) && n >= 1 ? n : piso
+    return Math.min(Math.max(base, 1), tope)
+  }
+
+  const cuenta: Record<'P' | 'T' | 'Pago', number> = {
+    P: leerCuenta(idNumPasajeros, SERIE_MAX.P, conDatos.P),
+    T: leerCuenta(idNumTrayectos, SERIE_MAX.T, conDatos.T),
+    Pago: cuentaPago,
+  }
+
+  function ponerCuenta(serie: 'P' | 'T' | 'Pago', n: number) {
+    if (serie === 'Pago') return setCuentaPago(n)
+    const id = serie === 'P' ? idNumPasajeros : idNumTrayectos
+    if (id) poner(id, String(n))
+  }
 
   const carpetaActual = pasos[paso]
   const camposDelPaso = campos.filter(c => c.folder === carpetaActual)
@@ -100,7 +134,8 @@ export function Wizard({ opportunityId, campos, valoresIniciales, prefill }: Pro
       }
     }
     return { grupos, sueltos, series }
-  }, [camposDelPaso, cuenta])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [camposDelPaso, cuenta.P, cuenta.T, cuenta.Pago])
 
   function poner(id: string, v: ValorCampo) {
     setValores(prev => ({ ...prev, [id]: v }))
@@ -123,6 +158,12 @@ export function Wizard({ opportunityId, campos, valoresIniciales, prefill }: Pro
       for (const c of visibles) {
         const v = valores[c.ghlId]
         if (v !== undefined && v !== '' && !(Array.isArray(v) && v.length === 0)) lote[c.ghlId] = v
+      }
+      // Los contadores (campos reales del contrato) viajan con cualquier paso:
+      // el representante pudo ajustarlos desde el encabezado.
+      for (const id of [idNumPasajeros, idNumTrayectos]) {
+        const v = id ? valores[id] : undefined
+        if (id && typeof v === 'string' && v !== '') lote[id] = v
       }
       const { guardados } = await guardarReserva(opportunityId, lote)
       setSugeridos(prev => {
@@ -190,7 +231,7 @@ export function Wizard({ opportunityId, campos, valoresIniciales, prefill }: Pro
                 {s === 'P' ? '¿Cuántos pasajeros?' : s === 'T' ? '¿Cuántos trayectos?' : '¿Cuántos pagos?'}
                 <select
                   value={cuenta[s]}
-                  onChange={e => setCuenta(prev => ({ ...prev, [s]: Number(e.target.value) }))}
+                  onChange={e => ponerCuenta(s, Number(e.target.value))}
                   className="rounded-md px-2 py-1 font-inter text-xs"
                   style={{ border: '1px solid var(--border)', color: 'var(--text-primary)' }}
                 >

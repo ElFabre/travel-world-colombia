@@ -26,11 +26,38 @@ export interface CampoCatalogo {
 }
 
 export interface CampoReserva extends CampoCatalogo {
-  /** id real del campo de oportunidad en GHL (resuelto por nombre). */
+  /** id real del campo en GHL (resuelto por nombre o fieldKey). */
   ghlId: string
-  /** id del campo de CONTACTO del que se prefillea, si aplica. */
+  /** En qué registro vive el campo. Casi todos en la oportunidad; los datos
+   *  estables de facturación se quedan en el contacto (diseño §4b). */
+  model: 'opportunity' | 'contact'
+  /** id del campo de CONTACTO del que se prefillea (y al que se ESPEJA), si aplica. */
   prefillContactId?: string
 }
+
+/**
+ * ESPEJO TRANSICIONAL: mientras la plantilla del contrato siga imprimiendo
+ * merge tags `{{contact.*}}` (la v2 con `{{opportunity.*}}` está EN PAUSA),
+ * cada guardado escribe el valor TAMBIÉN en el campo viejo del contacto
+ * (vía `sourceContactKey`). Así el contrato de hoy sale completo sin
+ * re-digitar nada. Apagar (false) cuando la plantilla v2 entre en uso —
+ * es la única excepción viva a la regla "no escribir campos viejos".
+ */
+export const ESPEJO_CONTACTO_TRANSICION = true
+
+/**
+ * Campos que viven SOLO en el contacto y el contrato también imprime: los
+ * datos estables de facturación (carpeta 📋Datos de Facturación). No migran
+ * a oportunidad por diseño; el wizard los muestra en el paso Facturación.
+ */
+const FACTURACION_CONTACTO_KEYS = [
+  'contact.cliente', //                         Cliente Nombre Completo
+  'contact.numero_de_documento', //             Numero de NIT
+  'contact.direccin', //                        Dirección
+  'contact.datos_de_facturacin__ciudad', //     Ciudad
+  'contact.datos_de_facturacin__correo_electrnico', // Correo Electrónico
+  'contact.telefono', //                        Teléfono
+]
 
 /** Orden de pasos del wizard = orden de aparición de las carpetas en el catálogo. */
 export function carpetasDelCatalogo(): string[] {
@@ -87,7 +114,25 @@ export async function catalogoResuelto(): Promise<{
       // editaron en la UI después de crearlas).
       options: real.picklistOptions?.length ? real.picklistOptions : c.options,
       ghlId: real.id,
+      model: 'opportunity',
       prefillContactId: fuente?.id,
+    })
+  }
+
+  // Facturación estable: campos de CONTACTO al final del paso Facturación.
+  for (const key of FACTURACION_CONTACTO_KEYS) {
+    const real = contactoPorKey.get(key)
+    if (!real) {
+      sinResolver.push(key)
+      continue
+    }
+    campos.push({
+      folder: 'Facturacion',
+      name: real.name ?? key,
+      dataType: real.dataType ?? 'TEXT',
+      options: real.picklistOptions,
+      ghlId: real.id,
+      model: 'contact',
     })
   }
 

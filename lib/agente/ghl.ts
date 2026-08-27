@@ -159,7 +159,7 @@ export async function quitarTags(contactId: string, tags: string[]): Promise<voi
  */
 export async function actualizarCampos(
   contactId: string,
-  campos: { id: string; field_value: string | number }[]
+  campos: { id: string; field_value: string | number | string[] }[]
 ): Promise<void> {
   await mandar('PUT', `/contacts/${contactId}`, { customFields: campos })
 }
