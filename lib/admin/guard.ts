@@ -30,10 +30,25 @@ export async function requireAdmin(): Promise<AdminSession> {
   return session
 }
 
-/** admin o editor (puede modificar). Lanza si es lector o no aprobado. */
+/** admin o editor (puede modificar). Lanza si es lector/representante o no aprobado. */
 export async function requireEditor(): Promise<AdminSession> {
   const session = await requireAdmin()
-  if (session.rol === 'lector') throw new Error('Tu rol (lector) no permite modificar.')
+  if (session.rol !== 'admin' && session.rol !== 'editor') {
+    throw new Error(`Tu rol (${session.rol}) no permite modificar.`)
+  }
+  return session
+}
+
+/**
+ * Acceso a la sección Reservas: admin, editor o representante (el rol que
+ * existe justamente para esto). El lector queda fuera: la sección escribe en
+ * el CRM y no tiene modo de solo-lectura.
+ */
+export async function requireReservas(): Promise<AdminSession> {
+  const session = await requireAdmin()
+  if (session.rol === 'lector') {
+    throw new Error('Tu rol (lector) no permite gestionar reservas.')
+  }
   return session
 }
 

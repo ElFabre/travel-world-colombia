@@ -49,15 +49,23 @@ export async function proxy(req: NextRequest) {
     const email = (user.email ?? '').toLowerCase()
     const superadmins = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) ?? []
     let aprobado = superadmins.includes(email)
+    let rol: string | null = aprobado ? 'admin' : null
     if (!aprobado) {
       // ¿Aprobado desde el panel? (tabla admin_allowlist). El usuario está
       // autenticado, así que la política RLS de lectura de su fila lo permite.
-      const { data } = await supabase.from('admin_allowlist').select('email').eq('email', email).maybeSingle()
+      const { data } = await supabase.from('admin_allowlist').select('email, rol').eq('email', email).maybeSingle()
       aprobado = Boolean(data)
+      rol = data?.rol ?? null
     }
     if (!aprobado) {
       // Autenticado pero fuera de la allowlist → pantalla de "pendiente".
       return NextResponse.redirect(new URL('/admin/registro', req.url))
+    }
+
+    // El representante solo ve Reservas: cualquier otra sección lo devuelve
+    // ahí (chequeo optimista; los guards de página/acción son la defensa real).
+    if (rol === 'representante' && !path.startsWith('/admin/reservas')) {
+      return NextResponse.redirect(new URL('/admin/reservas', req.url))
     }
   }
 

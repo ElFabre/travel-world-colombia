@@ -174,6 +174,8 @@ export interface CampoPersonalizadoGhl {
   fieldKey?: string
   name?: string
   dataType?: string
+  model?: string
+  picklistOptions?: string[]
 }
 
 /** Todos los campos personalizados de la subcuenta (~150, modelo contacto). */
@@ -182,6 +184,48 @@ export async function listarCamposPersonalizados(): Promise<CampoPersonalizadoGh
     `/locations/${GHL.locationId}/customFields`
   )
   return r.customFields ?? []
+}
+
+/** Campos personalizados de contacto Y oportunidad (model=all trae ambos). */
+export async function listarCamposTodosLosModelos(): Promise<CampoPersonalizadoGhl[]> {
+  const r = await pedir<{ customFields?: CampoPersonalizadoGhl[] }>(
+    `/locations/${GHL.locationId}/customFields?model=all`
+  )
+  return r.customFields ?? []
+}
+
+/** Búsqueda de contactos por texto libre (nombre, teléfono o correo). */
+export async function buscarContactos(query: string, limite = 10): Promise<ContactoGhl[]> {
+  const q = encodeURIComponent(query.trim())
+  const r = await pedir<{ contacts?: ContactoGhl[] }>(
+    `/contacts/?locationId=${GHL.locationId}&query=${q}&limit=${limite}`
+  )
+  return r.contacts ?? []
+}
+
+export interface PipelineGhl {
+  id: string
+  name?: string
+  stages?: { id: string; name?: string }[]
+}
+
+/** Pipelines de la subcuenta con sus etapas (para mostrar nombres, no IDs). */
+export async function listarPipelines(): Promise<PipelineGhl[]> {
+  const r = await pedir<{ pipelines?: PipelineGhl[] }>(
+    `/opportunities/pipelines?locationId=${GHL.locationId}`
+  )
+  return r.pipelines ?? []
+}
+
+/**
+ * Escribe campos personalizados de la OPORTUNIDAD. Igual que en contacto,
+ * GHL hace merge: solo pisa los campos del arreglo.
+ */
+export async function actualizarCamposOportunidad(
+  opportunityId: string,
+  campos: { id: string; field_value: string | number | string[] }[]
+): Promise<void> {
+  await mandar('PUT', `/opportunities/${opportunityId}`, { customFields: campos })
 }
 
 export interface OportunidadGhl {

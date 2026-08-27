@@ -6,15 +6,20 @@ import { createAdminClient } from '@/lib/supabase/admin'
  *  - Tabla `admin_allowlist`, editable desde /admin/usuarios.
  */
 
-/** Roles del panel: admin (todo) · editor (todo menos eliminar) · lector (solo ver). */
-export type Role = 'admin' | 'editor' | 'lector'
+/**
+ * Roles del panel: admin (todo) · editor (todo menos eliminar) · lector (solo
+ * ver) · representante (SOLO la sección Reservas: llena los datos de la venta
+ * en la oportunidad de GHL; no ve el resto del panel).
+ */
+export type Role = 'admin' | 'editor' | 'lector' | 'representante'
 
-export const ROLES: Role[] = ['admin', 'editor', 'lector']
+export const ROLES: Role[] = ['admin', 'editor', 'lector', 'representante']
 
 export const ROLE_LABEL: Record<Role, string> = {
   admin: 'Admin',
   editor: 'Editor',
   lector: 'Lector',
+  representante: 'Representante',
 }
 
 /** Superadmins definidos en env (en minúsculas). */

@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import {
   PlusCircle, Pencil, Trash2, Eye, EyeOff, Star, StarOff, Activity, UserCheck, UserX, UserCog,
+  ClipboardList,
 } from 'lucide-react'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getAdminUser } from '@/lib/admin/guard'
@@ -30,6 +31,7 @@ const ACCIONES: Record<AccionAudit, { label: string; color: string; Icon: typeof
   'aprobar-usuario':   { label: 'Aprobó acceso',   color: '#4ade80', Icon: UserCheck },
   'revocar-usuario':   { label: 'Revocó acceso',   color: '#ef4444', Icon: UserX },
   'cambiar-rol':       { label: 'Cambió rol',      color: 'var(--orange)', Icon: UserCog },
+  'guardar-reserva':   { label: 'Guardó reserva',  color: '#4ade80', Icon: ClipboardList },
 }
 
 // timeZone explícita: en Vercel el proceso corre en UTC, así que sin esto la

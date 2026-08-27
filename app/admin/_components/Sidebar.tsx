@@ -6,21 +6,34 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import {
   LayoutDashboard, Plane, Star, HelpCircle, Users, Activity, Globe, LogOut, Menu, X,
+  ClipboardList,
 } from 'lucide-react'
 import { signOut } from '../actions'
+import type { Role } from '@/lib/admin/allowlist'
 
 const NAV = [
   { href: '/admin',             label: 'Dashboard',    Icon: LayoutDashboard, exact: true },
   { href: '/admin/viajes',      label: 'Viajes',       Icon: Plane },
+  { href: '/admin/reservas',    label: 'Reservas',     Icon: ClipboardList },
   { href: '/admin/resenas',     label: 'Reseñas',      Icon: Star },
   { href: '/admin/faqs',        label: 'Preguntas',    Icon: HelpCircle },
   { href: '/admin/usuarios',    label: 'Usuarios',     Icon: Users },
   { href: '/admin/actividad',   label: 'Actividad',    Icon: Activity },
 ]
 
-export function Sidebar({ email }: { email: string }) {
+export function Sidebar({ email, rol }: { email: string; rol: Role }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+
+  // El representante solo ve Reservas (el proxy además lo redirige ahí);
+  // el lector ve el panel pero no Reservas (la sección escribe en el CRM).
+  const nav = NAV.filter(item =>
+    rol === 'representante'
+      ? item.href === '/admin/reservas'
+      : rol === 'lector'
+        ? item.href !== '/admin/reservas'
+        : true
+  )
 
   const esActiva = (href: string, exact?: boolean) =>
     exact ? pathname === href : pathname === href || pathname.startsWith(href + '/')
@@ -47,7 +60,7 @@ export function Sidebar({ email }: { email: string }) {
 
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         <ul className="flex flex-col gap-1">
-          {NAV.map(({ href, label, Icon, exact }) => {
+          {nav.map(({ href, label, Icon, exact }) => {
             const activa = esActiva(href, exact)
             return (
               <li key={href}>

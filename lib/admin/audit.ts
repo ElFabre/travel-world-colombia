@@ -12,6 +12,7 @@ export type AccionAudit =
   | 'aprobar-usuario'
   | 'revocar-usuario'
   | 'cambiar-rol'
+  | 'guardar-reserva'
 
 interface RegistroActividad {
   email: string

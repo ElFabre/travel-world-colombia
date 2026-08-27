@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { getAdminUser } from '@/lib/admin/guard'
+import { getAdminSession } from '@/lib/admin/guard'
 import { Sidebar } from './_components/Sidebar'
 
 export const metadata: Metadata = {
@@ -9,9 +9,9 @@ export const metadata: Metadata = {
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   // En /admin/login y /admin/registro no hay sesión aprobada → sin chrome.
-  const user = await getAdminUser()
+  const session = await getAdminSession()
 
-  if (!user) {
+  if (!session) {
     return (
       <div className="min-h-screen" style={{ background: '#f4f7fb' }}>
         <div className="mx-auto max-w-6xl px-6 py-8">{children}</div>
@@ -21,7 +21,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <div className="tema-claro min-h-screen" style={{ background: 'var(--bg-alt)' }}>
-      <Sidebar email={user.email ?? ''} />
+      <Sidebar email={session.user.email ?? ''} rol={session.rol} />
       <div className="md:pl-60">
         {/* Marca de agua tenue del logo en el fondo */}
         <div
