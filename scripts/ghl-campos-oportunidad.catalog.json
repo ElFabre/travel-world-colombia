@@ -831,7 +831,7 @@
  {
   "folder": "Plan de Pagos",
   "name": "Pago 1 - TRM",
-  "dataType": "TEXT",
+  "dataType": "NUMERICAL",
   "sourceContactKey": "contact.pago_1__trm"
  },
  {
@@ -867,7 +867,7 @@
  {
   "folder": "Plan de Pagos",
   "name": "Pago 2 - TRM",
-  "dataType": "TEXT",
+  "dataType": "NUMERICAL",
   "sourceContactKey": "contact.pago_2__trm"
  },
  {
@@ -903,7 +903,7 @@
  {
   "folder": "Plan de Pagos",
   "name": "Pago 3 - TRM",
-  "dataType": "TEXT",
+  "dataType": "NUMERICAL",
   "sourceContactKey": "contact.pago_3__trm"
  },
  {
@@ -939,7 +939,7 @@
  {
   "folder": "Plan de Pagos",
   "name": "Pago 4 - TRM",
-  "dataType": "TEXT",
+  "dataType": "NUMERICAL",
   "sourceContactKey": "contact.pago_4__trm"
  },
  {
