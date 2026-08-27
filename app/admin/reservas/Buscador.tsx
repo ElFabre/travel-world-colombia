@@ -68,7 +68,7 @@ export function Buscador() {
     <div className="flex flex-col gap-5">
       <div className="p-5" style={card}>
         <label className="mb-2 block font-inter text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-          ¿A qué cliente le vas a llenar la reserva?
+          ¿A qué cliente le vas a generar el contrato?
         </label>
         <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />

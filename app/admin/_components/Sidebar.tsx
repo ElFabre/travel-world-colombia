@@ -14,7 +14,7 @@ import type { Role } from '@/lib/admin/allowlist'
 const NAV = [
   { href: '/admin',             label: 'Dashboard',    Icon: LayoutDashboard, exact: true },
   { href: '/admin/viajes',      label: 'Viajes',       Icon: Plane },
-  { href: '/admin/reservas',    label: 'Reservas',     Icon: ClipboardList },
+  { href: '/admin/reservas',    label: 'Generador de Contratos', Icon: ClipboardList },
   { href: '/admin/resenas',     label: 'Reseñas',      Icon: Star },
   { href: '/admin/faqs',        label: 'Preguntas',    Icon: HelpCircle },
   { href: '/admin/usuarios',    label: 'Usuarios',     Icon: Users },

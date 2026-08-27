@@ -6,7 +6,7 @@ import { getAdminSession } from '@/lib/admin/guard'
 import { cargarReserva } from '../actions'
 import { Wizard } from './Wizard'
 
-export const metadata: Metadata = { title: 'Reserva · Panel' }
+export const metadata: Metadata = { title: 'Generador de Contratos · Panel' }
 export const dynamic = 'force-dynamic'
 
 export default async function ReservaPage({ params }: { params: Promise<{ id: string }> }) {
