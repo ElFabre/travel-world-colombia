@@ -25,7 +25,6 @@ export const WHATSAPP = {
   principal: '573204891930',
   alterno: '573005693381',
   telefonoDisplay: '+57 320 489 1930',
-  link: 'https://walink.co/e4211f',
 } as const
 
 /** URL de WhatsApp con mensaje pre-cargado por destino. */

@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { MapPin, Phone, Mail, Clock, Lock } from 'lucide-react'
-import { SITE, SOCIALS, WHATSAPP, NAV_LINKS } from '@/lib/site'
+import { SITE, SOCIALS, WHATSAPP, NAV_LINKS, whatsappUrl } from '@/lib/site'
 
 type IconProps = { size?: number }
 
@@ -116,7 +116,7 @@ export function Footer() {
             </li>
             <li className="flex items-center gap-2">
               <Phone size={16} className="shrink-0 text-orange" />
-              <a href={WHATSAPP.link} target="_blank" rel="noopener noreferrer" className="hover:text-orange">
+              <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer" className="hover:text-orange">
                 {WHATSAPP.telefonoDisplay}
               </a>
             </li>
