@@ -404,7 +404,8 @@ export function Wizard({ opportunityId, campos, valoresIniciales, prefill }: Pro
         {/* Grupos (pasajeros, trayectos, pagos, filas de liquidación) */}
         {[...grupos.entries()].map(([pref, items]) => {
           const rep = numeroRepetible(pref)
-          const titulo = rep ? `${SERIE_LABEL[rep.serie]} ${rep.n}` : pref
+          // TRM es la tasa de cambio, no una fila de pasajeros: título claro.
+          const titulo = rep ? `${SERIE_LABEL[rep.serie]} ${rep.n}` : pref === 'TRM' ? 'Tasa de cambio (TRM)' : pref
           return (
             <fieldset
               key={pref}

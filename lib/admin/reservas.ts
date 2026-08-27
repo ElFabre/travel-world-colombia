@@ -119,12 +119,12 @@ function pasoDe(c: CampoCatalogo): string {
 }
 
 /**
- * Campos que el wizard NO muestra (pedido del usuario 2026-08-27): el grupo
- * TRM es una tasa de cambio, no una fila de pasajeros — cantidad/valor plan/
- * valor total ahí no significan nada. Los campos siguen existiendo en GHL
- * (vacíos); si algún día hacen falta, se quitan de esta lista.
+ * Campos que el wizard NO muestra. El grupo TRM estuvo aquí un rato, pero la
+ * plantilla imprime trm__valor_plan/valor_total y el equipo sí los llena
+ * (verificado 2026-08-27) → se recuperaron; el grupo se titula "Tasa de
+ * cambio (TRM)" en el wizard. La lista queda como mecanismo.
  */
-const CAMPOS_OCULTOS = new Set(['TRM - Cantidad', 'TRM - Valor Plan', 'TRM - Valor Total'])
+const CAMPOS_OCULTOS = new Set<string>([])
 
 /**
  * Orden de los campos de Generales del Viaje calcando el recuadro del
