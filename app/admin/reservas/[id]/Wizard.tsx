@@ -291,10 +291,13 @@ export function Wizard({ opportunityId, campos, valoresIniciales, prefill }: Pro
     }
   }
 
+  // Los contadores de avance miran solo los campos que el contrato imprime:
+  // el objetivo del wizard es un contrato completo, no llenar el catálogo TMS.
   function llenosEn(carpeta: string): number {
     return campos.filter(
       c =>
         c.folder === carpeta &&
+        c.enContrato &&
         valores[c.ghlId] !== undefined &&
         valores[c.ghlId] !== '' &&
         !sugeridos.has(c.ghlId)
@@ -308,7 +311,7 @@ export function Wizard({ opportunityId, campos, valoresIniciales, prefill }: Pro
         {pasos.map((p, i) => {
           const activo = i === paso
           const llenos = llenosEn(p)
-          const total = campos.filter(c => c.folder === p).length
+          const total = campos.filter(c => c.folder === p && c.enContrato).length
           return (
             <button
               key={p}
@@ -369,10 +372,10 @@ export function Wizard({ opportunityId, campos, valoresIniciales, prefill }: Pro
           </p>
         )}
 
-        {/* Campos sueltos */}
-        {sueltos.length > 0 && (
+        {/* Campos sueltos que el contrato imprime: la cara principal del paso. */}
+        {sueltos.filter(c => c.enContrato).length > 0 && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {sueltos.map(c => (
+            {sueltos.filter(c => c.enContrato).map(c => (
               <Campo key={c.ghlId} campo={c} valor={valores[c.ghlId]} sugerido={sugeridos.has(c.ghlId)} auto={autos.has(c.ghlId)} onChange={poner} />
             ))}
           </div>
@@ -399,6 +402,25 @@ export function Wizard({ opportunityId, campos, valoresIniciales, prefill }: Pro
             </fieldset>
           )
         })}
+
+        {/* Campos operativos (catálogo TMS): no salen en el contrato, van plegados
+            para que el formulario calque el documento. */}
+        {sueltos.some(c => !c.enContrato) && (
+          <details className="mt-4 rounded-lg" style={{ border: '1px dashed var(--border)' }}>
+            <summary
+              className="cursor-pointer px-4 py-3 font-inter text-xs font-semibold"
+              style={{ color: 'var(--text-dim)' }}
+            >
+              Campos de operación ({sueltos.filter(c => !c.enContrato).length}) — no salen en el
+              contrato
+            </summary>
+            <div className="grid grid-cols-1 gap-4 p-4 pt-1 sm:grid-cols-2">
+              {sueltos.filter(c => !c.enContrato).map(c => (
+                <Campo key={c.ghlId} campo={c} valor={valores[c.ghlId]} sugerido={sugeridos.has(c.ghlId)} auto={autos.has(c.ghlId)} onChange={poner} />
+              ))}
+            </div>
+          </details>
+        )}
 
         {/* Acciones */}
         <div className="mt-6 flex flex-wrap items-center gap-3" style={{ borderTop: '1px solid var(--border)', paddingTop: 16 }}>

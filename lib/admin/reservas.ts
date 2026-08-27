@@ -33,6 +33,13 @@ export interface CampoReserva extends CampoCatalogo {
   model: 'opportunity' | 'contact'
   /** id del campo de CONTACTO del que se prefillea (y al que se ESPEJA), si aplica. */
   prefillContactId?: string
+  /**
+   * ¿El contrato imprime este campo? Los que tienen origen en contacto son
+   * los 128 merge tags de la plantilla; los del catálogo TMS (sin origen) son
+   * operativos y el wizard los pliega para que el formulario calque el
+   * documento y no confunda al representante.
+   */
+  enContrato: boolean
 }
 
 /**
@@ -82,11 +89,34 @@ const ORDEN_PASOS = [
 /** Reubica un campo del catálogo en su paso del wizard. */
 function pasoDe(c: CampoCatalogo): string {
   if (c.name === 'ENVIAR CONTRATO?') return 'Enviar Contrato'
+  // El contrato imprime estos dos en el recuadro "Generales del Viaje",
+  // aunque el catálogo los dejó en la carpeta Contrato.
+  if (c.name === 'Acomodacion' || c.name === 'Cantidad de Habitaciones') {
+    return 'Generales del Viaje'
+  }
   if (c.folder === 'Liquidacion') {
     return c.name.includes('Vuelos') ? 'Liquidación Vuelos' : 'Liquidación Porción Terrestre'
   }
   return c.folder
 }
+
+/**
+ * Orden de los campos de Generales del Viaje calcando el recuadro del
+ * contrato (fecha ida/regreso, noches, personas, habitaciones, acomodación,
+ * plan, hotel…). Lo que no esté aquí conserva su orden del catálogo.
+ */
+const ORDEN_GENERALES = [
+  'Fecha confirmada de salida',
+  'Fecha confirmada de regreso',
+  'Numero de noches',
+  'Pax total',
+  'Cantidad de Habitaciones',
+  'Acomodacion',
+  'Tipo de paquete',
+  'Hotel o producto',
+  'Destino de interés',
+  'Peticiones especiales',
+]
 
 // Los campos de la subcuenta cambian poco: cache en memoria del proceso con
 // TTL corto. Si el proceso es nuevo (serverless frío) simplemente se re-pide.
@@ -137,6 +167,7 @@ export async function catalogoResuelto(): Promise<{
       ghlId: real.id,
       model: 'opportunity',
       prefillContactId: fuente?.id,
+      enContrato: Boolean(c.sourceContactKey),
     })
   }
 
@@ -154,11 +185,20 @@ export async function catalogoResuelto(): Promise<{
       options: real.picklistOptions,
       ghlId: real.id,
       model: 'contact',
+      enContrato: true, // la factura electrónica del contrato los imprime
     })
   }
 
-  // Orden final de pasos (estable dentro de cada paso).
-  campos.sort((a, b) => ORDEN_PASOS.indexOf(a.folder) - ORDEN_PASOS.indexOf(b.folder))
+  // Orden final: por paso y, dentro de Generales, calcando el contrato.
+  const prioridad = (c: CampoReserva) => {
+    if (c.folder !== 'Generales del Viaje') return 0
+    const i = ORDEN_GENERALES.indexOf(c.name)
+    return i === -1 ? ORDEN_GENERALES.length : i
+  }
+  campos.sort(
+    (a, b) =>
+      ORDEN_PASOS.indexOf(a.folder) - ORDEN_PASOS.indexOf(b.folder) || prioridad(a) - prioridad(b)
+  )
 
   return { campos, sinResolver }
 }
