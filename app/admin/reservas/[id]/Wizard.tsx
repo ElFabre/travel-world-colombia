@@ -39,6 +39,15 @@ function numeroRepetible(prefijo: string): { serie: 'P' | 'T' | 'Pago'; n: numbe
 const SERIE_LABEL = { P: 'Pasajero', T: 'Trayecto', Pago: 'Pago' } as const
 const SERIE_MAX = { P: 8, T: 4, Pago: 4 } as const
 
+/** Nombre visible de cada paso (la llave interna viene del catálogo). */
+const ETIQUETA_PASO: Record<string, string> = {
+  Facturacion: 'Datos de Facturación',
+  'Generales del Viaje': 'Generales del Viaje',
+  Inclusiones: 'Inclusiones y Exclusiones',
+  'Plan de Pagos': 'Plan de Pagos',
+}
+const etiquetaPaso = (p: string) => ETIQUETA_PASO[p] ?? p
+
 /* ------------------------------------------------------------------ */
 /* Autosumas: la aritmética del contrato se calcula sola.              */
 /* Regla de convivencia: un valor calculado (auto) se recalcula cuando */
@@ -313,7 +322,7 @@ export function Wizard({ opportunityId, campos, valoresIniciales, prefill }: Pro
                 fontWeight: activo ? 600 : 400,
               }}
             >
-              {i + 1}. {p}
+              {i + 1}. {etiquetaPaso(p)}
               {llenos > 0 && <span className="ml-1 opacity-70">({llenos}/{total})</span>}
             </button>
           )
@@ -323,7 +332,7 @@ export function Wizard({ opportunityId, campos, valoresIniciales, prefill }: Pro
       <div className="p-5" style={card}>
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-inter text-base font-semibold" style={{ color: 'var(--text-primary)' }}>
-            {carpetaActual}
+            {etiquetaPaso(carpetaActual)}
           </h2>
 
           {/* Contadores de grupos repetibles del paso */}

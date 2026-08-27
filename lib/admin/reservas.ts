@@ -59,13 +59,33 @@ const FACTURACION_CONTACTO_KEYS = [
   'contact.telefono', //                        Teléfono
 ]
 
-/** Orden de pasos del wizard = orden de aparición de las carpetas en el catálogo. */
-export function carpetasDelCatalogo(): string[] {
-  const vistas: string[] = []
-  for (const c of catalogoCrudo as CampoCatalogo[]) {
-    if (!vistas.includes(c.folder)) vistas.push(c.folder)
+/**
+ * Orden de pasos del wizard, pedido por el usuario (2026-08-27) calcando el
+ * orden de las carpetas de contacto que el equipo ya conoce. Dos ajustes
+ * sobre las carpetas del catálogo: Liquidación se parte en Vuelos y Porción
+ * Terrestre, y "ENVIAR CONTRATO?" se va a un paso final propio — disparar el
+ * contrato es lo último, cuando ya todo está lleno.
+ */
+const ORDEN_PASOS = [
+  'Contrato',
+  'Facturacion',
+  'Generales del Viaje',
+  'Vuelos',
+  'Pasajeros',
+  'Liquidación Vuelos',
+  'Liquidación Porción Terrestre',
+  'Plan de Pagos',
+  'Inclusiones',
+  'Enviar Contrato',
+]
+
+/** Reubica un campo del catálogo en su paso del wizard. */
+function pasoDe(c: CampoCatalogo): string {
+  if (c.name === 'ENVIAR CONTRATO?') return 'Enviar Contrato'
+  if (c.folder === 'Liquidacion') {
+    return c.name.includes('Vuelos') ? 'Liquidación Vuelos' : 'Liquidación Porción Terrestre'
   }
-  return vistas
+  return c.folder
 }
 
 // Los campos de la subcuenta cambian poco: cache en memoria del proceso con
@@ -110,6 +130,7 @@ export async function catalogoResuelto(): Promise<{
     const fuente = c.sourceContactKey ? contactoPorKey.get(c.sourceContactKey) : undefined
     campos.push({
       ...c,
+      folder: pasoDe(c),
       // Las opciones reales de GHL mandan sobre las del catálogo (por si se
       // editaron en la UI después de crearlas).
       options: real.picklistOptions?.length ? real.picklistOptions : c.options,
@@ -135,6 +156,9 @@ export async function catalogoResuelto(): Promise<{
       model: 'contact',
     })
   }
+
+  // Orden final de pasos (estable dentro de cada paso).
+  campos.sort((a, b) => ORDEN_PASOS.indexOf(a.folder) - ORDEN_PASOS.indexOf(b.folder))
 
   return { campos, sinResolver }
 }
