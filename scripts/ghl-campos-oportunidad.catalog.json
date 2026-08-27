@@ -146,7 +146,7 @@
   "folder": "Contrato",
   "name": "Acomodacion",
   "dataType": "SINGLE_OPTIONS",
-  "options": ["Sencilla", "Doble", "Triple"],
+  "options": ["Sencilla", "Doble", "Multiple"],
   "sourceContactKey": "contact.cpa__acomodacion"
  },
  {
