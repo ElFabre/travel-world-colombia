@@ -105,6 +105,14 @@ function pasoDe(c: CampoCatalogo): string {
 }
 
 /**
+ * Campos que el wizard NO muestra (pedido del usuario 2026-08-27): el grupo
+ * TRM es una tasa de cambio, no una fila de pasajeros — cantidad/valor plan/
+ * valor total ahí no significan nada. Los campos siguen existiendo en GHL
+ * (vacíos); si algún día hacen falta, se quitan de esta lista.
+ */
+const CAMPOS_OCULTOS = new Set(['TRM - Cantidad', 'TRM - Valor Plan', 'TRM - Valor Total'])
+
+/**
  * Orden de los campos de Generales del Viaje calcando el recuadro del
  * contrato (fecha ida/regreso, noches, personas, habitaciones, acomodación,
  * plan, hotel…). Lo que no esté aquí conserva su orden del catálogo.
@@ -155,6 +163,7 @@ export async function catalogoResuelto(): Promise<{
   const sinResolver: string[] = []
 
   for (const c of catalogoCrudo as CampoCatalogo[]) {
+    if (CAMPOS_OCULTOS.has(c.name)) continue
     const real = oportunidadPorNombre.get(c.name.trim())
     if (!real) {
       sinResolver.push(c.name)

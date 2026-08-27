@@ -55,8 +55,9 @@ const etiquetaPaso = (p: string) => ETIQUETA_PASO[p] ?? p
 /* pasa a manual y no se vuelve a tocar.                               */
 /* ------------------------------------------------------------------ */
 
-/** Filas de la liquidación terrestre (cada una: Tarifa por pax × Cantidad = Valor Total). */
-const FILAS_LIQUIDACION = ['ADL Sencillo', 'ADL Doble', 'ADL Multiple', 'Valor Niño', 'Valor Infante', 'TRM']
+/** Filas de la liquidación terrestre (cada una: Tarifa por pax × Cantidad = Valor Total).
+ *  TRM no es fila: es la tasa de cambio (sus cantidad/valores están ocultos). */
+const FILAS_LIQUIDACION = ['ADL Sencillo', 'ADL Doble', 'ADL Multiple', 'Valor Niño', 'Valor Infante']
 /** Filas que suman al total de pasajeros (TRM no es gente). */
 const FILAS_PASAJEROS = ['ADL Sencillo', 'ADL Doble', 'ADL Multiple', 'Valor Niño', 'Valor Infante']
 
@@ -116,7 +117,6 @@ function recalcular(
     'Total Pasajeros - Valor Total',
     suma([
       ...FILAS_PASAJEROS.map(f => leer(`${f} - Valor Total`)),
-      leer('TRM - Valor Total'),
       leer('Valor total Adultos Vuelos'),
       leer('Valor total Niños Vuelos'),
     ])
