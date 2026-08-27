@@ -212,6 +212,16 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
       onSubmit={e => {
         e.preventDefault()
         const fd = new FormData(e.currentTarget)
+        // Guardar con "Activo" desmarcado saca el viaje de la web y su página
+        // pasa a dar 404 — ya ocurrió por descuido al editar otros campos, así
+        // que pedimos confirmación explícita antes de ocultarlo.
+        if (d?.activo && fd.get('activo') !== 'on') {
+          const seguro = window.confirm(
+            `"${d.nombre}" quedará OCULTO: desaparece de la web y su página dará error 404.\n\n` +
+              '¿Seguro que quieres guardarlo como oculto? Si fue sin querer, cancela y marca la casilla "Activo (visible en la web)".'
+          )
+          if (!seguro) return
+        }
         startTransition(() => formAction(fd))
       }}
       className="flex flex-col gap-5"
