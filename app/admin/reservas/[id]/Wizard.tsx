@@ -39,6 +39,95 @@ function numeroRepetible(prefijo: string): { serie: 'P' | 'T' | 'Pago'; n: numbe
 const SERIE_LABEL = { P: 'Pasajero', T: 'Trayecto', Pago: 'Pago' } as const
 const SERIE_MAX = { P: 8, T: 4, Pago: 4 } as const
 
+/* ------------------------------------------------------------------ */
+/* Autosumas: la aritmética del contrato se calcula sola.              */
+/* Regla de convivencia: un valor calculado (auto) se recalcula cuando */
+/* cambian sus insumos; si el representante escribe encima, ese campo  */
+/* pasa a manual y no se vuelve a tocar.                               */
+/* ------------------------------------------------------------------ */
+
+/** Filas de la liquidación terrestre (cada una: Tarifa por pax × Cantidad = Valor Total). */
+const FILAS_LIQUIDACION = ['ADL Sencillo', 'ADL Doble', 'ADL Multiple', 'Valor Niño', 'Valor Infante', 'TRM']
+/** Filas que suman al total de pasajeros (TRM no es gente). */
+const FILAS_PASAJEROS = ['ADL Sencillo', 'ADL Doble', 'ADL Multiple', 'Valor Niño', 'Valor Infante']
+
+function recalcular(
+  vals: Record<string, ValorCampo>,
+  autosPrevios: Set<string>,
+  idDe: (nombre: string) => string | undefined
+): { valores: Record<string, ValorCampo>; autos: Set<string> } {
+  const v = { ...vals }
+  const autos = new Set(autosPrevios)
+
+  const leer = (nombre: string): number | null => {
+    const id = idDe(nombre)
+    const x = id ? v[id] : undefined
+    if (typeof x !== 'string' || x.trim() === '') return null
+    const n = Number(x)
+    return Number.isFinite(n) ? n : null
+  }
+
+  const poner = (nombre: string, valor: number | null) => {
+    const id = idDe(nombre)
+    if (!id) return
+    const esManual = v[id] !== undefined && v[id] !== '' && !autos.has(id)
+    if (esManual) return // el humano ya lo escribió: se respeta
+    if (valor === null) {
+      // Sin insumos: si lo habíamos calculado nosotros, se limpia (nada de totales huérfanos).
+      if (autos.has(id)) {
+        delete v[id]
+        autos.delete(id)
+      }
+      return
+    }
+    v[id] = String(Math.round(valor * 100) / 100)
+    autos.add(id)
+  }
+
+  const mul = (a: number | null, b: number | null) => (a !== null && b !== null ? a * b : null)
+  const suma = (terminos: (number | null)[]) => {
+    const presentes = terminos.filter((t): t is number => t !== null)
+    return presentes.length ? presentes.reduce((a, b) => a + b, 0) : null
+  }
+
+  // 1. Vuelos: valor × cantidad.
+  poner('Valor total Adultos Vuelos', mul(leer('Valor Adulto Vuelos'), leer('Cantidad Adultos Vuelos')))
+  poner('Valor total Niños Vuelos', mul(leer('Valor Niño Vuelos'), leer('Cantidad Niños Vuelos')))
+
+  // 2. Filas de liquidación: tarifa (o valor plan) × cantidad.
+  for (const f of FILAS_LIQUIDACION) {
+    const base = leer(`${f} - Tarifa por pax`) ?? leer(`${f} - Valor Plan`)
+    poner(`${f} - Valor Total`, mul(base, leer(`${f} - Cantidad`)))
+  }
+
+  // 3. Totales por columna + vuelos.
+  poner('Total Pasajeros - Cantidad', suma(FILAS_PASAJEROS.map(f => leer(`${f} - Cantidad`))))
+  poner('Total Pasajeros - Valor Plan', suma(FILAS_PASAJEROS.map(f => leer(`${f} - Valor Plan`))))
+  poner(
+    'Total Pasajeros - Valor Total',
+    suma([
+      ...FILAS_PASAJEROS.map(f => leer(`${f} - Valor Total`)),
+      leer('TRM - Valor Total'),
+      leer('Valor total Adultos Vuelos'),
+      leer('Valor total Niños Vuelos'),
+    ])
+  )
+
+  // 4. Plan de pagos: el total del plan baja a cada pago y el saldo descuenta
+  //    los abonos acumulados hasta ese pago.
+  const totalPlan = leer('Total Pasajeros - Valor Total')
+  let abonado = 0
+  for (let n = 1; n <= 4; n++) {
+    poner(`Pago ${n} - Total Plan`, totalPlan)
+    const abono = leer(`Pago ${n} - Abono`)
+    if (abono !== null) abonado += abono
+    const total = leer(`Pago ${n} - Total Plan`)
+    poner(`Pago ${n} - Saldo en Pesos`, total !== null && abono !== null ? total - abonado : null)
+  }
+
+  return { valores: v, autos }
+}
+
 const card: React.CSSProperties = {
   background: 'white',
   border: '1px solid var(--border)',
@@ -52,11 +141,18 @@ export function Wizard({ opportunityId, campos, valoresIniciales, prefill }: Pro
     return vistos
   }, [campos])
 
+  const porNombre = useMemo(() => new Map(campos.map(c => [c.name, c.ghlId])), [campos])
+  const idDe = (nombre: string) => porNombre.get(nombre)
+
+  // Estado inicial: valores guardados + prefill, con las autosumas ya corridas.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const inicial = useMemo(() => recalcular({ ...prefill, ...valoresIniciales }, new Set(), idDe), [])
+
   const [paso, setPaso] = useState(0)
-  const [valores, setValores] = useState<Record<string, ValorCampo>>(() => ({
-    ...prefill,
-    ...valoresIniciales,
-  }))
+  const [valores, setValores] = useState<Record<string, ValorCampo>>(inicial.valores)
+  // Campos calculados por las autosumas: se recalculan al cambiar sus insumos
+  // y se pintan azules; si el representante escribe encima, pasan a manuales.
+  const [autos, setAutos] = useState<Set<string>>(inicial.autos)
   // Ids cuyo valor vino sugerido del contacto y aún no se guarda: se pintan
   // distinto para que el representante los revise en vez de confiar a ciegas.
   const [sugeridos, setSugeridos] = useState<Set<string>>(
@@ -138,7 +234,13 @@ export function Wizard({ opportunityId, campos, valoresIniciales, prefill }: Pro
   }, [camposDelPaso, cuenta.P, cuenta.T, cuenta.Pago])
 
   function poner(id: string, v: ValorCampo) {
-    setValores(prev => ({ ...prev, [id]: v }))
+    // Editar a mano un campo calculado lo vuelve manual: las autosumas dejan
+    // de tocarlo. Después del cambio, la aritmética se recorre completa.
+    const autosSinEste = new Set(autos)
+    autosSinEste.delete(id)
+    const r = recalcular({ ...valores, [id]: v }, autosSinEste, idDe)
+    setValores(r.valores)
+    setAutos(r.autos)
     setSugeridos(prev => {
       if (!prev.has(id)) return prev
       const s = new Set(prev)
@@ -251,11 +353,18 @@ export function Wizard({ opportunityId, campos, valoresIniciales, prefill }: Pro
           </p>
         )}
 
+        {autos.size > 0 && camposDelPaso.some(c => autos.has(c.ghlId)) && (
+          <p className="mb-4 rounded-md px-3 py-2 font-inter text-xs" style={{ background: '#eff6ff', color: '#1d4ed8' }}>
+            Los campos en azul se calculan solos (tarifa × cantidad, totales y saldos).
+            Si escribes encima, tu valor manda y no se recalcula.
+          </p>
+        )}
+
         {/* Campos sueltos */}
         {sueltos.length > 0 && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {sueltos.map(c => (
-              <Campo key={c.ghlId} campo={c} valor={valores[c.ghlId]} sugerido={sugeridos.has(c.ghlId)} onChange={poner} />
+              <Campo key={c.ghlId} campo={c} valor={valores[c.ghlId]} sugerido={sugeridos.has(c.ghlId)} auto={autos.has(c.ghlId)} onChange={poner} />
             ))}
           </div>
         )}
@@ -275,7 +384,7 @@ export function Wizard({ opportunityId, campos, valoresIniciales, prefill }: Pro
               </legend>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {items.map(c => (
-                  <Campo key={c.ghlId} campo={c} valor={valores[c.ghlId]} sugerido={sugeridos.has(c.ghlId)} onChange={poner} />
+                  <Campo key={c.ghlId} campo={c} valor={valores[c.ghlId]} sugerido={sugeridos.has(c.ghlId)} auto={autos.has(c.ghlId)} onChange={poner} />
                 ))}
               </div>
             </fieldset>
@@ -328,11 +437,12 @@ export function Wizard({ opportunityId, campos, valoresIniciales, prefill }: Pro
 
 /** Un campo del formulario, según su dataType de GHL. */
 function Campo({
-  campo, valor, sugerido, onChange,
+  campo, valor, sugerido, auto, onChange,
 }: {
   campo: CampoReserva
   valor: ValorCampo | undefined
   sugerido: boolean
+  auto: boolean
   onChange: (id: string, v: ValorCampo) => void
 }) {
   // La etiqueta sin el prefijo del grupo ("P3 - Documento" → "Documento").
@@ -340,7 +450,7 @@ function Campo({
   const base: React.CSSProperties = {
     border: '1px solid var(--border)',
     color: 'var(--text-primary)',
-    background: sugerido ? '#fffbeb' : 'white',
+    background: auto ? '#eff6ff' : sugerido ? '#fffbeb' : 'white',
   }
   const clase = 'w-full rounded-md px-3 py-2 font-inter text-sm outline-none'
 
