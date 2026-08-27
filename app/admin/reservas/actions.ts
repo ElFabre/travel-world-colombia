@@ -206,8 +206,13 @@ async function guardar(
       loteContacto.set(ghlId, v)
     } else {
       loteOportunidad.push({ id: ghlId, field_value: v })
-      if (ESPEJO_CONTACTO_TRANSICION && campo.prefillContactId) {
-        loteContacto.set(campo.prefillContactId, v)
+      if (ESPEJO_CONTACTO_TRANSICION) {
+        if (campo.prefillContactId) loteContacto.set(campo.prefillContactId, v)
+        // Duplicados viejos que la plantilla imprime (variantes TEXT): se
+        // escriben como texto para no pelear con su tipo.
+        for (const extra of campo.espejoExtraIds ?? []) {
+          loteContacto.set(extra, Array.isArray(v) ? v : String(v))
+        }
       }
     }
   }

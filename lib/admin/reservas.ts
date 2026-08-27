@@ -33,6 +33,8 @@ export interface CampoReserva extends CampoCatalogo {
   model: 'opportunity' | 'contact'
   /** id del campo de CONTACTO del que se prefillea (y al que se ESPEJA), si aplica. */
   prefillContactId?: string
+  /** ids de contacto ADICIONALES a espejar (duplicados viejos que imprime la plantilla). */
+  espejoExtraIds?: string[]
   /**
    * ¿El contrato imprime este campo? Los que tienen origen en contacto son
    * los 128 merge tags de la plantilla; los del catálogo TMS (sin origen) son
@@ -51,6 +53,17 @@ export interface CampoReserva extends CampoCatalogo {
  * es la única excepción viva a la regla "no escribir campos viejos".
  */
 export const ESPEJO_CONTACTO_TRANSICION = true
+
+/**
+ * Duplicados viejos que la plantilla imprime ADEMÁS del sourceContactKey del
+ * catálogo. Verificado 2026-08-27 contra las 128 llaves reales de un
+ * documento generado: el total del "Registro de Pagos" sale de estas
+ * variantes TEXT, no de contact.total_pasajeros / contact.tp__valor_total.
+ */
+const ESPEJOS_EXTRA: Record<string, string[]> = {
+  'Total Pasajeros - Cantidad': ['contact.total_pasajeros__cantidad'],
+  'Total Pasajeros - Valor Total': ['contact.total_pasajeros__valor_total'],
+}
 
 /**
  * Campos que viven SOLO en el contacto y el contrato también imprime: los
@@ -194,6 +207,9 @@ export async function catalogoResuelto(): Promise<{
       ghlId: real.id,
       model: 'opportunity',
       prefillContactId: fuente?.id,
+      espejoExtraIds: (ESPEJOS_EXTRA[c.name] ?? [])
+        .map(k => contactoPorKey.get(k)?.id)
+        .filter((x): x is string => Boolean(x)),
       enContrato: Boolean(c.sourceContactKey),
     })
   }
