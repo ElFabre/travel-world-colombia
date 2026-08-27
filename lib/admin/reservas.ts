@@ -94,6 +94,10 @@ function pasoDe(c: CampoCatalogo): string {
   if (c.name === 'Acomodacion' || c.name === 'Cantidad de Habitaciones') {
     return 'Generales del Viaje'
   }
+  // El destino sale en el ENCABEZADO del contrato, junto al número y el tipo:
+  // se pide en el paso Contrato (viene del viejo contact.c__destino). El
+  // nombre GHL no se toca — el catálogo TMS lo busca por nombre exacto.
+  if (c.name === 'Destino de interés') return 'Contrato'
   if (c.folder === 'Liquidacion') {
     return c.name.includes('Vuelos') ? 'Liquidación Vuelos' : 'Liquidación Porción Terrestre'
   }
@@ -114,7 +118,6 @@ const ORDEN_GENERALES = [
   'Acomodacion',
   'Tipo de paquete',
   'Hotel o producto',
-  'Destino de interés',
   'Peticiones especiales',
 ]
 

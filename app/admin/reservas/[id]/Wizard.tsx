@@ -477,7 +477,10 @@ function Campo({
   onChange: (id: string, v: ValorCampo) => void
 }) {
   // La etiqueta sin el prefijo del grupo ("P3 - Documento" → "Documento").
-  const etiqueta = campo.name.replace(/^.+? - /, '')
+  // 'Destino de interés' se muestra como 'Destino' en el paso Contrato (el
+  // nombre GHL no se toca: el catálogo TMS lo busca por nombre exacto).
+  const etiqueta =
+    campo.name === 'Destino de interés' ? 'Destino' : campo.name.replace(/^.+? - /, '')
   const base: React.CSSProperties = {
     border: '1px solid var(--border)',
     color: 'var(--text-primary)',
