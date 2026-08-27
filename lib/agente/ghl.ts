@@ -164,6 +164,17 @@ export async function actualizarCampos(
   await mandar('PUT', `/contacts/${contactId}`, { customFields: campos })
 }
 
+/**
+ * Actualiza el contacto con un cuerpo arbitrario: campos estándar
+ * (firstName, email, phone…) y/o `customFields` en un solo PUT.
+ */
+export async function actualizarContacto(
+  contactId: string,
+  cuerpo: Record<string, unknown>
+): Promise<void> {
+  await mandar('PUT', `/contacts/${contactId}`, cuerpo)
+}
+
 /** Nota interna en el timeline del contacto (la ven las asesoras, no el cliente). */
 export async function crearNota(contactId: string, texto: string): Promise<void> {
   await mandar('POST', `/contacts/${contactId}/notes`, { body: texto })

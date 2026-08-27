@@ -87,6 +87,7 @@ const FACTURACION_CONTACTO_KEYS = [
  * contrato es lo último, cuando ya todo está lleno.
  */
 const ORDEN_PASOS = [
+  'Contacto',
   'Contrato',
   'Facturacion',
   'Generales del Viaje',
@@ -231,6 +232,17 @@ export async function catalogoResuelto(): Promise<{
       enContrato: true, // la factura electrónica del contrato los imprime
     })
   }
+
+  // Paso "Contacto": los campos ESTÁNDAR del contacto (no personalizados).
+  // Sin teléfono y correo válidos el contrato no se puede enviar, así que van
+  // de primeros. El ghlId lleva el prefijo std: y guardarReserva los escribe
+  // como cuerpo del PUT /contacts (no como customFields).
+  campos.push(
+    { folder: 'Contacto', name: 'Nombre', dataType: 'TEXT', ghlId: 'std:firstName', model: 'contact', enContrato: true },
+    { folder: 'Contacto', name: 'Apellidos', dataType: 'TEXT', ghlId: 'std:lastName', model: 'contact', enContrato: true },
+    { folder: 'Contacto', name: 'Correo electrónico', dataType: 'EMAIL', ghlId: 'std:email', model: 'contact', enContrato: true },
+    { folder: 'Contacto', name: 'Teléfono', dataType: 'PHONE', ghlId: 'std:phone', model: 'contact', enContrato: true },
+  )
 
   // Orden final: por paso y, dentro de Generales, calcando el contrato.
   const prioridad = (c: CampoReserva) => {

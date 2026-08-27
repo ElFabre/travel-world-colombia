@@ -371,6 +371,13 @@ export function Wizard({ opportunityId, campos, valoresIniciales, prefill }: Pro
           </div>
         </div>
 
+        {carpetaActual === 'Contacto' && (
+          <p className="mb-4 rounded-md px-3 py-2 font-inter text-xs" style={{ background: '#eff6ff', color: '#1d4ed8' }}>
+            Verifica el teléfono y el correo: el contrato se envía a estos datos y sin ellos
+            correctos no llega. El teléfono va con indicativo (ej. +57 320 000 0000).
+          </p>
+        )}
+
         {sugeridos.size > 0 && (
           <p className="mb-4 rounded-md px-3 py-2 font-inter text-xs" style={{ background: '#fffbeb', color: '#92400e' }}>
             Los campos en amarillo vienen sugeridos del CRM (calificación de Sol / datos previos).
@@ -548,7 +555,7 @@ function Campo({
         </div>
       ) : (
         <input
-          type={campo.dataType === 'DATE' ? 'date' : campo.dataType === 'NUMERICAL' ? 'number' : campo.dataType === 'PHONE' ? 'tel' : 'text'}
+          type={campo.dataType === 'DATE' ? 'date' : campo.dataType === 'NUMERICAL' ? 'number' : campo.dataType === 'PHONE' ? 'tel' : campo.dataType === 'EMAIL' ? 'email' : 'text'}
           step={campo.dataType === 'NUMERICAL' ? 'any' : undefined}
           value={(valor as string) ?? ''}
           onChange={e => onChange(campo.ghlId, e.target.value)}

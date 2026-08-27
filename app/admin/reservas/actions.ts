@@ -7,7 +7,7 @@ import {
   oportunidadesDe,
   obtenerOportunidad,
   obtenerContacto,
-  actualizarCampos,
+  actualizarContacto,
   actualizarCamposOportunidad,
   listarPipelines,
 } from '@/lib/agente/ghl'
@@ -112,9 +112,17 @@ export async function cargarReserva(opportunityId: string): Promise<ReservaCarga
 
   // Los campos que VIVEN en el contacto (facturación estable) leen de ahí.
   for (const campo of campos) {
-    if (campo.model !== 'contact') continue
+    if (campo.model !== 'contact' || campo.ghlId.startsWith('std:')) continue
     const v = normalizarValor(contactoPorId.get(campo.ghlId), campo.dataType)
     if (v !== null) valores[campo.ghlId] = v
+  }
+
+  // Paso Contacto: los campos estándar del contacto.
+  if (contacto) {
+    if (contacto.firstName) valores['std:firstName'] = contacto.firstName
+    if (contacto.lastName) valores['std:lastName'] = contacto.lastName
+    if (contacto.email) valores['std:email'] = contacto.email
+    if (contacto.phone) valores['std:phone'] = contacto.phone
   }
 
   // Prefill: el valor que ya vive en el CONTACTO (campos viejos / calificación
@@ -195,6 +203,8 @@ async function guardar(
 
   const loteOportunidad: { id: string; field_value: string | number | string[] }[] = []
   const loteContacto = new Map<string, string | number | string[]>()
+  // Campos estándar del contacto (paso Contacto): van como cuerpo del PUT.
+  const estandar: Record<string, string> = {}
 
   for (const [ghlId, valor] of Object.entries(valores)) {
     const campo = porId.get(ghlId)
@@ -202,7 +212,9 @@ async function guardar(
     if (valor === '' || (Array.isArray(valor) && valor.length === 0)) continue
     const v = valorParaGhl(valor, campo.dataType)
 
-    if (campo.model === 'contact') {
+    if (campo.ghlId.startsWith('std:')) {
+      if (typeof v === 'string') estandar[campo.ghlId.slice(4)] = v.trim()
+    } else if (campo.model === 'contact') {
       loteContacto.set(ghlId, v)
     } else {
       loteOportunidad.push({ id: ghlId, field_value: v })
@@ -217,25 +229,33 @@ async function guardar(
     }
   }
 
-  const total = loteOportunidad.length + loteContacto.size
+  const nEstandar = Object.keys(estandar).length
+  const total = loteOportunidad.length + loteContacto.size + nEstandar
   if (total === 0) return 0
 
   if (loteOportunidad.length > 0) {
     await actualizarCamposOportunidad(opportunityId, loteOportunidad)
   }
-  if (loteContacto.size > 0 && contactId) {
-    await actualizarCampos(
-      contactId,
-      [...loteContacto.entries()].map(([id, field_value]) => ({ id, field_value }))
-    )
+  if ((loteContacto.size > 0 || nEstandar > 0) && contactId) {
+    await actualizarContacto(contactId, {
+      ...estandar,
+      ...(loteContacto.size > 0
+        ? {
+            customFields: [...loteContacto.entries()].map(([id, field_value]) => ({
+              id,
+              field_value,
+            })),
+          }
+        : {}),
+    })
   }
 
   await registrarActividad({
     email: user.email!,
     accion: 'guardar-reserva',
     nombre: opportunityId,
-    detalle: { oportunidad: loteOportunidad.length, contacto: loteContacto.size },
+    detalle: { oportunidad: loteOportunidad.length, contacto: loteContacto.size + nEstandar },
   })
 
-  return loteOportunidad.length
+  return total
 }
