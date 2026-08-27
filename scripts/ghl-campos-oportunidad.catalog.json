@@ -786,7 +786,7 @@
  {
   "folder": "Liquidacion",
   "name": "TRM - T/C",
-  "dataType": "TEXT",
+  "dataType": "NUMERICAL",
   "sourceContactKey": "contact.trm__tc"
  },
  {
