@@ -157,10 +157,29 @@ export async function cargarReserva(opportunityId: string): Promise<ReservaCarga
  * contacto (ver ESPEJO_CONTACTO_TRANSICION) para que la plantilla actual
  * (merge tags `{{contact.*}}`) imprima todo. GHL hace merge en ambos PUT.
  */
+export type ResultadoGuardado =
+  | { ok: true; guardados: number }
+  | { ok: false; error: string }
+
 export async function guardarReserva(
   opportunityId: string,
   valores: Record<string, ValorCampo>
-): Promise<{ guardados: number }> {
+): Promise<ResultadoGuardado> {
+  // El error se devuelve como dato, no se lanza: Next.js enmascara los errores
+  // lanzados en producción ("omitted in production builds") y el representante
+  // se quedaba sin saber POR QUÉ no guardó.
+  try {
+    return { ok: true, guardados: await guardar(opportunityId, valores) }
+  } catch (e) {
+    console.error('guardarReserva:', e)
+    return { ok: false, error: (e as Error).message }
+  }
+}
+
+async function guardar(
+  opportunityId: string,
+  valores: Record<string, ValorCampo>
+): Promise<number> {
   const { user } = await requireReservas()
 
   // El contacto dueño se deriva EN EL SERVIDOR de la oportunidad: el cliente
@@ -194,7 +213,7 @@ export async function guardarReserva(
   }
 
   const total = loteOportunidad.length + loteContacto.size
-  if (total === 0) return { guardados: 0 }
+  if (total === 0) return 0
 
   if (loteOportunidad.length > 0) {
     await actualizarCamposOportunidad(opportunityId, loteOportunidad)
@@ -213,5 +232,5 @@ export async function guardarReserva(
     detalle: { oportunidad: loteOportunidad.length, contacto: loteContacto.size },
   })
 
-  return { guardados: loteOportunidad.length }
+  return loteOportunidad.length
 }

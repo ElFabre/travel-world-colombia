@@ -276,16 +276,29 @@ export function Wizard({ opportunityId, campos, valoresIniciales, prefill }: Pro
         const v = id ? valores[id] : undefined
         if (id && typeof v === 'string' && v !== '') lote[id] = v
       }
-      const { guardados } = await guardarReserva(opportunityId, lote)
+      const r = await guardarReserva(opportunityId, lote)
+      if (!r.ok) {
+        setAviso({ ok: false, texto: `No se pudo guardar: ${r.error}` })
+        return
+      }
       setSugeridos(prev => {
         const s = new Set(prev)
         for (const id of Object.keys(lote)) s.delete(id)
         return s
       })
-      setAviso({ ok: true, texto: guardados ? `${guardados} campos guardados en GHL.` : 'Nada nuevo que guardar.' })
+      setAviso({ ok: true, texto: r.guardados ? `${r.guardados} campos guardados en GHL.` : 'Nada nuevo que guardar.' })
       if (avanzar && paso < pasos.length - 1) setPaso(paso + 1)
     } catch (e) {
-      setAviso({ ok: false, texto: `No se pudo guardar: ${(e as Error).message}` })
+      // Un throw aquí ya no viene de la lógica de guardado (eso vuelve como
+      // dato): casi siempre es que el navegador tiene una versión vieja del
+      // panel tras un despliegue y la acción del servidor ya no existe.
+      const m = (e as Error).message ?? ''
+      setAviso({
+        ok: false,
+        texto: /Server (Components|Action|Functions)|Failed to find/i.test(m)
+          ? 'El panel se actualizó mientras tenías esta página abierta. Recarga la página (F5) y vuelve a guardar — no se perdió nada de lo ya guardado.'
+          : `No se pudo guardar: ${m}`,
+      })
     } finally {
       setGuardando(false)
     }
