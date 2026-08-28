@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Search, Loader2, ChevronRight, User, Phone, Mail } from 'lucide-react'
 import {
@@ -24,19 +24,24 @@ export function Buscador() {
   const [oportunidades, setOportunidades] = useState<OportunidadListada[] | null>(null)
   const [cargandoOps, setCargandoOps] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // El reset de estado va en el handler (no en el efecto) para no disparar
+  // setState síncrono dentro del render — regla react-hooks/set-state-in-effect.
+  function onCambioQ(valor: string) {
+    setQ(valor)
+    setError(null)
+    if (valor.trim().length < 3) {
+      setClientes(null)
+      setBuscando(false)
+    } else {
+      setBuscando(true)
+    }
+  }
 
   // Búsqueda con debounce: se dispara sola al escribir 3+ caracteres.
   useEffect(() => {
-    if (timer.current) clearTimeout(timer.current)
-    setError(null)
-    if (q.trim().length < 3) {
-      setClientes(null)
-      setBuscando(false)
-      return
-    }
-    setBuscando(true)
-    timer.current = setTimeout(async () => {
+    if (q.trim().length < 3) return
+    const timer = setTimeout(async () => {
       try {
         setClientes(await buscarClientes(q))
       } catch (e) {
@@ -45,9 +50,7 @@ export function Buscador() {
         setBuscando(false)
       }
     }, 400)
-    return () => {
-      if (timer.current) clearTimeout(timer.current)
-    }
+    return () => clearTimeout(timer)
   }, [q])
 
   async function elegirCliente(c: ClienteEncontrado) {
@@ -75,7 +78,7 @@ export function Buscador() {
           <input
             type="text"
             value={q}
-            onChange={e => setQ(e.target.value)}
+            onChange={e => onCambioQ(e.target.value)}
             placeholder="Nombre, teléfono o correo (mínimo 3 letras)…"
             autoFocus
             className="w-full rounded-md py-2.5 pl-9 pr-3 font-inter text-sm outline-none"
