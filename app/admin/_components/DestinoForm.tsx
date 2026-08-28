@@ -327,7 +327,24 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
           </select>
           <p className="mt-1 font-inter text-xs" style={{ color: 'var(--text-muted)' }}>Agrupa los viajes de Colombia en /destinos.</p>
         </div>
-        <Campo label="Precio desde" name="precio_desde" defaultValue={d?.precio_desde} placeholder="Desde $899 USD" />
+        <Campo
+          label="Precio desde (solo el número)"
+          name="precio_valor"
+          type="number"
+          defaultValue={d?.precio_valor ?? undefined}
+          placeholder="1290000"
+          hint={d?.precio_desde && d?.precio_valor == null ? `Texto actual sin estructurar: "${d.precio_desde}"` : 'Sin puntos ni símbolos: 1290000 (COP) o 1290 (USD).'}
+        />
+        <div>
+          <label className={labelCls} style={labelStyle}>Moneda del precio</label>
+          <select name="precio_moneda" defaultValue={d?.precio_moneda ?? ''} className={inputCls} style={inputStyle}>
+            <option value="" style={{ background: 'var(--bg-alt)' }}>— Sin precio publicado</option>
+            <option value="COP" style={{ background: 'var(--bg-alt)' }}>COP (pesos)</option>
+            <option value="USD" style={{ background: 'var(--bg-alt)' }}>USD (dólares)</option>
+          </select>
+          <p className="mt-1 font-inter text-xs" style={{ color: 'var(--text-muted)' }}>Obligatoria si hay valor. Define cómo se formatea y qué ve Google.</p>
+        </div>
+        <Campo label="Nota del precio" name="precio_nota" defaultValue={d?.precio_nota ?? undefined} placeholder="Acomodación triple" hint="Opcional: acomodación, temporada, condiciones." />
         <Campo label="Duración" name="duracion" defaultValue={d?.duracion} placeholder="8 días / 7 noches" />
         <Campo label="Cupos disponibles" name="cupos_disponibles" type="number" defaultValue={d?.cupos_disponibles} placeholder="10" />
         <Campo label="Orden" name="orden" type="number" defaultValue={d?.orden ?? 0} hint="Menor = aparece primero." />

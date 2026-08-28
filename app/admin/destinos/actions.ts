@@ -6,6 +6,7 @@ import { requireEditor } from '@/lib/admin/guard'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { registrarActividad } from '@/lib/admin/audit'
 import { destinoSchema } from '@/lib/validations/destino'
+import { precioTextoPlano } from '@/lib/precio'
 
 export type FormState = { error?: string }
 
@@ -23,6 +24,14 @@ function numEntero(v: FormDataEntryValue | null): number | undefined {
   if (s === '') return undefined
   const n = Number(s)
   return Number.isFinite(n) ? Math.trunc(n) : undefined
+}
+
+/** Número (admite decimales) o undefined si está vacío / no es número. */
+function numDecimal(v: FormDataEntryValue | null): number | undefined {
+  const s = String(v ?? '').trim()
+  if (s === '') return undefined
+  const n = Number(s.replace(',', '.'))
+  return Number.isFinite(n) ? n : undefined
 }
 
 function texto(v: FormDataEntryValue | null): string | undefined {
@@ -48,6 +57,10 @@ function jsonArray(v: FormDataEntryValue | null): unknown[] {
 function construirPayload(formData: FormData) {
   const slug = String(formData.get('slug') ?? '').trim()
 
+  const precio_valor = numDecimal(formData.get('precio_valor'))
+  const precio_moneda = texto(formData.get('precio_moneda')) as 'COP' | 'USD' | undefined
+  const precio_nota = texto(formData.get('precio_nota'))
+
   const base = {
     nombre: String(formData.get('nombre') ?? '').trim(),
     slug,
@@ -59,7 +72,14 @@ function construirPayload(formData: FormData) {
     activo: formData.get('activo') === 'on',
     destacado: formData.get('destacado') === 'on',
     orden: numEntero(formData.get('orden')) ?? 0,
-    precio_desde: texto(formData.get('precio_desde')),
+    precio_valor,
+    precio_moneda,
+    precio_nota,
+    // precio_desde ahora es texto derivado del estructurado: lo lee el agente
+    // Sol (conocimiento.ts) y es el fallback de la web. Sin valor → null.
+    precio_desde: precio_valor != null && precio_moneda
+      ? precioTextoPlano(precio_valor, precio_moneda, precio_nota)
+      : undefined,
     duracion: texto(formData.get('duracion')),
     cupos_disponibles: numEntero(formData.get('cupos_disponibles')),
     frase_hero: texto(formData.get('frase_hero')),
