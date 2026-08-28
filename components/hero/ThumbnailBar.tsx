@@ -1,11 +1,32 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useSyncExternalStore } from 'react'
 import type { CSSProperties } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { Destino } from '@/types/destino'
 import { heroThumb } from '@/lib/hero'
+
+// ─── Media query: variante única por viewport ────────────────────────────────
+// Antes las variantes desktop y móvil se renderizaban AMBAS y CSS ocultaba una:
+// 68 botones en el DOM para 34 destinos (lectores de pantalla anunciaban la
+// lista duplicada). Ahora se monta solo la variante activa. En SSR/hidratación
+// se asume desktop y matchMedia corrige al montar.
+const MQ_MOVIL = '(max-width: 767px)'
+
+function suscribirMovil(cb: () => void) {
+  const mq = window.matchMedia(MQ_MOVIL)
+  mq.addEventListener('change', cb)
+  return () => mq.removeEventListener('change', cb)
+}
+
+function useEsMovil(): boolean {
+  return useSyncExternalStore(
+    suscribirMovil,
+    () => window.matchMedia(MQ_MOVIL).matches,
+    () => false
+  )
+}
 
 // ─── Props (same interface as before) ────────────────────────────────────────
 interface ThumbnailBarProps {
@@ -125,8 +146,9 @@ const ARROW_STYLE: CSSProperties = {
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function ThumbnailBar({ destinos, activeIndex, onSelect }: ThumbnailBarProps) {
-  const touchX = useRef<number | null>(null)
-  const total  = destinos.length
+  const touchX  = useRef<number | null>(null)
+  const total   = destinos.length
+  const esMovil = useEsMovil()
 
   const prev = () => onSelect((activeIndex - 1 + total) % total)
   const next = () => onSelect((activeIndex + 1) % total)
@@ -138,7 +160,10 @@ export function ThumbnailBar({ destinos, activeIndex, onSelect }: ThumbnailBarPr
   const onTouchEnd = (e: React.TouchEvent) => {
     if (touchX.current === null) return
     const delta = touchX.current - e.changedTouches[0].clientX
-    if (Math.abs(delta) > 44) delta > 0 ? next() : prev()
+    if (Math.abs(delta) > 44) {
+      if (delta > 0) next()
+      else prev()
+    }
     touchX.current = null
   }
 
@@ -185,7 +210,8 @@ export function ThumbnailBar({ destinos, activeIndex, onSelect }: ThumbnailBarPr
       {/* ══════════════════════════════════════════
           DESKTOP ≥768px — Coverflow 3D
       ══════════════════════════════════════════ */}
-      <div className="hidden md:block px-6 pt-2">
+      {!esMovil && (
+      <div className="px-6 pt-2">
         <div className="flex items-center gap-3">
 
           {/* Arrow — prev */}
@@ -238,7 +264,6 @@ export function ThumbnailBar({ destinos, activeIndex, onSelect }: ThumbnailBarPr
                     height={80}
                     className="h-full w-full object-cover"
                     draggable={false}
-                    priority={Math.abs(diff) <= 1}
                   />
                 </button>
               )
@@ -269,11 +294,13 @@ export function ThumbnailBar({ destinos, activeIndex, onSelect }: ThumbnailBarPr
 
         </div>
       </div>
+      )}
 
       {/* ══════════════════════════════════════════
           MOBILE <768px — Flat thumbnails + swipe
       ══════════════════════════════════════════ */}
-      <div className="flex items-center gap-2.5 px-6 pt-2 md:hidden">
+      {esMovil && (
+      <div className="flex items-center gap-2.5 px-6 pt-2">
 
         <button
           type="button"
@@ -364,6 +391,7 @@ export function ThumbnailBar({ destinos, activeIndex, onSelect }: ThumbnailBarPr
         </button>
 
       </div>
+      )}
 
       {/* ══════════════════════════════════════════
           DOTS — siempre visibles (desktop + móvil)

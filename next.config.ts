@@ -31,7 +31,9 @@ const nextConfig: NextConfig = {
             // sitio público (además GTM los necesita en la práctica).
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' *.googletagmanager.com *.facebook.net reputationhub.site",
+              // 'unsafe-eval' solo en dev: React lo usa para reconstruir
+              // callstacks en desarrollo; en producción nunca.
+              `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''} *.googletagmanager.com *.facebook.net reputationhub.site`,
               "frame-src 'self' reputationhub.site *.google.com www.googletagmanager.com",
               "img-src * data: blob:",
               // Solo los backends que el navegador realmente contacta:
