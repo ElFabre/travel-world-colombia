@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Clock, ChevronRight, Star, MapPin } from 'lucide-react'
 import type { Destino } from '@/types/destino'
 import { destinoCardImg } from '@/lib/hero'
+import { precioDesde } from '@/lib/precio'
 
 /**
  * Tarjeta de un programa — única implementación, compartida por el grid del
@@ -57,12 +58,12 @@ export function DestinoCard({
             </div>
           )}
 
-          {d.precio_desde && (
+          {precioDesde(d) && (
             <span
               className="absolute bottom-3 left-3 font-plus-jakarta text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-sm"
               style={{ background: 'var(--orange)', color: 'var(--orange-contrast)' }}
             >
-              {d.precio_desde}
+              {precioDesde(d)}
             </span>
           )}
           {d.duracion && (
