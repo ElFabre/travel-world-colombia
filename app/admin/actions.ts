@@ -2,21 +2,39 @@
 
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { requireEditor, requireAdminRole } from '@/lib/admin/guard'
 import { isApprovedEmail } from '@/lib/admin/allowlist'
 import { registrarActividad } from '@/lib/admin/audit'
+import { checkRateLimit } from '@/lib/security/rateLimit'
 import { SITE } from '@/lib/site'
 
 export type LoginState = { error?: string }
 export type RegisterState = { error?: string; ok?: string }
 export type ResetState = { error?: string; ok?: string }
 
+/** IP del visitante (tras el proxy de Vercel), para las claves de rate limit. */
+async function ipActual(): Promise<string> {
+  const h = await headers()
+  return h.get('x-forwarded-for')?.split(',')[0]?.trim() ?? h.get('x-real-ip') ?? 'unknown'
+}
+
+const MSG_DEMASIADOS = 'Demasiados intentos. Espera unos minutos e inténtalo de nuevo.'
+
 /** Inicio de sesión del admin. */
 export async function signIn(_prev: LoginState, formData: FormData): Promise<LoginState> {
   const email = String(formData.get('email') ?? '').trim()
   const password = String(formData.get('password') ?? '')
   if (!email || !password) return { error: 'Ingresa email y contraseña.' }
+
+  // Frena fuerza bruta: 5 intentos / 15 min, por IP y por cuenta atacada.
+  const ip = await ipActual()
+  const [porIp, porEmail] = await Promise.all([
+    checkRateLimit(`login:ip:${ip}`, { limit: 5, windowMs: 900_000 }),
+    checkRateLimit(`login:email:${email.toLowerCase()}`, { limit: 5, windowMs: 900_000 }),
+  ])
+  if (!porIp.success || !porEmail.success) return { error: MSG_DEMASIADOS }
 
   const supabase = await createClient()
   const { error } = await supabase.auth.signInWithPassword({ email, password })
@@ -49,13 +67,21 @@ export async function signUp(_prev: RegisterState, formData: FormData): Promise<
   if (password.length < 8) return { error: 'La contraseña debe tener al menos 8 caracteres.' }
   if (password !== confirm) return { error: 'Las contraseñas no coinciden.' }
 
+  // 3 registros / hora por IP: el signup dispara correos y es spameable.
+  const rl = await checkRateLimit(`signup:ip:${await ipActual()}`, { limit: 3, windowMs: 3_600_000 })
+  if (!rl.success) return { error: MSG_DEMASIADOS }
+
   const supabase = await createClient()
   const { data, error } = await supabase.auth.signUp({ email, password })
   if (error) {
-    const msg = /already registered|already exists/i.test(error.message)
-      ? 'Ya existe una cuenta con ese correo. Inicia sesión.'
-      : error.message
-    return { error: msg }
+    if (/already registered|already exists/i.test(error.message)) {
+      return { error: 'Ya existe una cuenta con ese correo. Inicia sesión.' }
+    }
+    // Con "Enable Sign ups" apagado en Supabase, el alta es solo por invitación.
+    if (/signups? not allowed|disabled/i.test(error.message)) {
+      return { error: 'El registro directo está deshabilitado. Pide a un administrador que te invite desde el panel (Usuarios → Invitar).' }
+    }
+    return { error: error.message }
   }
 
   // Con la confirmación de correo activada, registrar un correo ya existente
@@ -93,6 +119,14 @@ export async function signUp(_prev: RegisterState, formData: FormData): Promise<
 export async function solicitarReset(_prev: ResetState, formData: FormData): Promise<ResetState> {
   const email = String(formData.get('email') ?? '').trim()
   if (!email) return { error: 'Ingresa tu correo.' }
+
+  // 3 solicitudes / 15 min por IP y por correo: cada intento envía un email.
+  const ip = await ipActual()
+  const [porIp, porEmail] = await Promise.all([
+    checkRateLimit(`reset:ip:${ip}`, { limit: 3, windowMs: 900_000 }),
+    checkRateLimit(`reset:email:${email.toLowerCase()}`, { limit: 3, windowMs: 900_000 }),
+  ])
+  if (!porIp.success || !porEmail.success) return { error: MSG_DEMASIADOS }
 
   const supabase = await createClient()
   const redirectTo = `${SITE.url}/auth/confirm?next=/admin/actualizar-password`
