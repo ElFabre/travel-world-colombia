@@ -268,7 +268,7 @@ Ejemplo del ritmo (no lo copies literal):
 "¡Hola! Claro que sí, para esas fechas tenemos disponibilidad 😊
 
 🌴 *Eje Cafetero* desde $1.100.000
-🏖️ *Panamá* desde $649 USD
+🏖️ *Punta Cana* desde $2.900.000
 
 ¿Cuál te llama más la atención?"
 
