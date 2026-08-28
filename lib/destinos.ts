@@ -2,7 +2,11 @@ import { cache } from 'react'
 import { createPublicClient } from '@/lib/supabase/publico'
 import type { Destino } from '@/types/destino'
 
-/** Lista de destinos activos, ordenados por `orden`. */
+/**
+ * Lista de destinos activos, ordenados por `orden` con desempate alfabético.
+ * Sin el desempate, los ~20 destinos con orden=0 salían en orden indeterminado
+ * de Postgres y el grid "se reordenaba solo" entre revalidaciones ISR.
+ */
 export const getDestinos = cache(async function getDestinos(): Promise<Destino[]> {
   const supabase = createPublicClient()
   const { data, error } = await supabase
@@ -10,6 +14,7 @@ export const getDestinos = cache(async function getDestinos(): Promise<Destino[]
     .select('*')
     .eq('activo', true)
     .order('orden', { ascending: true })
+    .order('nombre', { ascending: true })
 
   if (error) {
     console.error('getDestinos error:', error.message)
