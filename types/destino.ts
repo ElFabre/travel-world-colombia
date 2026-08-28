@@ -65,7 +65,11 @@ export interface Destino {
   info_clave?: InfoClave[]
   itinerario?: ItinerarioDia[]
 
+  /** LEGADO: texto libre; derivado del estructurado al guardar desde el panel. */
   precio_desde?: string
+  precio_valor?: number | null
+  precio_moneda?: 'COP' | 'USD' | null
+  precio_nota?: string | null
   incluye?: string[]
   no_incluye?: string[]
   duracion?: string

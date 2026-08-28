@@ -16,6 +16,9 @@ export const destinoSchema = z.object({
   destacado: z.boolean(),
   orden: z.number().int().min(0),
   precio_desde: z.string().optional(),
+  precio_valor: z.number().positive('El precio debe ser mayor a 0.').optional(),
+  precio_moneda: z.enum(['COP', 'USD']).optional(),
+  precio_nota: z.string().optional(),
   duracion: z.string().optional(),
   cupos_disponibles: z.number().int().min(0).optional(),
 
@@ -40,6 +43,16 @@ export const destinoSchema = z.object({
   cta_subtitulo: z.string().optional(),
   meta_title: z.string().optional(),
   meta_description: z.string().optional(),
+}).superRefine((d, ctx) => {
+  // Ambos opcionales (9 destinos no publican precio), pero en pareja: un valor
+  // sin moneda no se puede formatear ni publicar en Schema.org, y viceversa.
+  if ((d.precio_valor != null) !== (d.precio_moneda != null)) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['precio_valor'],
+      message: 'Precio: indica valor y moneda juntos (o deja ambos vacíos).',
+    })
+  }
 })
 
 export type DestinoInput = z.infer<typeof destinoSchema>
