@@ -161,8 +161,8 @@ export async function atender(e: Entrada): Promise<ResultadoTurno> {
     // Si Sol puso un marcador [foto:slug], se convierte en imagen adjunta y se
     // limpia del texto (solo destinos del catálogo; máx. una foto).
     const { texto, imagenes } = await extraerFotos(decision.mensaje.trim())
-    const { messageId } = await enviarMensaje(e.contactId, texto, ruta, imagenes)
-    if (messageId) await registrarEnviado(messageId, e.conversationId, e.contactId)
+    const envio = await enviarMensaje(e.contactId, texto, ruta, imagenes)
+    await registrarEnvio(envio, e.conversationId, e.contactId, texto, (imagenes?.length ?? 0) > 0)
   }
 
   // Escalar avisa al equipo (dispara la notificación) pero NO apaga a Sol: queda
@@ -240,4 +240,55 @@ export async function registrarEnviado(messageId: string, conversationId: string
     .from('agente_mensajes_enviados')
     .insert({ message_id: messageId, conversation_id: conversationId, contact_id: contactId })
   if (error) console.error('registrarEnviado error:', error.message)
+}
+
+/**
+ * Registra un envío de Sol, incluyendo los ids "gemelos" de los envíos con
+ * adjuntos.
+ *
+ * Cuando el mensaje lleva una foto, GHL (verificado en Instagram el 2026-08-27)
+ * lo PARTE en dos mensajes con ids distintos: el texto queda bajo un id nuevo y
+ * la API solo devuelve el del adjunto (cuerpo vacío). Si solo se registra el id
+ * devuelto, el mensaje de texto queda como saliente "desconocido" y
+ * `humanoTomoElChat` lo lee como intervención humana → falso stop_bot que deja
+ * a Sol muda con ese contacto para siempre. Por eso, tras un envío con
+ * adjuntos, se relee la conversación y se registra todo saliente RECIENTE cuyo
+ * cuerpo sea exactamente el texto enviado o esté vacío (el gemelo del adjunto).
+ * La ventana de 3 minutos evita tragarse un saliente viejo de una asesora.
+ */
+export async function registrarEnvio(
+  envio: { messageId?: string },
+  conversationId: string,
+  contactId: string,
+  texto: string,
+  conAdjuntos: boolean
+): Promise<void> {
+  if (envio.messageId) await registrarEnviado(envio.messageId, conversationId, contactId)
+  if (!conAdjuntos) return
+
+  const cuerpoEnviado = texto.trim()
+  const esGemelo = (m: MensajeGhl): m is MensajeGhl & { id: string } =>
+    m.direction === 'outbound' &&
+    Boolean(m.id) &&
+    m.id !== envio.messageId &&
+    Boolean(m.messageType) &&
+    !m.messageType!.startsWith('TYPE_ACTIVITY') &&
+    Boolean(m.dateAdded) &&
+    Date.now() - Date.parse(m.dateAdded!) < 3 * 60_000 &&
+    ((m.body ?? '').trim() === cuerpoEnviado || (m.body ?? '').trim() === '')
+
+  try {
+    // GHL puede tardar en indexar el mensaje recién creado: un reintento corto.
+    for (let intento = 0; intento < 2; intento++) {
+      const gemelos = (await ultimosMensajes(conversationId, 6)).filter(esGemelo)
+      if (gemelos.length > 0) {
+        for (const g of gemelos) await registrarEnviado(g.id, conversationId, contactId)
+        return
+      }
+      if (intento === 0) await new Promise(r => setTimeout(r, 2000))
+    }
+  } catch (err) {
+    // No es fatal: en el peor caso queda el hueco de siempre y se ve en logs.
+    console.error('registrarEnvio (gemelos) falló:', (err as Error).message)
+  }
 }

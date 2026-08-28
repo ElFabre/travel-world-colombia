@@ -8,7 +8,7 @@ import {
   rutaDeRespuesta,
   ultimosMensajes,
 } from '@/lib/agente/ghl'
-import { enHorario, humanoTomoElChat, registrarEnviado } from '@/lib/agente/conversacion'
+import { enHorario, humanoTomoElChat, registrarEnvio } from '@/lib/agente/conversacion'
 import { fechaBogota, sincronizarCrm } from '@/lib/agente/crm'
 import { extraerFotos } from '@/lib/agente/conocimiento'
 import { registrarEvento } from '@/lib/agente/eventos'
@@ -144,8 +144,8 @@ async function atenderSeguimiento(fila: FilaSeguimiento): Promise<string> {
   if (habla) {
     // Por el mismo canal por el que escribió el cliente (custom provider incluido).
     const { texto, imagenes } = await extraerFotos(decision.mensaje.trim())
-    const { messageId } = await enviarMensaje(fila.contact_id, texto, rutaDeRespuesta(mensajes), imagenes)
-    if (messageId) await registrarEnviado(messageId, fila.conversation_id, fila.contact_id)
+    const envio = await enviarMensaje(fila.contact_id, texto, rutaDeRespuesta(mensajes), imagenes)
+    await registrarEnvio(envio, fila.conversation_id, fila.contact_id, texto, (imagenes?.length ?? 0) > 0)
   }
 
   // Escalar avisa al equipo pero no apaga a Sol (espera caliente); el stop_bot
