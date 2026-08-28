@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import {
   PlusCircle, Pencil, Trash2, Eye, EyeOff, Star, StarOff, Activity, UserCheck, UserX, UserCog,
-  ClipboardList,
+  ClipboardList, Send,
 } from 'lucide-react'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getAdminUser } from '@/lib/admin/guard'
@@ -29,6 +29,7 @@ const ACCIONES: Record<AccionAudit, { label: string; color: string; Icon: typeof
   destacar:            { label: 'Destacó',         color: 'var(--orange)', Icon: Star },
   'quitar-destacado':  { label: 'Quitó destacado', color: 'var(--text-muted)', Icon: StarOff },
   'aprobar-usuario':   { label: 'Aprobó acceso',   color: '#4ade80', Icon: UserCheck },
+  'invitar-usuario':   { label: 'Invitó',          color: '#4ade80', Icon: Send },
   'revocar-usuario':   { label: 'Revocó acceso',   color: '#ef4444', Icon: UserX },
   'cambiar-rol':       { label: 'Cambió rol',      color: 'var(--orange)', Icon: UserCog },
   'guardar-reserva':   { label: 'Guardó reserva',  color: '#4ade80', Icon: ClipboardList },

@@ -5,6 +5,48 @@ import { requireAdminRole } from '@/lib/admin/guard'
 import { isSuperadmin, type Role, ROLES } from '@/lib/admin/allowlist'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { registrarActividad } from '@/lib/admin/audit'
+import { SITE } from '@/lib/site'
+
+export type InviteState = { error?: string; ok?: string }
+
+/**
+ * Invita a un correo al panel: crea la cuenta en Supabase Auth (envía el correo
+ * de invitación nativo) y la deja aprobada en la allowlist con el rol elegido.
+ * Es la única vía de alta cuando "Enable Sign ups" está apagado en Supabase.
+ */
+export async function invitarUsuario(_prev: InviteState, formData: FormData): Promise<InviteState> {
+  const { user } = await requireAdminRole()
+  const e = String(formData.get('email') ?? '').trim().toLowerCase()
+  const rol = String(formData.get('rol') ?? 'editor') as Role
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return { error: 'Ingresa un correo válido.' }
+  if (!ROLES.includes(rol)) return { error: 'Rol inválido.' }
+  if (isSuperadmin(e)) return { error: 'Ese correo ya es superadmin (ADMIN_EMAILS).' }
+
+  const admin = createAdminClient()
+
+  // El enlace del correo pasa por /auth/confirm y aterriza en el formulario de
+  // contraseña (misma ruta que usa el flujo de "olvidé mi contraseña").
+  const { error } = await admin.auth.admin.inviteUserByEmail(e, {
+    redirectTo: `${SITE.url}/auth/confirm?next=/admin/actualizar-password`,
+  })
+  if (error) {
+    if (/already.*(registered|exists|been invited)/i.test(error.message)) {
+      return { error: 'Ese correo ya tiene cuenta. Si está en "Pendientes", apruébalo directamente.' }
+    }
+    return { error: `No se pudo enviar la invitación: ${error.message}` }
+  }
+
+  // Aprobado de una vez: al aceptar la invitación entra directo con su rol.
+  const { error: errAllow } = await admin
+    .from('admin_allowlist')
+    .upsert({ email: e, rol, aprobado_por: user.email }, { onConflict: 'email' })
+  if (errAllow) return { error: `Invitación enviada, pero falló la aprobación: ${errAllow.message}` }
+
+  await registrarActividad({ email: user.email!, accion: 'invitar-usuario', nombre: `${e} → ${rol}` })
+  revalidatePath('/admin/usuarios')
+  return { ok: `Invitación enviada a ${e} (rol ${rol}). Debe abrir el correo y crear su contraseña.` }
+}
 
 /** Aprueba un correo manualmente (rol editor por defecto). Solo admin. */
 export async function aprobarUsuario(email: string): Promise<void> {
