@@ -45,7 +45,42 @@ const nextConfig: NextConfig = {
     ]
   },
   async redirects() {
+    // Mapa 301 del WordPress viejo (travelworldcolombia.com) → sitio nuevo.
+    // Fuente: page-sitemap.xml + product-sitemap.xml del sitio viejo (ago 2026).
+    // /cruceros existe en ambos sitios, no necesita redirección.
+    const aDestinos = [
+      '/caribe',
+      '/europa',
+      '/norte-america',
+      '/sur-america',
+      '/mexico',
+      '/peru',
+      '/otros-destinos',
+      '/otros-destinos-internacionales',
+      '/nuestros-destinos',
+      '/viajes-nacionales-2',
+      '/viajes-nacionales-2-2',
+      '/viajes-nacionales-en-bus',
+    ]
+    const aServicios = ['/seguros-de-viaje', '/renta-autos']
+    const aContacto = ['/contactanos', '/pagos']
+    const aNosotros = [
+      '/somos',
+      '/politicas-de-sostenibilidad',
+      '/codigo-de-conducta-del-turista-responsable',
+      '/rnt-agencia-de-viajes-2025',
+      '/politica-de-privaciadad',
+      '/politicas-y-condiciones',
+    ]
+    const aInicio = ['/tienda', '/carrito', '/mi-cuenta', '/finalizar-compra']
+
     return [
+      ...aDestinos.map(source => ({ source, destination: '/destinos', permanent: true })),
+      ...aServicios.map(source => ({ source, destination: '/servicios', permanent: true })),
+      ...aContacto.map(source => ({ source, destination: '/contacto', permanent: true })),
+      ...aNosotros.map(source => ({ source, destination: '/nosotros', permanent: true })),
+      ...aInicio.map(source => ({ source, destination: '/', permanent: true })),
+      { source: '/producto/:path*', destination: '/', permanent: true },
       {
         source: '/wp-admin/:path*',
         destination: '/',
