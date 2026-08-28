@@ -26,14 +26,38 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Security-Policy',
+            // Nota: 'unsafe-inline' en script-src se queda a propósito — los
+            // nonces exigen render por request y matarían el ISR de todo el
+            // sitio público (además GTM los necesita en la práctica).
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' *.googletagmanager.com *.facebook.net reputationhub.site",
               "frame-src 'self' reputationhub.site *.google.com www.googletagmanager.com",
               "img-src * data: blob:",
-              "connect-src * 'self'",
-              "style-src 'self' 'unsafe-inline' fonts.googleapis.com",
-              "font-src 'self' fonts.gstatic.com",
+              // Solo los backends que el navegador realmente contacta:
+              // Supabase (lecturas públicas + subida de imágenes del panel),
+              // GA4/GTM, beacons del Pixel de Meta y el widget de reseñas
+              // de GHL (reputationhub/leadconnector).
+              [
+                "connect-src 'self'",
+                '*.supabase.co',
+                '*.google-analytics.com',
+                '*.analytics.google.com',
+                '*.googletagmanager.com',
+                '*.facebook.com',
+                '*.facebook.net',
+                'reputationhub.site',
+                '*.leadconnectorhq.com',
+              ].join(' '),
+              // next/font sirve las fuentes desde el propio dominio; los hosts
+              // de Google Fonts ya no hacen falta.
+              "style-src 'self' 'unsafe-inline'",
+              "font-src 'self'",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              // 'self' (no 'none') para no contradecir X-Frame-Options: SAMEORIGIN.
+              "frame-ancestors 'self'",
             ].join('; '),
           },
         ],
