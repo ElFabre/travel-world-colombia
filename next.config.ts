@@ -64,21 +64,22 @@ const nextConfig: NextConfig = {
     ]
     const aServicios = ['/seguros-de-viaje', '/renta-autos']
     const aContacto = ['/contactanos', '/pagos']
-    const aNosotros = [
-      '/somos',
-      '/politicas-de-sostenibilidad',
-      '/codigo-de-conducta-del-turista-responsable',
-      '/rnt-agencia-de-viajes-2025',
-      '/politica-de-privaciadad',
-      '/politicas-y-condiciones',
-    ]
     const aInicio = ['/tienda', '/carrito', '/mi-cuenta', '/finalizar-compra']
+    // Páginas legales del WP viejo → sus equivalentes nuevas (slug limpio).
+    const legales = [
+      { source: '/politicas-de-sostenibilidad', destination: '/sostenibilidad' },
+      { source: '/codigo-de-conducta-del-turista-responsable', destination: '/codigo-de-conducta' },
+      { source: '/rnt-agencia-de-viajes-2025', destination: '/rnt' },
+      { source: '/politica-de-privaciadad', destination: '/privacidad' },
+      { source: '/politicas-y-condiciones', destination: '/terminos-y-condiciones' },
+    ]
 
     return [
       ...aDestinos.map(source => ({ source, destination: '/destinos', permanent: true })),
       ...aServicios.map(source => ({ source, destination: '/servicios', permanent: true })),
       ...aContacto.map(source => ({ source, destination: '/contacto', permanent: true })),
-      ...aNosotros.map(source => ({ source, destination: '/nosotros', permanent: true })),
+      { source: '/somos', destination: '/nosotros', permanent: true },
+      ...legales.map(r => ({ ...r, permanent: true })),
       ...aInicio.map(source => ({ source, destination: '/', permanent: true })),
       { source: '/producto/:path*', destination: '/', permanent: true },
       {

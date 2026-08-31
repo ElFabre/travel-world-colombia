@@ -134,10 +134,29 @@ export function Footer() {
 
       {/* Barra inferior */}
       <div className="border-t" style={{ borderColor: 'var(--border)' }}>
+        {/* Enlaces legales */}
+        <nav
+          aria-label="Enlaces legales"
+          className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-5 gap-y-1 px-6 pt-5 font-inter text-[12px]"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          {[
+            { href: '/terminos-y-condiciones', label: 'Términos y condiciones' },
+            { href: '/privacidad', label: 'Privacidad' },
+            { href: '/sostenibilidad', label: 'Sostenibilidad' },
+            { href: '/codigo-de-conducta', label: 'Turista responsable' },
+          ].map(link => (
+            <Link key={link.href} href={link.href} className="transition-colors hover:text-orange">
+              {link.label}
+            </Link>
+          ))}
+        </nav>
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-6 py-5 font-inter text-[12px] md:flex-row">
           <p>© {new Date().getFullYear()} {SITE.nombre}. Todos los derechos reservados.</p>
           <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-5" style={{ color: 'var(--text-muted)' }}>
-            <p>Registro Nacional de Turismo · RNT {SITE.rnt}</p>
+            <Link href="/rnt" className="transition-colors hover:text-orange">
+              Registro Nacional de Turismo · RNT {SITE.rnt}
+            </Link>
             <Link
               href="/admin/login"
               className="flex items-center gap-1.5 transition-colors hover:text-orange"
