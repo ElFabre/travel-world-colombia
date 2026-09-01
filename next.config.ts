@@ -12,61 +12,80 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 2_592_000,
   },
   async headers() {
+    // CSP compartida; solo cambia frame-ancestors: el sitio público no se
+    // embebe en ningún lado, pero /admin sí — es Custom Menu Link (iframe)
+    // dentro de GHL, así que se permiten los dominios de la app de GHL.
+    const csp = (frameAncestors: string) =>
+      [
+        "default-src 'self'",
+        // Nota: 'unsafe-inline' en script-src se queda a propósito — los
+        // nonces exigen render por request y matarían el ISR de todo el
+        // sitio público (además GTM los necesita en la práctica).
+        // 'unsafe-eval' solo en dev: React lo usa para reconstruir
+        // callstacks en desarrollo; en producción nunca.
+        `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''} *.googletagmanager.com *.facebook.net reputationhub.site`,
+        "frame-src 'self' reputationhub.site *.google.com www.googletagmanager.com",
+        "img-src * data: blob:",
+        // Solo los backends que el navegador realmente contacta:
+        // Supabase (lecturas públicas + subida de imágenes del panel),
+        // GA4/GTM, beacons del Pixel de Meta y el widget de reseñas
+        // de GHL (reputationhub/leadconnector).
+        [
+          "connect-src 'self'",
+          '*.supabase.co',
+          '*.google-analytics.com',
+          '*.analytics.google.com',
+          '*.googletagmanager.com',
+          '*.facebook.com',
+          '*.facebook.net',
+          'reputationhub.site',
+          '*.leadconnectorhq.com',
+        ].join(' '),
+        // next/font sirve las fuentes desde el propio dominio; los hosts
+        // de Google Fonts ya no hacen falta.
+        "style-src 'self' 'unsafe-inline'",
+        "font-src 'self'",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+        `frame-ancestors ${frameAncestors}`,
+      ].join('; ')
+
+    const comunes = [
+      { key: 'X-Content-Type-Options', value: 'nosniff' },
+      { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+      { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(self), payment=()' },
+      {
+        key: 'Strict-Transport-Security',
+        value: 'max-age=63072000; includeSubDomains; preload',
+      },
+    ]
+
     return [
       {
-        source: '/(.*)',
+        // Todo el sitio salvo /admin: sin framing de terceros.
+        source: '/((?!admin).*)',
         headers: [
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(self), payment=()' },
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload',
-          },
-          {
-            key: 'Content-Security-Policy',
-            // Nota: 'unsafe-inline' en script-src se queda a propósito — los
-            // nonces exigen render por request y matarían el ISR de todo el
-            // sitio público (además GTM los necesita en la práctica).
-            value: [
-              "default-src 'self'",
-              // 'unsafe-eval' solo en dev: React lo usa para reconstruir
-              // callstacks en desarrollo; en producción nunca.
-              `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''} *.googletagmanager.com *.facebook.net reputationhub.site`,
-              "frame-src 'self' reputationhub.site *.google.com www.googletagmanager.com",
-              "img-src * data: blob:",
-              // Solo los backends que el navegador realmente contacta:
-              // Supabase (lecturas públicas + subida de imágenes del panel),
-              // GA4/GTM, beacons del Pixel de Meta y el widget de reseñas
-              // de GHL (reputationhub/leadconnector).
-              [
-                "connect-src 'self'",
-                '*.supabase.co',
-                '*.google-analytics.com',
-                '*.analytics.google.com',
-                '*.googletagmanager.com',
-                '*.facebook.com',
-                '*.facebook.net',
-                'reputationhub.site',
-                '*.leadconnectorhq.com',
-              ].join(' '),
-              // next/font sirve las fuentes desde el propio dominio; los hosts
-              // de Google Fonts ya no hacen falta.
-              "style-src 'self' 'unsafe-inline'",
-              "font-src 'self'",
-              "object-src 'none'",
-              "base-uri 'self'",
-              "form-action 'self'",
-              // 'self' (no 'none') para no contradecir X-Frame-Options: SAMEORIGIN.
-              "frame-ancestors 'self'",
-            ].join('; '),
-          },
+          ...comunes,
+          { key: 'Content-Security-Policy', value: csp("'self'") },
         ],
       },
       {
-        source: '/admin/(.*)',
-        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+        // /admin: embebible SOLO desde GHL (Custom Menu Link). Sin
+        // X-Frame-Options — no admite lista de dominios; frame-ancestors
+        // es su reemplazo y todos los navegadores actuales lo respetan.
+        source: '/admin/:path*',
+        headers: [
+          ...comunes,
+          {
+            key: 'Content-Security-Policy',
+            value: csp(
+              "'self' https://app.gohighlevel.com https://*.gohighlevel.com https://*.leadconnectorhq.com"
+            ),
+          },
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+        ],
       },
     ]
   },
