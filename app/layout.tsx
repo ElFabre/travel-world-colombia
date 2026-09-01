@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/Footer'
 import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
 import { PublicOnly } from '@/components/layout/PublicOnly'
 import { Analytics, AnalyticsNoScript } from '@/components/analytics/Analytics'
+import { FbPixelTracker } from '@/components/analytics/FbPixelTracker'
 import { SITE, WHATSAPP, SOCIALS } from '@/lib/site'
 import { jsonLd } from '@/lib/seo/jsonLd'
 
@@ -148,8 +149,13 @@ export default function RootLayout({
         >
           Saltar al contenido
         </a>
-        <Analytics />
-        <AnalyticsNoScript />
+        {/* Tracking solo en el sitio público — el panel /admin no debe
+            alimentar píxel ni GTM (ensuciaría públicos y estadísticas). */}
+        <PublicOnly>
+          <Analytics />
+          <AnalyticsNoScript />
+          <FbPixelTracker />
+        </PublicOnly>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLd(schemaOrg) }}

@@ -5,3 +5,9 @@ export function fbEvent(eventName: string, data?: object) {
     window.fbq('track', eventName, data)
   }
 }
+
+export function fbPageView() {
+  if (typeof window !== 'undefined' && window.fbq) {
+    window.fbq('track', 'PageView')
+  }
+}

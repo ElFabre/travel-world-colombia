@@ -11,6 +11,7 @@ import {
   MESES,
 } from '@/lib/validations/cotizacion'
 import { submitCotizacion } from '@/app/contacto/actions'
+import { fbEvent } from '@/lib/analytics/fbpixel'
 import { whatsappUrl } from '@/lib/site'
 import type { Destino } from '@/types/destino'
 
@@ -53,6 +54,7 @@ export function FormularioCotizacion({ destinos }: Props) {
     setStatus('loading')
     const result = await submitCotizacion(data)
     if (result.ok) {
+      fbEvent('Lead', { content_name: 'formulario-cotizacion' })
       setStatus('success')
     } else {
       setErrorMsg(result.message)
