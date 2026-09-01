@@ -21,7 +21,8 @@ export const metadata: Metadata = {
 }
 
 export default async function Home() {
-  const destinos = await getDestinos()
+  // Sin cruceros, igual que /destinos: los cruceros tienen su propia página.
+  const destinos = (await getDestinos()).filter(d => !d.es_crucero)
 
   // Precarga la imagen LCP del hero (mismo destino que elige HeroSection por
   // defecto: primer destacado, o el primero). El hero es un background-image de

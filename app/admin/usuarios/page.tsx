@@ -1,9 +1,9 @@
 import { redirect } from 'next/navigation'
-import { ShieldCheck, Clock, Users as UsersIcon } from 'lucide-react'
+import { ShieldCheck, Clock, Users as UsersIcon, Send } from 'lucide-react'
 import { getAdminSession } from '@/lib/admin/guard'
 import { superadmins, ROLE_LABEL, type Role } from '@/lib/admin/allowlist'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { AprobarBtn, RevocarBtn, RoleSelect } from './UserActions'
+import { AprobarBtn, RevocarBtn, RoleSelect, InvitarForm } from './UserActions'
 
 export const dynamic = 'force-dynamic'
 
@@ -44,9 +44,21 @@ export default async function UsuariosPage() {
           Usuarios
         </h1>
         <p className="mt-1 font-inter text-sm" style={{ color: 'var(--text-dim)' }}>
-          Quien se registra queda <strong>pendiente</strong> hasta que un administrador lo apruebe aquí
+          El acceso al panel es solo por invitación: invita aquí a los nuevos usuarios con su rol
         </p>
       </div>
+
+      {/* Invitar: única vía de alta (el registro público de Supabase está apagado). */}
+      {esAdmin && (
+        <Seccion icon={<Send size={16} />} titulo="Invitar usuario">
+          <li
+            className="rounded-lg p-4"
+            style={{ background: 'var(--card-bg)', border: '1px solid var(--border)' }}
+          >
+            <InvitarForm />
+          </li>
+        </Seccion>
+      )}
 
       {/* Pendientes: cuentas registradas o creadas en Supabase, aún sin aprobar. */}
       {pendientes.length > 0 && (
@@ -98,13 +110,15 @@ export default async function UsuariosPage() {
   )
 }
 
-function Seccion({ icon, titulo, n, children }: { icon: React.ReactNode; titulo: string; n: number; children: React.ReactNode }) {
+function Seccion({ icon, titulo, n, children }: { icon: React.ReactNode; titulo: string; n?: number; children: React.ReactNode }) {
   return (
     <section className="mb-8">
       <h2 className="mb-3 flex items-center gap-2 font-plus-jakarta text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
         <span style={{ color: 'var(--orange)' }}>{icon}</span>
         {titulo}
-        <span className="rounded-full px-2 py-0.5 font-inter text-xs" style={{ background: 'var(--bg-alt)', border: '1px solid var(--border)', color: 'var(--text-dim)' }}>{n}</span>
+        {n !== undefined && (
+          <span className="rounded-full px-2 py-0.5 font-inter text-xs" style={{ background: 'var(--bg-alt)', border: '1px solid var(--border)', color: 'var(--text-dim)' }}>{n}</span>
+        )}
       </h2>
       <ul className="flex flex-col gap-2">{children}</ul>
     </section>

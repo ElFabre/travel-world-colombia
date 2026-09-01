@@ -33,6 +33,12 @@ dev-server.log
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# dumps de contactos/webhooks de GHL (contienen PII — nunca versionar)
+c2.json
+*.ghl.json
+*.dump.json
 
 # vercel
 .vercel

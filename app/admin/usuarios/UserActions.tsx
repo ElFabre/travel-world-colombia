@@ -1,11 +1,51 @@
 'use client'
 
-import { useTransition } from 'react'
-import { Check, X } from 'lucide-react'
-import { aprobarUsuario, revocarUsuario, cambiarRol } from './actions'
+import { useActionState, useTransition } from 'react'
+import { Check, X, Send } from 'lucide-react'
+import { aprobarUsuario, revocarUsuario, cambiarRol, invitarUsuario, type InviteState } from './actions'
 import { ROLES, ROLE_LABEL, type Role } from '@/lib/admin/allowlist'
 
 const btn = 'flex items-center gap-1.5 rounded-md px-3 py-1.5 font-inter text-xs disabled:opacity-50'
+
+/** Formulario de invitación: única vía de alta con el signup público apagado. */
+export function InvitarForm() {
+  const [state, action, pending] = useActionState<InviteState, FormData>(invitarUsuario, {})
+  return (
+    <form action={action} className="flex flex-col gap-2">
+      <div className="flex flex-wrap items-center gap-2">
+        <input
+          type="email"
+          name="email"
+          required
+          placeholder="correo@ejemplo.com"
+          className="min-w-0 flex-1 rounded-md px-3 py-1.5 font-inter text-sm outline-none"
+          style={{ background: 'var(--bg-alt)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+        />
+        <select
+          name="rol"
+          defaultValue="editor"
+          className="rounded-md px-2 py-1.5 font-inter text-xs"
+          style={{ background: 'var(--bg-alt)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+        >
+          {ROLES.map(r => (
+            <option key={r} value={r}>{ROLE_LABEL[r]}</option>
+          ))}
+        </select>
+        <button
+          type="submit"
+          disabled={pending}
+          className={btn}
+          style={{ background: 'var(--orange)', color: 'var(--orange-contrast)' }}
+        >
+          <Send size={14} />
+          {pending ? 'Enviando…' : 'Invitar'}
+        </button>
+      </div>
+      {state.error && <p className="font-inter text-xs" style={{ color: '#ef4444' }}>{state.error}</p>}
+      {state.ok && <p className="font-inter text-xs" style={{ color: 'var(--text-dim)' }}>{state.ok}</p>}
+    </form>
+  )
+}
 
 /** Selector de rol de un usuario aprobado. */
 export function RoleSelect({

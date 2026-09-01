@@ -13,6 +13,9 @@ export async function proxy(req: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      // SameSite=None para sobrevivir dentro del iframe de GHL — ver
+      // lib/supabase/server.ts (los tres clientes deben coincidir).
+      cookieOptions: { sameSite: 'none', secure: true },
       cookies: {
         getAll() {
           return req.cookies.getAll()

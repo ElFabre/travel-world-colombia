@@ -10,6 +10,7 @@ export type AccionAudit =
   | 'destacar'
   | 'quitar-destacado'
   | 'aprobar-usuario'
+  | 'invitar-usuario'
   | 'revocar-usuario'
   | 'cambiar-rol'
   | 'guardar-reserva'

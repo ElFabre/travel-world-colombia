@@ -3,19 +3,30 @@ import Link from 'next/link'
 import { Clock, ChevronRight, Star, MapPin } from 'lucide-react'
 import type { Destino } from '@/types/destino'
 import { destinoCardImg } from '@/lib/hero'
+import { precioDesde } from '@/lib/precio'
 
-/** Tarjeta de un programa. `i` solo escalona la animación de entrada. */
-export function DestinoCard({ d, i = 0 }: { d: Destino; i?: number }) {
+/**
+ * Tarjeta de un programa — única implementación, compartida por el grid del
+ * home, /destinos y /cruceros. `i` solo escalona la animación de entrada.
+ * `entrada`: 'stagger' (listados, por defecto) · 'fade' (cargar más del home)
+ * · 'none' (cards iniciales del home, sin animación).
+ */
+export function DestinoCard({
+  d, i = 0, entrada = 'stagger',
+}: { d: Destino; i?: number; entrada?: 'stagger' | 'fade' | 'none' }) {
+  const anim =
+    entrada === 'stagger'
+      ? { className: 'animate-fade-up', style: { animationDelay: `${Math.min(i, 8) * 60}ms`, animationFillMode: 'both' as const } }
+      : entrada === 'fade'
+        ? { className: 'destino-fade-in', style: undefined }
+        : { className: undefined, style: undefined }
   return (
-    <li
-      className="animate-fade-up"
-      style={{ animationDelay: `${Math.min(i, 8) * 60}ms`, animationFillMode: 'both' }}
-    >
+    <li className={anim.className} style={anim.style}>
       <Link href={`/destinos/${d.slug}`} className="destino-card u-lift tema-oscuro group flex h-full flex-col overflow-hidden rounded-lg">
         <div className="relative h-56 overflow-hidden">
           <Image
             src={destinoCardImg(d)}
-            alt={d.nombre}
+            alt={d.duracion ? `${d.nombre}, ${d.pais} — paquete de viaje de ${d.duracion}` : `${d.nombre}, ${d.pais} — paquete de viaje`}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -47,12 +58,12 @@ export function DestinoCard({ d, i = 0 }: { d: Destino; i?: number }) {
             </div>
           )}
 
-          {d.precio_desde && (
+          {precioDesde(d) && (
             <span
               className="absolute bottom-3 left-3 font-plus-jakarta text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-sm"
               style={{ background: 'var(--orange)', color: 'var(--orange-contrast)' }}
             >
-              {d.precio_desde}
+              {precioDesde(d)}
             </span>
           )}
           {d.duracion && (

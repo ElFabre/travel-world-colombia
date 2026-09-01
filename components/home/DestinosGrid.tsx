@@ -1,12 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
-import { MapPin, Clock } from 'lucide-react'
 import type { Destino } from '@/types/destino'
 import { SectionTag } from '@/components/ui/SectionTag'
-import { destinoCardImg } from '@/lib/hero'
+import { DestinoCard } from '@/components/destinos/DestinoCard'
 
 interface DestinosGridProps {
   destinos: Destino[]
@@ -45,84 +43,7 @@ export function DestinosGrid({ destinos }: DestinosGridProps) {
 
         <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {lista.map((d, i) => (
-            <li key={d.id} className={i >= INICIAL ? 'destino-fade-in' : undefined}>
-              <Link
-                href={`/destinos/${d.slug}`}
-                className="destino-card u-lift tema-oscuro group relative flex flex-col overflow-hidden rounded-lg"
-              >
-                {/* Imagen — sincronizada con el hero (preview local) */}
-                <div className="relative h-52 overflow-hidden">
-                  <Image
-                    src={destinoCardImg(d)}
-                    alt={d.nombre}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      background: 'linear-gradient(to top, rgba(8, 18, 38,0.8) 0%, transparent 60%)',
-                    }}
-                  />
-                  {d.precio_desde && (
-                    <span
-                      className="absolute bottom-3 left-3 font-plus-jakarta text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-sm"
-                      style={{ background: 'var(--orange)', color: '#fff' }}
-                    >
-                      {d.precio_desde}
-                    </span>
-                  )}
-                </div>
-
-                {/* Info */}
-                <div className="flex flex-col gap-2 p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <h3
-                      className="font-plus-jakarta text-base font-bold leading-tight"
-                      style={{ color: 'var(--text-primary)' }}
-                    >
-                      {d.nombre}
-                    </h3>
-                  </div>
-
-                  <div className="flex flex-wrap gap-3">
-                    <span
-                      className="flex items-center gap-1 font-inter text-xs"
-                      style={{ color: 'var(--text-dim)' }}
-                    >
-                      <MapPin size={12} />
-                      {d.pais}
-                    </span>
-                    {d.duracion && (
-                      <span
-                        className="flex items-center gap-1 font-inter text-xs"
-                        style={{ color: 'var(--text-dim)' }}
-                      >
-                        <Clock size={12} />
-                        {d.duracion}
-                      </span>
-                    )}
-                  </div>
-
-                  {d.descripcion && (
-                    <p
-                      className="line-clamp-2 font-inter text-base leading-relaxed"
-                      style={{ color: 'var(--text-muted)' }}
-                    >
-                      {d.descripcion}
-                    </p>
-                  )}
-
-                  <span
-                    className="mt-1 font-plus-jakarta text-[10px] font-bold tracking-[0.12em] uppercase"
-                    style={{ color: 'var(--orange)' }}
-                  >
-                    Ver detalles →
-                  </span>
-                </div>
-              </Link>
-            </li>
+            <DestinoCard key={d.id} d={d} entrada={i >= INICIAL ? 'fade' : 'none'} />
           ))}
         </ul>
 

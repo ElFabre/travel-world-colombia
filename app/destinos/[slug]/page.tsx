@@ -12,6 +12,8 @@ import { Icono } from '@/components/ui/Icono'
 import { Button } from '@/components/ui/Button'
 import { SITE, whatsappUrl, whatsappReservaUrl, whatsappDudasUrl } from '@/lib/site'
 import { jsonLd } from '@/lib/seo/jsonLd'
+import { precioDesde } from '@/lib/precio'
+import type { Destino } from '@/types/destino'
 
 export const revalidate = 1800
 
@@ -38,23 +40,21 @@ export async function generateStaticParams() {
  * 8 días" publicaba lowPrice "8998" — un precio inventado que Google puede
  * mostrar como rich result.
  */
-function precioToOffer(precio?: string): { lowPrice: string; priceCurrency: string } | null {
+function precioToOffer(
+  d: Pick<Destino, 'precio_valor' | 'precio_moneda' | 'precio_desde'>
+): { lowPrice: string; priceCurrency: string } | null {
+  // Estructurado primero: moneda declarada, sin adivinanzas.
+  if (d.precio_valor != null && d.precio_moneda) {
+    return { lowPrice: String(d.precio_valor), priceCurrency: d.precio_moneda }
+  }
+  // Legado: inferencia por regex sobre el texto libre.
+  const precio = d.precio_desde
   if (!precio) return null
   const primerNumero = precio.match(/\d[\d.,\s]*/)?.[0]
   const lowPrice = primerNumero?.replace(/[^\d]/g, '') ?? ''
   if (!lowPrice) return null
   const priceCurrency = /usd|d[oó]lar/i.test(precio) ? 'USD' : 'COP'
   return { lowPrice, priceCurrency }
-}
-
-/**
- * Antepone "Desde" solo si el precio guardado no lo trae ya (el panel sugiere
- * escribir "Desde $899 USD", lo que duplicaba la palabra en la web).
- */
-function conDesde(precio: string): string {
-  const p = precio.trim()
-  if (!/^desde\b/i.test(p)) return `Desde ${p}`
-  return p.charAt(0).toUpperCase() + p.slice(1)
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -90,7 +90,8 @@ export default async function DestinoPage({ params }: Props) {
   // muestran en carrusel).
   const infoClave = d.info_clave ?? []
 
-  const offer = precioToOffer(d.precio_desde)
+  const offer = precioToOffer(d)
+  const precioMostrar = precioDesde(d, { conNota: true })
 
   const schemaTouristDestination = {
     '@context': 'https://schema.org',
@@ -189,9 +190,9 @@ export default async function DestinoPage({ params }: Props) {
                   <Users size={14} /> {d.cupos_disponibles} cupos disponibles
                 </span>
               )}
-              {d.precio_desde && (
+              {precioMostrar && (
                 <span className="flex items-center gap-2 rounded-full px-4 py-2 font-plus-jakarta text-sm font-bold" style={{ background: 'var(--orange)', color: 'var(--orange-contrast)', boxShadow: '0 4px 20px color-mix(in srgb, var(--orange) 45%, transparent)' }}>
-                  {conDesde(d.precio_desde)}
+                  {precioMostrar}
                 </span>
               )}
             </div>
@@ -413,8 +414,8 @@ export default async function DestinoPage({ params }: Props) {
               {d.cta_subtitulo}
             </p>
           )}
-          {d.precio_desde && (
-            <p className="mt-3 font-plus-jakarta text-lg font-bold" style={{ color: 'var(--orange)' }}>{conDesde(d.precio_desde)}</p>
+          {precioMostrar && (
+            <p className="mt-3 font-plus-jakarta text-lg font-bold" style={{ color: 'var(--orange)' }}>{precioMostrar}</p>
           )}
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Button variant="whatsapp" href={waReserva}>Quiero reservar</Button>
