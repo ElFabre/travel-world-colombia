@@ -39,13 +39,26 @@ const REGIONES: { nombre: string; dx: number; dy: number }[] = [
 ]
 
 function Pill({
-  x, y, texto, activo, tenue,
-}: { x: number; y: number; texto: string; activo: boolean; tenue?: boolean }) {
+  x, y, texto, activo, tenue, onClick, onHover, onLeave,
+}: {
+  x: number; y: number; texto: string; activo: boolean; tenue?: boolean
+  onClick?: () => void; onHover?: () => void; onLeave?: () => void
+}) {
   // El mapa se muestra compacto (max-w-3xl ≈ escala 0.8), así que la pastilla
   // es un poco más grande en unidades SVG para que quede legible en pantalla.
+  // Las pastillas con onClick también filtran (mismo gesto que la silueta);
+  // sin onClick quedan decorativas y dejan pasar el clic a lo que hay debajo.
   const w = texto.length * 7.4 + 22
   return (
-    <g transform={`translate(${x - w / 2}, ${y - 13})`} style={{ pointerEvents: 'none' }}>
+    <g
+      transform={`translate(${x - w / 2}, ${y - 13})`}
+      style={{ pointerEvents: onClick ? 'auto' : 'none', cursor: onClick ? 'pointer' : undefined }}
+      // stopPropagation: la pastilla de Colombia vive dentro del <g> clicable
+      // del pin; sin esto el clic haría toggle dos veces y se anularía.
+      onClick={onClick ? e => { e.stopPropagation(); onClick() } : undefined}
+      onMouseEnter={onHover}
+      onMouseLeave={onLeave}
+    >
       <rect
         width={w}
         height={26}
@@ -138,6 +151,9 @@ export function MapaDestinos({ regiones, nacionales, seleccion, onSelect }: Mapa
               texto={conDatos ? `${nombre} · ${n}` : nombre}
               activo={seleccion === nombre || (hover === nombre && conDatos)}
               tenue={!conDatos}
+              onClick={conDatos ? () => toggle(nombre) : undefined}
+              onHover={conDatos ? () => setHover(nombre) : undefined}
+              onLeave={conDatos ? () => setHover(null) : undefined}
             />
           )
         })}
@@ -171,6 +187,9 @@ export function MapaDestinos({ regiones, nacionales, seleccion, onSelect }: Mapa
               y={COLOMBIA_XY[1] + 22}
               texto={`Colombia · ${nacionales}`}
               activo={nacionalActivo || hover === 'CO'}
+              onClick={() => toggle('nacional')}
+              onHover={() => setHover('CO')}
+              onLeave={() => setHover(null)}
             />
           </g>
         )}

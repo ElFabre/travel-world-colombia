@@ -5,7 +5,7 @@ interface TrustBadgesProps {
   className?: string
 }
 
-/** Barra de confianza — "126 reseñas ⭐⭐⭐⭐⭐ · RNT 27287 · +14 años". */
+/** Barra de confianza — "{SITE.reseñas} reseñas ⭐⭐⭐⭐⭐ · RNT 27287 · +14 años". */
 export function TrustBadges({ className = '' }: TrustBadgesProps) {
   return (
     <div

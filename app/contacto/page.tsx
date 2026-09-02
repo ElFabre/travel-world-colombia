@@ -10,7 +10,7 @@ export const revalidate = 3600
 export const metadata: Metadata = {
   title: 'Cotiza tu viaje gratis',
   description:
-    'Solicita tu cotización gratuita. Agencia de viajes en Fusagasugá con más de 126 reseñas ⭐⭐⭐⭐⭐ — RNT 27287.',
+    `Solicita tu cotización gratuita. Agencia de viajes en Fusagasugá con más de ${SITE.reseñas} reseñas ⭐⭐⭐⭐⭐ — RNT 27287.`,
   alternates: { canonical: '/contacto' },
 }
 
@@ -146,7 +146,7 @@ export default async function ContactoPage() {
                 {[
                   'Sin costo ni compromiso',
                   'Respuesta en menos de 24 horas',
-                  '126 viajeros satisfechos',
+                  `+${SITE.familias} familias atendidas`,
                   'RNT 27287 — agencia certificada',
                   'Atención personalizada',
                 ].map(item => (

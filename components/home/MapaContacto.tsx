@@ -53,6 +53,7 @@ export function MapaContacto() {
             style={{ color: 'var(--text-dim)' }}
           >
             Estamos en el corazón de Fusagasugá, listos para planear tu viaje soñado.
+            Puedes hacer tu reserva con nosotros desde cualquier lugar del mundo.
           </p>
         </div>
 

@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/Button'
-import { whatsappUrl } from '@/lib/site'
+import { SITE, whatsappUrl } from '@/lib/site'
 import { Plane } from 'lucide-react'
 
 export function CTABanner() {
@@ -57,7 +57,7 @@ export function CTABanner() {
           className="mx-auto mt-5 max-w-lg font-inter text-sm leading-relaxed sm:text-base"
           style={{ color: 'var(--text-dim)' }}
         >
-          Cotiza gratis en menos de 24 horas. Sin compromisos. Más de 126 viajeros ya confían en nosotros.
+          Cotiza gratis en menos de 24 horas. Sin compromisos. Más de {SITE.familias} familias ya confían en nosotros.
         </p>
 
         <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">

@@ -37,7 +37,7 @@ export function DestinosGrid({ destinos }: DestinosGridProps) {
             className="mx-auto mt-4 max-w-xl font-inter text-sm leading-relaxed"
             style={{ color: 'var(--text-dim)' }}
           >
-            Paquetes diseñados para cada tipo de viajero, con atención personalizada desde Fusagasugá.
+            Paquetes diseñados para cada tipo de viajero, con atención personalizada de nuestro equipo de expertos.
           </p>
         </div>
 

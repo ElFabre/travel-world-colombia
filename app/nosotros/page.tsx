@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Script from 'next/script'
-import { Target, Eye, Award, Users, MapPin, Star, Globe } from 'lucide-react'
+import { Target, Eye, Award, Users, Star, Globe } from 'lucide-react'
 import { SectionTag } from '@/components/ui/SectionTag'
 import { Button } from '@/components/ui/Button'
 import { EquipoSection } from '@/components/equipo/EquipoSection'
@@ -15,17 +15,17 @@ export const revalidate = 86400
 export const metadata: Metadata = {
   title: 'Nuestra Historia',
   description:
-    'Conoce a Travel World Colombia — agencia de viajes en Fusagasugá con más de 14 años de experiencia, 126 reseñas ⭐⭐⭐⭐⭐ y RNT 27287. Misión, visión y equipo.',
+    `Conoce a Travel World Colombia — agencia de viajes en Fusagasugá con más de 14 años de experiencia, ${SITE.reseñas} reseñas ⭐⭐⭐⭐⭐ y RNT 27287. Misión, visión y equipo.`,
   alternates: { canonical: '/nosotros' },
 }
 
 /* ─────────── DATOS ESTÁTICOS ─────────── */
 
 const STATS = [
-  { icon: Star,   to: 126, prefix: '',  suffix: '',  label: 'reseñas 5 estrellas' },
-  { icon: Globe,  to: 500, prefix: '+', suffix: '',  label: 'destinos disponibles' },
-  { icon: Users,  to: 14,  prefix: '+', suffix: '',  label: 'años de experiencia' },
-  { icon: MapPin, to: 1,   prefix: '',  suffix: '',  label: 'centro de operación' },
+  { icon: Star,   to: SITE.reseñas, prefix: '', suffix: '', label: 'reseñas 5 estrellas' },
+  { icon: Users,  to: 1500, prefix: '+', suffix: '', label: 'familias atendidas' },
+  { icon: Globe,  to: 500,  prefix: '+', suffix: '', label: 'destinos disponibles' },
+  { icon: Award,  to: 14,   prefix: '+', suffix: '', label: 'años de experiencia' },
 ]
 
 /* ─────────── COMPONENTES INTERNOS ─────────── */
@@ -421,7 +421,7 @@ export default function NosotrosPage() {
             className="mx-auto mt-5 max-w-md font-inter text-sm leading-relaxed"
             style={{ color: 'var(--text-dim)' }}
           >
-            Más de 126 familias ya viajaron con nosotros. Cotiza gratis y recibe
+            Más de {SITE.familias} familias ya viajaron con nosotros. Cotiza gratis y recibe
             una propuesta personalizada en menos de 24 horas.
           </p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">

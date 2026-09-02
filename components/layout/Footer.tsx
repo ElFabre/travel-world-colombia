@@ -62,7 +62,7 @@ export function Footer() {
           />
           <p className="mt-4 max-w-sm font-inter text-[13px] leading-relaxed">
             Agencia de viajes en {SITE.ciudad}, {SITE.region}. Paquetes nacionales e
-            internacionales todo incluido. Más de {SITE.reseñas} familias nos recomiendan.
+            internacionales todo incluido. Más de {SITE.familias} familias han viajado con nosotros.
           </p>
           <div className="mt-5 flex gap-3">
             {socialLinks.map(({ href, label, Icon }) => (

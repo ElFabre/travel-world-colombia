@@ -18,7 +18,11 @@ export const SITE = {
 
   horario: 'Lun–Vie 9am–5pm · Sáb 9am–1pm · Dom cerrado',
 
-  reseñas: 126,
+  // Reseñas de Google (actualizar a mano; el conteo automático necesitaría la
+  // API de Google Places con su key). Familias atendidas: récord contable de
+  // facturación — solo facturas, sin contar que algunas son grupos.
+  reseñas: 196,
+  familias: '1.500',
 } as const
 
 export const WHATSAPP = {

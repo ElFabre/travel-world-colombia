@@ -19,7 +19,7 @@ const schemaOrg = {
   logo: `${SITE.url}/images/travel-world-colombia-logo.png`,
   image: `${SITE.url}/og-image.jpg`,
   description:
-    'Agencia de viajes en Fusagasugá con más de 126 reseñas ⭐⭐⭐⭐⭐. Paquetes nacionales e internacionales todo incluido. RNT 27287.',
+    `Agencia de viajes en Fusagasugá con más de ${SITE.reseñas} reseñas ⭐⭐⭐⭐⭐. Paquetes nacionales e internacionales todo incluido. RNT 27287.`,
   telephone: WHATSAPP.telefonoDisplay,
   email: SITE.email,
   address: {
@@ -93,7 +93,7 @@ export const metadata: Metadata = {
     template: '%s | Travel World Colombia',
   },
   description:
-    'Agencia de viajes en Fusagasugá con más de 126 reseñas ⭐⭐⭐⭐⭐ Paquetes a todo el mundo. Cotiza gratis ✈️ RNT 27287.',
+    `Agencia de viajes en Fusagasugá con más de ${SITE.reseñas} reseñas ⭐⭐⭐⭐⭐ Paquetes a todo el mundo. Cotiza gratis ✈️ RNT 27287.`,
   keywords: [
     'agencia de viajes fusagasugá',
     'paquetes de viaje colombia',
@@ -107,7 +107,7 @@ export const metadata: Metadata = {
     url: '/',
     title: 'Agencia de Viajes Fusagasugá | Travel World Colombia',
     description:
-      'Agencia de viajes en Fusagasugá con más de 126 reseñas ⭐⭐⭐⭐⭐ Paquetes a todo el mundo. Cotiza gratis ✈️ RNT 27287.',
+      `Agencia de viajes en Fusagasugá con más de ${SITE.reseñas} reseñas ⭐⭐⭐⭐⭐ Paquetes a todo el mundo. Cotiza gratis ✈️ RNT 27287.`,
     images: [
       {
         url: '/og-image.jpg',

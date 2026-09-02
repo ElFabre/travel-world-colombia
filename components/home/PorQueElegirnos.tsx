@@ -212,7 +212,7 @@ export function PorQueElegirnos() {
         <div className="mt-16 flex flex-col items-center gap-4 text-center md:mt-20">
           <Stars size={22} color="var(--gold)" />
           <p className="font-inter text-base" style={{ color: 'var(--text-primary)' }}>
-            Más de {SITE.reseñas} familias nos recomiendan en Google
+            Más de {SITE.reseñas} reseñas de 5 estrellas en Google · +{SITE.familias} familias atendidas
           </p>
           <a
             href={SOCIALS.maps}

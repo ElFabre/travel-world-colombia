@@ -62,7 +62,7 @@ export function ComoFunciona() {
             className="font-plus-jakarta text-4xl font-extrabold leading-tight sm:text-6xl"
             style={{ color: 'var(--text-primary)' }}
           >
-            Cómo <span style={{ color: 'var(--orange)' }}>¡Funciona!</span>
+            ¿Cómo <span style={{ color: 'var(--orange)' }}>funciona?</span>
           </h2>
 
           <a
