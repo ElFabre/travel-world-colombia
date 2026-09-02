@@ -32,6 +32,7 @@ const ACCIONES: Record<AccionAudit, { label: string; color: string; Icon: typeof
   'invitar-usuario':   { label: 'Invitó',          color: '#4ade80', Icon: Send },
   'revocar-usuario':   { label: 'Revocó acceso',   color: '#ef4444', Icon: UserX },
   'cambiar-rol':       { label: 'Cambió rol',      color: 'var(--orange)', Icon: UserCog },
+  'cambiar-nombre-usuario': { label: 'Cambió nombre', color: 'var(--orange)', Icon: UserCog },
   'guardar-reserva':   { label: 'Guardó reserva',  color: '#4ade80', Icon: ClipboardList },
 }
 

@@ -13,6 +13,7 @@ export type AccionAudit =
   | 'invitar-usuario'
   | 'revocar-usuario'
   | 'cambiar-rol'
+  | 'cambiar-nombre-usuario'
   | 'guardar-reserva'
 
 interface RegistroActividad {

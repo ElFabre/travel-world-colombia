@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { requireAdminRole } from '@/lib/admin/guard'
+import { requireAdminRole, requireEditor } from '@/lib/admin/guard'
 import { isSuperadmin, type Role, ROLES } from '@/lib/admin/allowlist'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { registrarActividad } from '@/lib/admin/audit'
@@ -18,6 +18,7 @@ export async function invitarUsuario(_prev: InviteState, formData: FormData): Pr
   const { user } = await requireAdminRole()
   const e = String(formData.get('email') ?? '').trim().toLowerCase()
   const rol = String(formData.get('rol') ?? 'editor') as Role
+  const nombre = String(formData.get('nombre') ?? '').trim() || null
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return { error: 'Ingresa un correo válido.' }
   if (!ROLES.includes(rol)) return { error: 'Rol inválido.' }
@@ -40,7 +41,7 @@ export async function invitarUsuario(_prev: InviteState, formData: FormData): Pr
   // Aprobado de una vez: al aceptar la invitación entra directo con su rol.
   const { error: errAllow } = await admin
     .from('admin_allowlist')
-    .upsert({ email: e, rol, aprobado_por: user.email }, { onConflict: 'email' })
+    .upsert({ email: e, rol, nombre, aprobado_por: user.email }, { onConflict: 'email' })
   if (errAllow) return { error: `Invitación enviada, pero falló la aprobación: ${errAllow.message}` }
 
   await registrarActividad({ email: user.email!, accion: 'invitar-usuario', nombre: `${e} → ${rol}` })
@@ -61,6 +62,22 @@ export async function aprobarUsuario(email: string): Promise<void> {
   if (error) throw new Error(error.message)
 
   await registrarActividad({ email: user.email!, accion: 'aprobar-usuario', nombre: e })
+  revalidatePath('/admin/usuarios')
+}
+
+/** Cambia el nombre visible de un usuario aprobado (admin o editor). */
+export async function cambiarNombre(email: string, nombre: string): Promise<void> {
+  const { user } = await requireEditor()
+  const e = email.trim().toLowerCase()
+  const n = nombre.trim()
+  if (!e) throw new Error('Correo vacío.')
+  if (n.length > 80) throw new Error('El nombre es demasiado largo.')
+
+  const admin = createAdminClient()
+  const { error } = await admin.from('admin_allowlist').update({ nombre: n || null }).eq('email', e)
+  if (error) throw new Error(error.message)
+
+  await registrarActividad({ email: user.email!, accion: 'cambiar-nombre-usuario', nombre: `${e} → ${n || '(vacío)'}` })
   revalidatePath('/admin/usuarios')
 }
 

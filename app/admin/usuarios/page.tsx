@@ -3,13 +3,13 @@ import { ShieldCheck, Clock, Users as UsersIcon, Send } from 'lucide-react'
 import { getAdminSession } from '@/lib/admin/guard'
 import { superadmins, ROLE_LABEL, type Role } from '@/lib/admin/allowlist'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { AprobarBtn, RevocarBtn, RoleSelect, InvitarForm } from './UserActions'
+import { AprobarBtn, RevocarBtn, RoleSelect, InvitarForm, NombreEditable } from './UserActions'
 
 export const dynamic = 'force-dynamic'
 
 const fmtFecha = new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'America/Bogota' })
 
-interface AllowRow { email: string; rol: Role | null; aprobado_por: string | null; created_at: string }
+interface AllowRow { email: string; nombre: string | null; rol: Role | null; aprobado_por: string | null; created_at: string }
 
 export default async function UsuariosPage() {
   const session = await getAdminSession()
@@ -20,7 +20,7 @@ export default async function UsuariosPage() {
 
   const admin = createAdminClient()
   const [{ data: aprobados }, { data: usersData }] = await Promise.all([
-    admin.from('admin_allowlist').select('email, rol, aprobado_por, created_at').order('created_at', { ascending: false }),
+    admin.from('admin_allowlist').select('email, nombre, rol, aprobado_por, created_at').order('created_at', { ascending: false }),
     admin.auth.admin.listUsers(),
   ])
 
@@ -64,7 +64,7 @@ export default async function UsuariosPage() {
       {pendientes.length > 0 && (
         <Seccion icon={<Clock size={16} />} titulo="Pendientes" n={pendientes.length}>
           {pendientes.map(u => (
-            <Fila key={u.id} email={u.email ?? '—'} sub={`Registrado el ${fmtFecha.format(new Date(u.created_at))}`}>
+            <Fila key={u.id} titulo={u.email ?? '—'} sub={`Registrado el ${fmtFecha.format(new Date(u.created_at))}`}>
               {puedeModificar ? <AprobarBtn email={u.email ?? ''} /> : null}
             </Fila>
           ))}
@@ -82,9 +82,9 @@ export default async function UsuariosPage() {
             return (
               <Fila
                 key={a.email}
-                email={a.email}
+                titulo={<NombreEditable email={a.email} nombre={a.nombre} puedeEditar={puedeModificar} />}
                 badge={<EstadoBadge authExiste={Boolean(authUser)} confirmado={Boolean(authUser?.email_confirmed_at)} />}
-                sub={<>Rol: {ROLE_LABEL[(a.rol ?? 'lector') as Role]} · alta {fmtFecha.format(new Date(a.created_at))}{a.aprobado_por ? ` · por ${a.aprobado_por}` : ''}{esYo ? ' · (tú)' : ''}</>}
+                sub={<>{a.email} · {ROLE_LABEL[(a.rol ?? 'lector') as Role]} · alta {fmtFecha.format(new Date(a.created_at))}{a.aprobado_por ? ` · por ${a.aprobado_por}` : ''}{esYo ? ' · (tú)' : ''}</>}
               >
                 {puedeModificar && (
                   <div className="flex items-center gap-2">
@@ -100,11 +100,14 @@ export default async function UsuariosPage() {
 
       {/* Superadmins (env) */}
       <Seccion icon={<ShieldCheck size={16} />} titulo="Superadmins (fijos)" n={supers.length}>
-        {supers.map(e => (
-          <Fila key={e} email={e} sub="Admin · definido en ADMIN_EMAILS · no se puede cambiar aquí">
+        {supers.map(e => {
+          const nombre = filas.find(a => a.email.toLowerCase() === e)?.nombre
+          return (
+          <Fila key={e} titulo={nombre ?? e} sub={`${nombre ? `${e} · ` : ''}Admin · definido en ADMIN_EMAILS · no se puede cambiar aquí`}>
             <span className="font-inter text-xs" style={{ color: 'var(--text-muted)' }}>Permanente</span>
           </Fila>
-        ))}
+          )
+        })}
       </Seccion>
     </>
   )
@@ -125,7 +128,7 @@ function Seccion({ icon, titulo, n, children }: { icon: React.ReactNode; titulo:
   )
 }
 
-function Fila({ email, sub, badge, children }: { email: string; sub: React.ReactNode; badge?: React.ReactNode; children: React.ReactNode }) {
+function Fila({ titulo, sub, badge, children }: { titulo: React.ReactNode; sub: React.ReactNode; badge?: React.ReactNode; children: React.ReactNode }) {
   return (
     <li
       className="flex items-center gap-4 rounded-lg p-3"
@@ -133,7 +136,7 @@ function Fila({ email, sub, badge, children }: { email: string; sub: React.React
     >
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <p className="truncate font-inter text-sm" style={{ color: 'var(--text-primary)' }}>{email}</p>
+          <div className="min-w-0 truncate font-inter text-sm" style={{ color: 'var(--text-primary)' }}>{titulo}</div>
           {badge}
         </div>
         <p className="truncate font-inter text-xs" style={{ color: 'var(--text-muted)' }}>{sub}</p>
