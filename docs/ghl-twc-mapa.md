@@ -129,12 +129,18 @@ Campos del agente Sol (creados por API el 2026-08-04, propuesta §6.2 del diseñ
 
 ### Pipeline de ventas (espejo de las etapas del PIPELINE PRINCIPAL)
 - `99784d96` 1.-Nuevo Lead (Actualización den Pipeline)
-- `7a2a522c` **2.-Calificado por Bot (Actualización en Pipeline)** ← v45, muy iterado; clave para el agente
+- `7a2a522c` **2.-Calificado por Bot (Actualización en Pipeline)** ← v45, muy iterado; clave para el agente.
+  Desde 2026-09-01 además crea una TAREA "🤖 Cotizar lead calificado por Sol" (asignada al
+  Contact's Assigned User, con el campo *Mensaje de cotización* en la descripción) después del paso de asignación.
 - `40df1f58` 4.-Contactado · `939394cd` 5.- Cotización en Proceso · `29dca22e` 6.- Cotización enviada
 - `f0b80f21` 7.- En Seguimiento · `c093feef` Documentacion · `dd2b503e` 8.- Cierre Ganado
 - `44ef6e3e` Ganado / Abonado · `6ace2f77` 9.- Cierre Perdido · `c0394b05` 10.- Cierre Abandonado
 
 ### Bot / IA
+- **Escalada a humano** (creado 2026-09-01) ← dispara con tag `transferencia a humano`:
+  SMS interno al usuario asignado + tarea "🚨 Cliente pidió humano / escalado por Sol".
+  Antes de esto NADA reaccionaba al tag: la escalada dura solo dejaba tag + nota.
+  ⚠️ No debe enviar mensajes al cliente (Sol lo leería como intervención humana → `stop_bot`).
 - `45776930` **Stop/Active Bot** (v15) ← el switch del bot actual; seguramente reacciona al tag `stop_bot`
 - `a8191fc5` Nombre de usuario (probable: guarda `contact.ia__nombre`)
 

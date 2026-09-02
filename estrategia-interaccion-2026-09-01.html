@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <title>Estrategia Meta Ads — Interacción WhatsApp · Travel World Colombia</title>
+  <style>
+    body { font-family: 'Lato', sans-serif; background: #F5F6F7; color: #2e3848; padding: 32px; margin: 0; }
+    h1 { color: #2e3848; font-size: 28px; font-weight: 900; margin-bottom: 4px; }
+    .subtitle { color: #666; margin-bottom: 24px; font-size: 14px; font-weight: 300; }
+    .presupuesto-total { background: #2e3848; color: #74fbfb; padding: 16px 24px; border-radius: 12px; margin-bottom: 16px; font-size: 18px; font-weight: 700; display: inline-block; }
+    .alerta { background: #fff3cd; border: 1px solid #ffc107; color: #664d03; padding: 16px 20px; border-radius: 10px; margin-bottom: 28px; font-size: 14px; line-height: 1.6; max-width: 860px; }
+    .alerta strong { color: #2e3848; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 0; }
+    .tab-btn { background: #dfe3e8; border: none; padding: 14px 28px; border-radius: 12px 12px 0 0; font-family: 'Lato', sans-serif; font-size: 15px; font-weight: 900; color: #666; cursor: pointer; }
+    .tab-btn.active { background: #2e3848; color: #74fbfb; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .campaña { background: white; border-radius: 0 16px 16px 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(46,56,72,0.08); }
+    .campaña-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 8px; }
+    .campaña-nombre { font-size: 20px; font-weight: 900; }
+    .campaña-presupuesto { background: rgba(116,251,251,0.15); color: #376290; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 14px; }
+    .bloque-titulo { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 900; color: #376290; margin: 18px 0 10px; }
+    .params { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 8px; }
+    .param { background: #F5F6F7; border-radius: 8px; padding: 12px; }
+    .param-label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; font-weight: 700; }
+    .param-value { font-size: 14px; font-weight: 700; color: #2e3848; }
+    table.conjuntos { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
+    table.conjuntos th { background: #2e3848; color: #74fbfb; text-align: left; padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    table.conjuntos td { border: 1px solid #e9ecef; padding: 12px; vertical-align: top; line-height: 1.5; }
+    table.conjuntos tr td:first-child { font-weight: 900; color: #376290; white-space: nowrap; }
+    .anuncios { background: #F5F6F7; border-radius: 10px; padding: 16px 20px; margin-top: 18px; }
+    .anuncios h4 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #376290; }
+    .anuncios p { margin: 4px 0; font-size: 13px; line-height: 1.6; }
+    .pill { display: inline-block; background: white; border: 1px solid #8dd0df; border-radius: 14px; padding: 3px 10px; margin: 3px 4px 3px 0; font-size: 12px; font-weight: 700; color: #376290; }
+    .footer { margin-top: 40px; background: #2e3848; padding: 32px; text-align: center; color: #8dd0df; font-size: 12px; border-radius: 12px; }
+    .disclaimer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(46,56,72,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    .disclaimer-box { background: white; border-radius: 16px; padding: 40px; max-width: 520px; text-align: center; }
+    .disclaimer-box h2 { font-size: 20px; font-weight: 900; margin-bottom: 16px; color: #2e3848; }
+    .disclaimer-box p { font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 24px; }
+    .disclaimer-box button { background: #2e3848; color: #74fbfb; border: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; }
+    .disclaimer-box button:hover { background: #376290; }
+  </style>
+</head>
+<body>
+  <div class="disclaimer-overlay" id="disclaimer">
+    <div class="disclaimer-box">
+      <h2>Antes de continuar</h2>
+      <p>Este reporte es una herramienta de apoyo basada en los datos que proporcionaste. Las estructuras de campañas, presupuestos y creativos son <strong>ideas y puntos de partida</strong>, no recomendaciones definitivas.<br><br>Cada negocio es diferente. Usa este reporte como complemento de lo que aprendes en la comunidad de Felipe Vergara, no como sustituto.</p>
+      <button onclick="document.getElementById('disclaimer').style.display='none'">Acepto y entiendo →</button>
+    </div>
+  </div>
+
+  <h1>📊 Estrategia Meta Ads — Interacción (WhatsApp)</h1>
+  <p class="subtitle">Travel World Colombia · Metodología Felipe Vergara — generado con Claude</p>
+  <div class="presupuesto-total">💰 Presupuesto mensual: $120.000 COP (~$30 USD)</div>
+
+  <div class="alerta">
+    ⚠️ <strong>El presupuesto está por debajo de los mínimos de Meta.</strong> Esta cuenta exige ~$3.100 COP/día por conjunto de anuncios. Con $120.000 COP/mes, la campaña de Presentación (3 conjuntos bajo CBO) queda en $3.200 COP/día para repartir entre 3 conjuntos, y Evaluación en $800 COP/día — Meta no permitirá publicar así. <strong>Presupuesto mínimo realista para esta estructura completa: ~$372.000 COP/mes (~$93 USD), es decir $12.400 COP/día.</strong> Alternativa con el presupuesto actual: publicar solo la campaña de Presentación con 1 conjunto (el Abierto) a $4.000 COP/día, y activar el resto de la estructura cuando suba el presupuesto.
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="verTab(event,'presentacion')">🎯 Presentación</button>
+    <button class="tab-btn" onclick="verTab(event,'evaluacion')">🔁 Evaluación</button>
+  </div>
+
+  <!-- ══════════ PRESENTACIÓN ══════════ -->
+  <div class="tab-panel active" id="presentacion">
+    <div class="campaña">
+      <div class="campaña-header">
+        <div class="campaña-nombre">🎯 Presentación — 80%</div>
+        <div class="campaña-presupuesto">$96.000 COP/mes · $3.200 COP/día (CBO, campaña) · $1.066 COP/día por conjunto</div>
+      </div>
+      <div class="bloque-titulo">Campaña</div>
+      <div class="params">
+        <div class="param"><div class="param-label">Objetivo</div><div class="param-value">Interacción</div></div>
+        <div class="param"><div class="param-label">App de mensajería</div><div class="param-value">WhatsApp</div></div>
+        <div class="param"><div class="param-label">CBO Advantage+</div><div class="param-value">ON</div></div>
+        <div class="param"><div class="param-label">Evento de conversión</div><div class="param-value">No aplica</div></div>
+        <div class="param"><div class="param-label">Calendario</div><div class="param-value">Indefinido</div></div>
+        <div class="param"><div class="param-label">Ubicaciones</div><div class="param-value">Advantage+</div></div>
+      </div>
+      <div class="bloque-titulo">Conjuntos de anuncios</div>
+      <table class="conjuntos">
+        <tr><th>Conjunto</th><th>Público</th><th>Exclusiones</th></tr>
+        <tr>
+          <td>1 · Abierto</td>
+          <td>Colombia, H+M, 18-65+</td>
+          <td>FB 90d · IG 90d · Video +10s 90d · Web 90d · Compradores 180d · Lista clientes</td>
+        </tr>
+        <tr>
+          <td>2 · Intereses</td>
+          <td>Colombia, H+M, 18-40 + Intereses</td>
+          <td>FB 90d · IG 90d · Video +10s 90d · Web 90d · Compradores 180d · Lista clientes</td>
+        </tr>
+        <tr>
+          <td>3 · Similares</td>
+          <td>Colombia, H+M, 18-40 · LAL 1% Compras 180d + LAL 1% Lista clientes</td>
+          <td>FB 90d · IG 90d · Video +10s 90d · Web 90d · Compradores 180d · Lista clientes</td>
+        </tr>
+      </table>
+      <div class="anuncios">
+        <h4>Anuncios recomendados (3 a 6 creativos, los mismos en los 3 conjuntos)</h4>
+        <p>
+          <span class="pill">Demostración</span><span class="pill">Aspiracional</span><span class="pill">Beneficios</span><span class="pill">Educativo</span><span class="pill">Pantalla dividida</span><span class="pill">Humano</span><span class="pill">Prensa</span>
+        </p>
+        <p><strong>Nivel de consciencia:</strong> Inconsciente, Problema y Solución.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ EVALUACIÓN ══════════ -->
+  <div class="tab-panel" id="evaluacion">
+    <div class="campaña">
+      <div class="campaña-header">
+        <div class="campaña-nombre">🔁 Evaluación — 20%</div>
+        <div class="campaña-presupuesto">$24.000 COP/mes · $800 COP/día</div>
+      </div>
+      <div class="bloque-titulo">Campaña</div>
+      <div class="params">
+        <div class="param"><div class="param-label">Objetivo</div><div class="param-value">Interacción</div></div>
+        <div class="param"><div class="param-label">App de mensajería</div><div class="param-value">WhatsApp</div></div>
+        <div class="param"><div class="param-label">CBO Advantage+</div><div class="param-value">ON</div></div>
+        <div class="param"><div class="param-label">Evento de conversión</div><div class="param-value">No aplica</div></div>
+        <div class="param"><div class="param-label">Calendario</div><div class="param-value">Indefinido</div></div>
+        <div class="param"><div class="param-label">Ubicaciones</div><div class="param-value">Advantage+</div></div>
+      </div>
+      <div class="bloque-titulo">Conjuntos de anuncios</div>
+      <table class="conjuntos">
+        <tr><th>Conjunto</th><th>Público</th><th>Exclusiones</th></tr>
+        <tr>
+          <td>1 · Retargeting 30d</td>
+          <td>Colombia, H+M, 18-65 — FB 30d + IG 30d + Video medio 30d + Web 30d</td>
+          <td>Compradores 30d · Lista clientes</td>
+        </tr>
+      </table>
+      <div class="anuncios">
+        <h4>Anuncios recomendados (3 a 6 creativos)</h4>
+        <p>
+          <span class="pill">Testimonio</span><span class="pill">Prensa</span><span class="pill">Producto</span><span class="pill">Beneficios</span><span class="pill">Promociones</span>
+        </p>
+        <p><strong>Nivel de consciencia:</strong> Producto y Decisión.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Estructura según metodología Felipe Vergara · Presupuesto ≤ $600 USD → 2 campañas: Presentación 80% + Evaluación 20% · Sin Conversión ni Ascensión hasta subir presupuesto · Travel World Colombia · 2026-09-01
+  </div>
+
+  <script>
+    function verTab(e, id) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      e.currentTarget.classList.add('active');
+    }
+  </script>
+</body>
+</html>

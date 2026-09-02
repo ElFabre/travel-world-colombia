@@ -1,24 +1,60 @@
 # HANDOFF — Travel World Colombia
 
-> Punto de entrada para una **sesión nueva**. Actualizado **2026-08-26**.
+> Punto de entrada para una **sesión nueva**. Actualizado **2026-08-30**.
 > Lee también `AGENTS.md` (esta versión de Next tiene cambios de API: consulta
 > `node_modules/next/dist/docs/` antes de escribir código nuevo) y la memoria
 > persistente del proyecto (se carga sola; `MEMORY.md` es el índice).
 
 ---
 
-## ⏭️ PRÓXIMA SESIÓN: curso de inducción GHL para agentes de viajes
+## ✅ DOMINIO MIGRADO (2026-08-30) — travelworldcolombia.com en producción
 
-Pedido del usuario (2026-08-26, aún NO diseñado — la próxima sesión ARRANCA
-conversando esto): **un curso de cero a cien de GoHighLevel para los
-representantes/operadores de la agencia**. Objetivo: que sepan usar la
-plataforma con eficiencia — agendar tareas, modificar oportunidades, operar los
-pipelines nuevos, "sacarle el máximo provecho" — porque un equipo que domina la
-plataforma es lo que le permite al usuario automatizar procesos encima.
-Contexto clave: la guía visual del embudo nuevo ya existe como Artifact
-(**"Embudo TWC"** — https://claude.ai/code/artifact/2868f34c-d7a6-421c-bbc2-6a2704b127a5)
-y puede ser el módulo semilla del curso. El curso es TAMBIÉN el prerequisito de
-la Fase 5 de la migración (los campos viejos no se borran hasta capacitar).
+**El dominio real ya sirve el sitio de Vercel.** Cutover sin caída, correo
+intacto, Search Console actualizado (sitemap enviado). Detalle completo en la
+memoria `dominio-pendiente`. Resumen operativo:
+
+- **DNS** (zona en el cPanel del hosting viejo, NS redexpertos): A del apex →
+  `216.198.79.1` (Vercel, TTL 300); `www` CNAME → apex (Vercel lo 308-redirige
+  al apex, que es el canónico). `mail.` → `23.111.141.202` y MX →
+  `mail.travelworldcolombia.com` — el **correo sigue en el hosting viejo**.
+- ⚠️ **NO cancelar el hosting viejo**: ahora es el servidor de correo (17
+  cuentas). Rollback del sitio = devolver el A a `23.111.141.202` (5 min).
+- **Redirects 301 del WP viejo** en `next.config.ts` (28 páginas + productos,
+  sacados de sus sitemaps). En producción y verificados.
+- **Páginas legales construidas** (commit `037b00d` en main): `/sostenibilidad`,
+  `/codigo-de-conducta`, `/rnt` (¡2º registro descubierto: RNT 118011
+  mayorista!), `/privacidad` (reescrita según Ley 1581/2012 — **pendiente
+  revisión de abogado**), `/terminos-y-condiciones`. Armazón compartido:
+  `components/legal/LegalShell.tsx`. Enlaces en el footer + sitemap.
+- `NEXT_PUBLIC_SITE_URL=https://travelworldcolombia.com` en Vercel (Production,
+  tipo Config) → canonicals/OG correctos. Los webhooks/crons siguen usando
+  `travel-world-colombia.vercel.app` y **siguen funcionando** (el alias no se
+  pierde).
+- ⚠️ **Conflicto pendiente**: al mergear `mejoras/p0-p2` a main chocará la
+  sección `redirects()` de `next.config.ts` — conservar el mapeo `legales` de
+  main.
+- Vigilancia: GSC ~2 semanas (404/cobertura; "Descubierta: sin indexar" es
+  normal). Backup del WP viejo desde cPanel aún pendiente.
+
+---
+
+## ⏭️ FRENTE ABIERTO: curso de inducción GHL para agentes de viajes
+
+**Contenido COMPLETO escrito (2026-08-26) en `docs/curso-ghl/`** — 7 módulos
+(mapa mental, conversaciones/Sol, embudo 🎯 Leads, tarjeta, tareas/agenda,
+🗂️ Reservaciones, reglas de oro + checklist de certificación), con ejercicios
+sobre contactos de prueba (`PRUEBA - <nombre>` + tag `pruebas`). Decisiones del
+usuario: formato = **herramienta de Comunidades de GHL en la subcuenta TWC**;
+alcance = cero a cien completo; evaluación = ejercicios + checklist validado
+por él. Guía de montaje paso a paso: `docs/curso-ghl/montaje-comunidad.md`
+(la comunidad/curso se crea en la UI de GHL — no hay API pública).
+
+**Pendiente:** crear el grupo "Academia TWC" + curso en la UI, pegar las
+lecciones, incrustar la guía visual (Artifact **"Embudo TWC"** —
+https://claude.ai/code/artifact/2868f34c-d7a6-421c-bbc2-6a2704b127a5 — como
+imagen/PDF en la lección 2.1), invitar al equipo y correr la certificación.
+El curso sigue siendo prerequisito de la Fase 5 de la migración (los campos
+viejos no se borran hasta certificar a todo el equipo).
 
 ---
 
@@ -264,6 +300,10 @@ esa es la fuente de verdad.
 7. Históricos aún abiertos: registros públicos de Supabase (Sign Ups),
    protección HaveIBeenPwned, precio de "Perú de Colores", fotos del
    itinerario perdidas, fotos de los 7 paquetes ocultos de Drive.
+8. **Post-dominio**: backup del WP viejo desde cPanel · revisar `/privacidad`
+   con abogado · vigilar GSC (404/cobertura) ~2 semanas · confirmar que los
+   Outlook/celulares del equipo usen `mail.travelworldcolombia.com` como
+   servidor de correo (no el dominio a secas).
 
 ## ⏭️ CANDIDATOS PARA SESIONES FUTURAS
 
@@ -273,6 +313,8 @@ esa es la fuente de verdad.
 - Fase 4 de la web: menú con dropdowns.
 - Botón "Editar" en el panel de FAQs.
 - Probar un seguimiento real de punta a punta (tras resolver el cron).
+- Migrar el correo a Google Workspace/Zoho para poder cancelar el hosting
+  viejo (disco al 85%; hasta entonces el hosting NO se toca).
 - ~~Workflow de progresión de pipeline al asignar~~ → resuelto por el circuito
   nuevo (la asignación mueve a "Asignado a Agente" en el pipeline nuevo).
 
@@ -283,7 +325,8 @@ esa es la fuente de verdad.
 **Stack:** Next.js 16.2.7 (App Router, Turbopack) · React 19 · Tailwind v4 ·
 TypeScript · Supabase · GoHighLevel (API REST con `GHL_TWC_PIT`) · Claude Opus 5.
 **Repo:** `C:\Users\efabr\Travelworldcolombia`.
-**Producción:** https://travel-world-colombia.vercel.app
+**Producción:** https://travelworldcolombia.com (el alias
+travel-world-colombia.vercel.app sigue activo — webhooks/crons lo usan).
 
 ### Gotchas vigentes
 
