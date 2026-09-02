@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server'
 import { timingSafeEqual } from 'node:crypto'
 import { correrVigilancia } from '@/lib/agente/vigilante'
+import { secretoRecibido } from '@/lib/agente/secreto'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -32,8 +33,7 @@ function autorizado(req: NextRequest): boolean {
   const bearer = (req.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '')
   if (igual(bearer, process.env.CRON_SECRET)) return true
 
-  const secreto = req.headers.get('x-sol-secret') ?? req.nextUrl.searchParams.get('secret') ?? ''
-  return igual(secreto, process.env.AGENTE_WEBHOOK_SECRET)
+  return igual(secretoRecibido(req), process.env.AGENTE_WEBHOOK_SECRET)
 }
 
 export async function GET(req: NextRequest) {

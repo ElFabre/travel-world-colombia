@@ -19,6 +19,13 @@ function token(): string {
   return t
 }
 
+/**
+ * Codifica un id antes de interpolarlo en la ruta. Los ids vienen de payloads
+ * externos (webhooks, el panel): uno con `/` o `?` cambiaría la ruta que se
+ * llama con el PIT.
+ */
+const id = encodeURIComponent
+
 async function pedir<T>(ruta: string): Promise<T> {
   const res = await fetch(`${GHL.api}${ruta}`, {
     headers: {
@@ -145,12 +152,12 @@ export async function enviarMensaje(
 
 /** Agrega tags al contacto (escalada, estado, fuera de alcance). */
 export async function agregarTags(contactId: string, tags: string[]): Promise<void> {
-  await mandar('POST', `/contacts/${contactId}/tags`, { tags })
+  await mandar('POST', `/contacts/${id(contactId)}/tags`, { tags })
 }
 
 /** Quita tags del contacto (p. ej. re-armar el vigilante cuando ya respondieron). */
 export async function quitarTags(contactId: string, tags: string[]): Promise<void> {
-  await mandar('DELETE', `/contacts/${contactId}/tags`, { tags })
+  await mandar('DELETE', `/contacts/${id(contactId)}/tags`, { tags })
 }
 
 /**
@@ -161,7 +168,7 @@ export async function actualizarCampos(
   contactId: string,
   campos: { id: string; field_value: string | number | string[] }[]
 ): Promise<void> {
-  await mandar('PUT', `/contacts/${contactId}`, { customFields: campos })
+  await mandar('PUT', `/contacts/${id(contactId)}`, { customFields: campos })
 }
 
 /**
@@ -172,12 +179,12 @@ export async function actualizarContacto(
   contactId: string,
   cuerpo: Record<string, unknown>
 ): Promise<void> {
-  await mandar('PUT', `/contacts/${contactId}`, cuerpo)
+  await mandar('PUT', `/contacts/${id(contactId)}`, cuerpo)
 }
 
 /** Nota interna en el timeline del contacto (la ven las asesoras, no el cliente). */
 export async function crearNota(contactId: string, texto: string): Promise<void> {
-  await mandar('POST', `/contacts/${contactId}/notes`, { body: texto })
+  await mandar('POST', `/contacts/${id(contactId)}/notes`, { body: texto })
 }
 
 export interface CampoPersonalizadoGhl {
@@ -236,7 +243,7 @@ export async function actualizarCamposOportunidad(
   opportunityId: string,
   campos: { id: string; field_value: string | number | string[] }[]
 ): Promise<void> {
-  await mandar('PUT', `/opportunities/${opportunityId}`, { customFields: campos })
+  await mandar('PUT', `/opportunities/${id(opportunityId)}`, { customFields: campos })
 }
 
 export interface OportunidadGhl {
@@ -250,7 +257,7 @@ export interface OportunidadGhl {
 /** Oportunidades de un contacto (para saber en qué etapa del pipeline va). */
 export async function oportunidadesDe(contactId: string): Promise<OportunidadGhl[]> {
   const r = await pedir<{ opportunities?: OportunidadGhl[] }>(
-    `/opportunities/search?location_id=${GHL.locationId}&contact_id=${contactId}`
+    `/opportunities/search?location_id=${GHL.locationId}&contact_id=${id(contactId)}`
   )
   return r.opportunities ?? []
 }
@@ -266,7 +273,7 @@ export async function moverOportunidad(
   pipelineStageId: string,
   status?: 'open' | 'won' | 'lost' | 'abandoned'
 ): Promise<void> {
-  await mandar('PUT', `/opportunities/${opportunityId}`, {
+  await mandar('PUT', `/opportunities/${id(opportunityId)}`, {
     pipelineId,
     pipelineStageId,
     ...(status ? { status } : {}),
@@ -293,20 +300,20 @@ export async function obtenerOportunidad(
   opportunityId: string
 ): Promise<OportunidadDetalleGhl | null> {
   const r = await pedir<{ opportunity?: OportunidadDetalleGhl }>(
-    `/opportunities/${opportunityId}`
+    `/opportunities/${id(opportunityId)}`
   )
   return r.opportunity ?? null
 }
 
 export async function obtenerContacto(contactId: string): Promise<ContactoGhl | null> {
-  const r = await pedir<{ contact?: ContactoGhl }>(`/contacts/${contactId}`)
+  const r = await pedir<{ contact?: ContactoGhl }>(`/contacts/${id(contactId)}`)
   return r.contact ?? null
 }
 
 /** Conversación más reciente de un contacto. */
 export async function conversacionDe(contactId: string): Promise<ConversacionGhl | null> {
   const r = await pedir<{ conversations?: ConversacionGhl[] }>(
-    `/conversations/search?locationId=${GHL.locationId}&contactId=${contactId}&limit=1`
+    `/conversations/search?locationId=${GHL.locationId}&contactId=${id(contactId)}&limit=1`
   )
   return r.conversations?.[0] ?? null
 }
@@ -314,7 +321,7 @@ export async function conversacionDe(contactId: string): Promise<ConversacionGhl
 /** Últimos mensajes de una conversación, del más reciente al más antiguo. */
 export async function ultimosMensajes(conversationId: string, limite = 10): Promise<MensajeGhl[]> {
   const r = await pedir<{ messages?: { messages?: MensajeGhl[] } }>(
-    `/conversations/${conversationId}/messages?limit=${limite}`
+    `/conversations/${id(conversationId)}/messages?limit=${limite}`
   )
   return r.messages?.messages ?? []
 }

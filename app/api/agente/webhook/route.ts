@@ -7,6 +7,7 @@ import { anotarEvento, registrarEvento } from '@/lib/agente/eventos'
 import { enriquecerDesdeContacto } from '@/lib/agente/enriquecer'
 import { TAGS, ACTIVO_DESDE, TAG_PRUEBAS } from '@/lib/agente/config'
 import { atender, meTocaResponder } from '@/lib/agente/conversacion'
+import { secretoRecibido } from '@/lib/agente/secreto'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -34,10 +35,7 @@ function secretoValido(req: NextRequest): boolean {
   const esperado = process.env.AGENTE_WEBHOOK_SECRET
   if (!esperado) return false // sin secreto configurado, nadie entra
 
-  const recibido =
-    req.headers.get('x-sol-secret') ??
-    req.nextUrl.searchParams.get('secret') ??
-    ''
+  const recibido = secretoRecibido(req)
 
   // Comparación de tiempo constante (evita descubrir el secreto midiendo).
   const a = Buffer.from(recibido)

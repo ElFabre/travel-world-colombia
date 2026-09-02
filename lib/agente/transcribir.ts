@@ -40,6 +40,13 @@ export async function resolverAudios(mensajes: MensajeGhl[]): Promise<MensajeGhl
 
   const cache = await leerCache(conAudio.map(m => m.id))
 
+  // Tope de transcripciones NUEVAS por turno (las cacheadas no cuentan): frena
+  // a quien mande audios en tanda para quemar créditos de OpenAI. En una
+  // conversación real casi todo viene del caché; los audios que excedan el
+  // tope se quedan sin transcribir este turno y se reintentan en el siguiente.
+  const MAX_NUEVAS_POR_TURNO = 3
+  let nuevas = 0
+
   const transcripciones = new Map<string, string>()
   for (const m of conAudio) {
     const cacheado = cache.get(m.id)
@@ -47,6 +54,8 @@ export async function resolverAudios(mensajes: MensajeGhl[]): Promise<MensajeGhl
       transcripciones.set(m.id, cacheado)
       continue
     }
+    if (nuevas >= MAX_NUEVAS_POR_TURNO) continue
+    nuevas++
     const url = urlDeAudio(m)!
     const r = await transcribirAudio(url)
     if ('texto' in r) {

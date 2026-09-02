@@ -19,10 +19,13 @@ const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
 
 function rateLimitMemoria(ip: string, options: RateLimitOptions): RateLimitResult {
   const now = Date.now()
-  const record = rateLimitMap.get(ip)
+  // La config forma parte de la clave: dos límites distintos sobre el mismo
+  // identificador no deben compartir contador.
+  const clave = `${ip}|${options.limit}/${options.windowMs}`
+  const record = rateLimitMap.get(clave)
 
   if (!record || now > record.resetTime) {
-    rateLimitMap.set(ip, { count: 1, resetTime: now + options.windowMs })
+    rateLimitMap.set(clave, { count: 1, resetTime: now + options.windowMs })
     return { success: true, remaining: options.limit - 1, retryAfter: 0 }
   }
 
@@ -37,21 +40,34 @@ function rateLimitMemoria(ip: string, options: RateLimitOptions): RateLimitResul
 // ── Upstash Redis (distribuido) ──
 // Se activa solo si existen las credenciales (UPSTASH_* o KV_*), que Vercel
 // inyecta al instalar la integración de Upstash desde el Marketplace.
-let upstash: Ratelimit | null | undefined
+// Un limitador por configuración (limit/window): antes había uno solo y la
+// primera llamada fijaba su ventana para todos los demás usos del proceso.
+// La config va también en el prefijo para que dos límites distintos sobre el
+// mismo identificador no compartan contador.
+let redis: Redis | null | undefined
+const limitadores = new Map<string, Ratelimit>()
 
 function getUpstash(limit: number, windowMs: number): Ratelimit | null {
-  if (upstash !== undefined) return upstash
-  const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN
-  upstash = url && token
-    ? new Ratelimit({
-        redis: new Redis({ url, token }),
-        limiter: Ratelimit.slidingWindow(limit, `${Math.round(windowMs / 1000)} s`),
-        prefix: 'twc/rl',
-        analytics: false,
-      })
-    : null
-  return upstash
+  if (redis === undefined) {
+    const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL
+    const token = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN
+    redis = url && token ? new Redis({ url, token }) : null
+  }
+  if (!redis) return null
+
+  const segundos = Math.round(windowMs / 1000)
+  const clave = `${limit}/${segundos}`
+  let limitador = limitadores.get(clave)
+  if (!limitador) {
+    limitador = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(limit, `${segundos} s`),
+      prefix: `twc/rl/${clave}`,
+      analytics: false,
+    })
+    limitadores.set(clave, limitador)
+  }
+  return limitador
 }
 
 /**

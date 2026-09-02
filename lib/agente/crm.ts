@@ -224,7 +224,13 @@ function componerBrief(decision: Decision): string | null {
   ].filter(Boolean)
 
   if (partes.length === 0) return null
-  return ['📝 RESUMEN PARA COTIZAR', ...partes].join('\n\n')
+  return [
+    '📝 RESUMEN PARA COTIZAR',
+    ...partes,
+    // Recordatorio fijo: todo lo de arriba sale del chat con el cliente. Evita
+    // que una instrucción colada en la conversación se lea como orden interna.
+    'ℹ️ Datos tomados del chat con el cliente, sin verificar.',
+  ].join('\n\n')
 }
 
 const ETIQUETA_TEMP: Record<string, string> = {
@@ -420,6 +426,8 @@ async function dejarNotaDeEscalada({ contactId, decision }: EntradaCrm): Promise
     decision.resumen?.trim() || `Motivo: ${decision.motivo}`,
     datos.length ? `Datos capturados:\n- ${datos.join('\n- ')}` : null,
     decision.temperatura !== 'no_aplica' ? `Temperatura: ${decision.temperatura}` : null,
+    // Mismo recordatorio que en el brief: el contenido viene del cliente.
+    'ℹ️ Datos tomados del chat con el cliente, sin verificar.',
   ]
     .filter(Boolean)
     .join('\n\n')
@@ -429,10 +437,10 @@ async function dejarNotaDeEscalada({ contactId, decision }: EntradaCrm): Promise
 }
 
 /**
- * ⚠️ Mover a "Calificado por Bot" dispara el workflow "2.-Calificado por Bot"
- * (v45) de la cuenta. Revisar en la UI qué hace ANTES de encender a Sol en
- * producción — la etapa lleva meses en 0 usos y ese workflow nunca se ha
- * ejecutado con datos del agente.
+ * Mover a "Calificado por Bot" dispara el workflow "2.-Calificado por Bot" de la
+ * cuenta: asigna asesora y crea la tarea "Cotizar lead calificado por Sol" con el
+ * campo Mensaje de cotización en la descripción (por eso ese campo se escribe en
+ * guardarCalificacion ANTES de este paso). El workflow no le escribe al cliente.
  */
 async function moverSiCalificado({ contactId, decision }: EntradaCrm): Promise<string | null> {
   if (!estaCalificado(decision.datos)) return null

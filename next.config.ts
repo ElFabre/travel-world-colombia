@@ -75,13 +75,20 @@ const nextConfig: NextConfig = {
         // /admin: embebible SOLO desde GHL (Custom Menu Link). Sin
         // X-Frame-Options — no admite lista de dominios; frame-ancestors
         // es su reemplazo y todos los navegadores actuales lo respetan.
+        //
+        // Hosts EXACTOS, nunca comodines: *.gohighlevel.com y
+        // *.leadconnectorhq.com alojan páginas de CUALQUIER cliente de GHL
+        // (multi-tenant), y con cookies SameSite=None un tenant hostil podía
+        // enmarcar el panel con la sesión viva de un admin (clickjacking).
+        // Si el equipo entra por un dominio white-label propio, se agrega
+        // aquí ese host exacto.
         source: '/admin/:path*',
         headers: [
           ...comunes,
           {
             key: 'Content-Security-Policy',
             value: csp(
-              "'self' https://app.gohighlevel.com https://*.gohighlevel.com https://*.leadconnectorhq.com"
+              "'self' https://app.gohighlevel.com https://app.leadconnectorhq.com"
             ),
           },
           { key: 'X-Robots-Tag', value: 'noindex, nofollow' },

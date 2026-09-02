@@ -4,6 +4,14 @@ import { agregarTags, enviarMensaje, rutaDeRespuesta, ultimosMensajes, type Mens
 import { sincronizarCrm } from '@/lib/agente/crm'
 import { extraerFotos } from '@/lib/agente/conocimiento'
 import { ACTIVO_DESDE, AVISO_DATOS, HORARIO, RAFAGA_MS, TAGS, TAG_PRUEBAS } from '@/lib/agente/config'
+import { checkRateLimit } from '@/lib/security/rateLimit'
+
+/**
+ * Tope de turnos de Sol por contacto por hora. Generoso para una conversación
+ * real (la ráfaga agrupa los mensajes seguidos en un solo turno) y suficiente
+ * para frenar a quien intente quemar créditos del modelo a punta de spam.
+ */
+const RL_SOL = { limit: 20, windowMs: 3_600_000 }
 
 /** ¿Estamos dentro del horario de atención de la agencia (hora de Colombia)? */
 export function enHorario(ahora = new Date()): boolean {
@@ -106,6 +114,24 @@ export async function atender(e: Entrada): Promise<ResultadoTurno> {
   }
   if (e.tags.some(t => (TAGS.noCliente as readonly string[]).includes(t))) {
     return { actuo: false, nota: 'proveedor/mayorista' }
+  }
+
+  // 3b. Freno de abuso: nadie legítimo sostiene más de RL_TURNOS turnos de Sol
+  //     por hora (la ráfaga ya agrupa los mensajes seguidos). Sin esto, un
+  //     número anónimo puede quemar créditos del modelo a voluntad. Va ANTES
+  //     de las llamadas a la API de GHL y al modelo: turno frenado = turno
+  //     que no cuesta nada. Si el limitador falla, se atiende (fail-open:
+  //     peor que responder de más es dejar a un cliente real sin respuesta).
+  try {
+    const rl = await checkRateLimit(`sol:${e.contactId}`, RL_SOL)
+    if (!rl.success) {
+      return {
+        actuo: false,
+        nota: `freno de abuso: más de ${RL_SOL.limit} turnos/hora de este contacto (reintenta en ${rl.retryAfter}s)`,
+      }
+    }
+  } catch (err) {
+    console.error('rate limit de Sol falló:', (err as Error).message)
   }
 
   // 4. Historial y re-verificación anti-choque: si el último mensaje es

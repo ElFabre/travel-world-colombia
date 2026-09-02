@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server'
 import { timingSafeEqual } from 'node:crypto'
+import { secretoRecibido } from '@/lib/agente/secreto'
 import {
   CAMPOS_RESERVA,
   ETAPA_GANADA,
@@ -36,7 +37,7 @@ export const runtime = 'nodejs'
 
 function autorizado(req: NextRequest): boolean {
   const esperado = process.env.AGENTE_WEBHOOK_SECRET
-  const recibido = req.headers.get('x-sol-secret') ?? req.nextUrl.searchParams.get('secret') ?? ''
+  const recibido = secretoRecibido(req)
   if (!esperado || !recibido) return false
   const a = Buffer.from(recibido)
   const b = Buffer.from(esperado)

@@ -34,8 +34,15 @@ export const cotizacionSchema = z.object({
     .min(1, 'Mínimo 1 viajero')
     .max(20, 'Máximo 20 viajeros'),
 
-  fecha_mes: z.string().min(1, 'Selecciona un mes'),
-  fecha_año: z.string().min(1, 'Selecciona un año'),
+  fecha_mes: z.enum(MESES, { error: 'Selecciona un mes' }),
+  fecha_año: z
+    .string()
+    .regex(/^\d{4}$/, 'Selecciona un año')
+    .refine(v => {
+      const año = Number(v)
+      const actual = new Date().getFullYear()
+      return año >= actual && año <= actual + 3
+    }, 'Selecciona un año válido'),
 
   presupuesto: z.enum(
     ['menos-2m', '2m-5m', '5m-10m', 'mas-10m'] as const,
