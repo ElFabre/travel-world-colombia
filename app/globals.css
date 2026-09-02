@@ -129,9 +129,9 @@
 /* ── Base styles ── */
 html {
   scroll-behavior: smooth;
-  /* Base 17px (en vez de 16): sube ~1pt todos los tamaños rem del sitio
+  /* Base 18px (en vez de 16): sube todos los tamaños rem del sitio
      (text-xs/sm/etc.) — pedido del cliente: los textos pequeños se leían chicos. */
-  font-size: 17px;
+  font-size: 18px;
 }
 
 body {
