@@ -67,3 +67,22 @@ export const NAV_LINKS = [
   { href: '/nosotros', label: 'Nosotros' },
   { href: '/contacto', label: 'Contacto' },
 ] as const
+
+/**
+ * Submenú de Servicios en el navbar. Los slugs deben coincidir con los `id`
+ * de las tarjetas en app/servicios/page.tsx (anclas #slug); Cruceros enlaza
+ * a su propia página.
+ */
+export const SERVICIOS_MENU = [
+  { label: 'Vuelos', href: '/servicios#vuelos' },
+  { label: 'Alojamientos', href: '/servicios#alojamientos' },
+  { label: 'Paquetes', href: '/servicios#paquetes' },
+  { label: 'Circuitos', href: '/servicios#circuitos' },
+  { label: 'Actividades', href: '/servicios#actividades' },
+  { label: 'Parques temáticos', href: '/servicios#parques-tematicos' },
+  { label: 'Alquiler de vehículos', href: '/servicios#alquiler-de-vehiculos' },
+  { label: 'Seguro de viajes', href: '/servicios#seguro-de-viajes' },
+  { label: 'SIM card', href: '/servicios#sim-card' },
+  { label: 'Tickets de tren', href: '/servicios#tickets-de-tren' },
+  { label: 'Cruceros', href: '/cruceros' },
+] as const

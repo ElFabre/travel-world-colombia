@@ -9,6 +9,7 @@ import { Analytics, AnalyticsNoScript } from '@/components/analytics/Analytics'
 import { FbPixelTracker } from '@/components/analytics/FbPixelTracker'
 import { SITE, WHATSAPP, SOCIALS } from '@/lib/site'
 import { jsonLd } from '@/lib/seo/jsonLd'
+import { getDestinos } from '@/lib/destinos'
 
 const schemaOrg = {
   '@context': 'https://schema.org',
@@ -130,14 +131,27 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  // Regiones reales para el submenú "Destinos" del navbar (mismo criterio que
+  // /destinos: sin cruceros). getDestinos está cacheado por request, así que en
+  // las páginas que ya lo consultan no agrega viajes extra a Supabase.
+  const destinos = (await getDestinos()).filter(d => !d.es_crucero)
+  const regiones = [...new Set(
+    destinos.filter(d => d.pais !== 'Colombia' && d.region).map(d => d.region as string)
+  )]
+  const hayNacionales = destinos.some(d => d.pais === 'Colombia')
+
   return (
     <html
       lang="es"
+      // Next 16 ya no anula el scroll-behavior:smooth global (globals.css) al
+      // navegar, lo que rompía el scroll a anclas (#id) entre páginas; este
+      // atributo restaura el override recomendado por la guía de migración.
+      data-scroll-behavior="smooth"
       className={`${plusJakarta.variable} ${cinzel.variable} ${inter.variable}`}
     >
       <body className="min-h-screen antialiased">
@@ -160,7 +174,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLd(schemaOrg) }}
         />
-        <PublicOnly><Navbar /></PublicOnly>
+        <PublicOnly><Navbar regiones={regiones} hayNacionales={hayNacionales} /></PublicOnly>
         <main id="contenido">{children}</main>
         <PublicOnly><Footer /></PublicOnly>
         <PublicOnly><WhatsAppButton /></PublicOnly>

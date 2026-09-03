@@ -3,13 +3,95 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { NAV_LINKS, SITE } from '@/lib/site'
+import { NAV_LINKS, SERVICIOS_MENU, SITE } from '@/lib/site'
 
-export function Navbar() {
+interface NavbarProps {
+  /** Regiones (continentes) con destinos activos, para el submenú de Destinos. */
+  regiones: string[]
+  /** Si hay destinos en Colombia, el submenú ofrece la entrada nacional. */
+  hayNacionales: boolean
+}
+
+interface SubItem {
+  label: string
+  href: string
+  /** Filtros del explorador de /destinos (?f=...) — ver goFiltro. */
+  esFiltro?: boolean
+}
+
+/**
+ * Mismo evento que dispara el explorador de /destinos al cambiar ?f= con
+ * replaceState (replaceState no emite popstate). Si ya estamos en /destinos,
+ * navegar con Link no re-monta el componente, así que actualizamos la URL a
+ * mano y avisamos con el evento para que el filtro aplique al instante.
+ */
+const EVENTO_FILTRO = 'twc:filtro-destinos'
+
+function goFiltro(e: React.MouseEvent, href: string) {
+  if (window.location.pathname !== '/destinos') return // navegación normal de Link
+  e.preventDefault()
+  window.history.replaceState(null, '', href)
+  window.dispatchEvent(new Event(EVENTO_FILTRO))
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+const estiloLink = {
+  className:
+    'u-underline font-plus-jakarta text-[11px] font-bold tracking-[0.15em] uppercase transition-colors hover:text-orange',
+  style: { color: 'var(--text-primary)' },
+} as const
+
+/** Item del navbar desktop con panel desplegable (hover y focus-within). */
+function DropdownDesktop({ label, href, items, onItemClick }: {
+  label: string
+  href: string
+  items: SubItem[]
+  onItemClick?: (e: React.MouseEvent, item: SubItem) => void
+}) {
+  return (
+    <li className="group relative">
+      <Link href={href} {...estiloLink} aria-haspopup="true">
+        <span className="inline-flex items-center gap-1">
+          {label}
+          <ChevronDown size={12} className="transition-transform group-hover:rotate-180" />
+        </span>
+      </Link>
+      {/* pt-4 mantiene el hover al cruzar el espacio entre el link y el panel.
+          Con muchos ítems el panel va a 2 columnas: si crece hacia abajo choca
+          con el botón flotante de WhatsApp (z-50, por encima del header z-40). */}
+      <div className="invisible absolute left-1/2 -translate-x-1/2 pt-4 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+        <ul
+          className={`${items.length > 8 ? 'grid w-[26rem] grid-cols-2' : 'min-w-56'} rounded-xl p-2`}
+          style={{
+            background: 'var(--dark)',
+            border: '1px solid var(--border)',
+            boxShadow: '0 16px 40px rgba(8, 18, 38, 0.5)',
+          }}
+        >
+          {items.map(item => (
+            <li key={item.href}>
+              <Link
+                href={item.href}
+                onClick={e => onItemClick?.(e, item)}
+                className="block rounded-lg px-4 py-2.5 font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase transition-colors hover:text-orange"
+                style={{ color: 'var(--text-primary)' }}
+              >
+                {item.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </li>
+  )
+}
+
+export function Navbar({ regiones, hayNacionales }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
+  const [subAbierto, setSubAbierto] = useState<string | null>(null)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40)
@@ -17,6 +99,32 @@ export function Navbar() {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  const destinosItems: SubItem[] = [
+    { label: 'Todos los destinos', href: '/destinos', esFiltro: true },
+    ...(hayNacionales ? [{ label: 'Colombia', href: '/destinos?f=nacional', esFiltro: true }] : []),
+    ...regiones.map(r => ({
+      label: r,
+      href: `/destinos?f=${encodeURIComponent(`region:${r}`)}`,
+      esFiltro: true,
+    })),
+  ]
+
+  const serviciosItems: SubItem[] = SERVICIOS_MENU.map(s => ({ label: s.label, href: s.href }))
+
+  const submenus: Record<string, SubItem[]> = {
+    '/destinos': destinosItems,
+    '/servicios': serviciosItems,
+  }
+
+  const onSubItemClick = (e: React.MouseEvent, item: SubItem) => {
+    if (item.esFiltro) goFiltro(e, item.href)
+  }
+
+  const cerrarMovil = () => {
+    setOpen(false)
+    setSubAbierto(null)
+  }
 
   return (
     <header
@@ -44,17 +152,24 @@ export function Navbar() {
 
         {/* Links desktop */}
         <ul className="hidden items-center gap-8 md:flex">
-          {NAV_LINKS.map(link => (
-            <li key={link.href}>
-              <Link
+          {NAV_LINKS.map(link => {
+            const items = submenus[link.href]
+            return items ? (
+              <DropdownDesktop
+                key={link.href}
+                label={link.label}
                 href={link.href}
-                className="u-underline font-plus-jakarta text-[11px] font-bold tracking-[0.15em] uppercase transition-colors hover:text-orange"
-                style={{ color: 'var(--text-primary)' }}
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
+                items={items}
+                onItemClick={onSubItemClick}
+              />
+            ) : (
+              <li key={link.href}>
+                <Link href={link.href} {...estiloLink}>
+                  {link.label}
+                </Link>
+              </li>
+            )
+          })}
         </ul>
 
         <div className="hidden md:block">
@@ -79,24 +194,65 @@ export function Navbar() {
       {open && (
         <div
           id="mobile-menu"
-          className="md:hidden"
+          className="max-h-[calc(100svh-72px)] overflow-y-auto md:hidden"
           style={{ background: 'var(--overlay)', borderTop: '1px solid var(--border)' }}
         >
           <ul className="flex flex-col gap-1 px-6 py-4">
-            {NAV_LINKS.map(link => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className="block py-3 font-plus-jakarta text-[12px] font-bold tracking-[0.15em] uppercase transition-colors hover:text-orange"
-                  style={{ color: 'var(--text-primary)' }}
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
+            {NAV_LINKS.map(link => {
+              const items = submenus[link.href]
+              const abierto = subAbierto === link.href
+              return (
+                <li key={link.href}>
+                  <div className="flex items-center">
+                    <Link
+                      href={link.href}
+                      onClick={cerrarMovil}
+                      className="block flex-1 py-3 font-plus-jakarta text-[12px] font-bold tracking-[0.15em] uppercase transition-colors hover:text-orange"
+                      style={{ color: 'var(--text-primary)' }}
+                    >
+                      {link.label}
+                    </Link>
+                    {items && (
+                      <button
+                        type="button"
+                        onClick={() => setSubAbierto(abierto ? null : link.href)}
+                        aria-expanded={abierto}
+                        aria-label={`${abierto ? 'Cerrar' : 'Abrir'} submenú de ${link.label}`}
+                        className="p-3"
+                        style={{ color: 'var(--text-primary)' }}
+                      >
+                        <ChevronDown
+                          size={16}
+                          className="transition-transform"
+                          style={{ transform: abierto ? 'rotate(180deg)' : 'none' }}
+                        />
+                      </button>
+                    )}
+                  </div>
+                  {items && abierto && (
+                    <ul className="mb-2 flex flex-col border-l pl-4" style={{ borderColor: 'var(--border)' }}>
+                      {items.map(item => (
+                        <li key={item.href}>
+                          <Link
+                            href={item.href}
+                            onClick={e => {
+                              onSubItemClick(e, item)
+                              cerrarMovil()
+                            }}
+                            className="block py-2.5 font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase transition-colors hover:text-orange"
+                            style={{ color: 'var(--text-dim)' }}
+                          >
+                            {item.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              )
+            })}
             <li className="pt-2">
-              <Button href="/contacto" size="sm" className="w-full" onClick={() => setOpen(false)}>
+              <Button href="/contacto" size="sm" className="w-full" onClick={cerrarMovil}>
                 Cotizar ahora
               </Button>
             </li>
