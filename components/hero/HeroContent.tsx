@@ -25,12 +25,11 @@ export function HeroContent({ destino }: HeroContentProps) {
       )}
 
       <h1
-        className="uppercase"
+        className="text-4xl sm:text-6xl"
         style={{
           fontFamily: 'var(--font-plus-jakarta)',
           fontWeight: 800,
-          fontSize: 'clamp(38px, 8.5vw, 68px)',
-          lineHeight: 1.05,
+          lineHeight: 0.9,
           letterSpacing: '-0.02em',
           color: 'var(--white)',
           textShadow: '0 2px 24px rgba(8, 18, 38,0.55)',
