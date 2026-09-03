@@ -267,11 +267,8 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
 
   return (
     <div>
-      {/* Tarjetas de categorías (pedido del cliente): navegación rápida por
-          transporte, región y país; aplican el mismo filtro que el mapa. */}
-      <CategoriasDestinos grupos={grupos} filtro={filtro} onSelect={f => setFiltro(f, { scroll: f !== 'todos', origen: 'tarjeta' })} />
-
-      {/* Mapa interactivo por país. En móvil va colapsado tras un botón para
+      {/* Mapa interactivo por país — primero, arriba de las categorías y el
+          listado (pedido del cliente). En móvil va colapsado tras un botón para
           que el listado quede más a mano; en sm+ siempre visible. */}
       <div className="mx-auto mb-8 max-w-3xl">
         <button
@@ -292,6 +289,10 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
           />
         </div>
       </div>
+
+      {/* Tarjetas de categorías (pedido del cliente): navegación rápida por
+          transporte, región y país; aplican el mismo filtro que el mapa. */}
+      <CategoriasDestinos grupos={grupos} filtro={filtro} onSelect={f => setFiltro(f, { scroll: f !== 'todos', origen: 'tarjeta' })} />
 
       {/* Facetas transversales + chip para limpiar la selección activa */}
       <div className="mb-10 flex flex-wrap justify-center gap-2">

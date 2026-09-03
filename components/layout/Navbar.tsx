@@ -37,10 +37,14 @@ function goFiltro(e: React.MouseEvent, href: string) {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
+/**
+ * El color va en clase (no en style inline): un style inline pisa SIEMPRE a la
+ * clase hover:text-orange y el resaltado amarillo al pasar el cursor nunca se
+ * veía. text-(--text-primary) es el shorthand de Tailwind v4 para var().
+ */
 const estiloLink = {
   className:
-    'u-underline font-plus-jakarta text-[11px] font-bold tracking-[0.15em] uppercase transition-colors hover:text-orange',
-  style: { color: 'var(--text-primary)' },
+    'u-underline font-plus-jakarta text-[11px] font-bold tracking-[0.15em] uppercase text-(--text-primary) transition-colors hover:text-orange',
 } as const
 
 /** Item del navbar desktop con panel desplegable (hover y focus-within). */
@@ -75,8 +79,7 @@ function DropdownDesktop({ label, href, items, onItemClick }: {
               <Link
                 href={item.href}
                 onClick={e => onItemClick?.(e, item)}
-                className="block rounded-lg px-4 py-2.5 font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase transition-colors hover:text-orange"
-                style={{ color: 'var(--text-primary)' }}
+                className="block rounded-lg px-4 py-2.5 font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase text-(--text-primary) transition-colors hover:bg-white/5 hover:text-orange"
               >
                 {item.label}
               </Link>
@@ -207,8 +210,7 @@ export function Navbar({ regiones, hayNacionales }: NavbarProps) {
                     <Link
                       href={link.href}
                       onClick={cerrarMovil}
-                      className="block flex-1 py-3 font-plus-jakarta text-[12px] font-bold tracking-[0.15em] uppercase transition-colors hover:text-orange"
-                      style={{ color: 'var(--text-primary)' }}
+                      className="block flex-1 py-3 font-plus-jakarta text-[12px] font-bold tracking-[0.15em] uppercase text-(--text-primary) transition-colors hover:text-orange"
                     >
                       {link.label}
                     </Link>
@@ -239,8 +241,7 @@ export function Navbar({ regiones, hayNacionales }: NavbarProps) {
                               onSubItemClick(e, item)
                               cerrarMovil()
                             }}
-                            className="block py-2.5 font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase transition-colors hover:text-orange"
-                            style={{ color: 'var(--text-dim)' }}
+                            className="block py-2.5 font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase text-(--text-dim) transition-colors hover:text-orange"
                           >
                             {item.label}
                           </Link>

@@ -129,13 +129,18 @@ export function CategoriasDestinos({
     <div className="mb-10 flex flex-col gap-8">
       {grupos.map(g => (
         <section key={g.titulo}>
+          {/* El color va en clase, no inline: el inline pisaría el hover amarillo.
+              text-gold (no --orange): sobre este navy el acento es amarillo aunque
+              la sección viva en tema claro (donde --orange es azul). */}
           <span
-            className="mb-4 inline-block rounded-lg px-4 py-1.5 font-plus-jakarta text-xs font-extrabold uppercase tracking-[0.14em]"
-            style={{ background: 'rgb(13, 30, 60)', color: '#fff' }}
+            className="mb-4 inline-block rounded-lg px-4 py-1.5 font-plus-jakarta text-xs font-extrabold uppercase tracking-[0.14em] text-white transition-colors hover:text-gold"
+            style={{ background: 'rgb(13, 30, 60)' }}
           >
             {g.titulo}
           </span>
-          <ul className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+          {/* Misma grilla y altura que las tarjetas de producto (DestinoCard:
+              h-56) — pedido del cliente: "del mismo tamaño que los productos". */}
+          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {g.cards.map(c => {
               const activo = filtro === c.filtro
               return (
@@ -144,7 +149,7 @@ export function CategoriasDestinos({
                     type="button"
                     aria-pressed={activo}
                     onClick={() => onSelect(activo ? 'todos' : c.filtro)}
-                    className="u-lift group relative block h-28 w-full overflow-hidden rounded-xl text-left sm:h-32"
+                    className="u-lift group relative block h-56 w-full overflow-hidden rounded-xl text-left"
                     style={{
                       border: activo ? '2px solid var(--orange)' : '1px solid var(--border)',
                       boxShadow: activo ? '0 0 0 3px color-mix(in srgb, var(--orange) 30%, transparent)' : undefined,
@@ -154,7 +159,7 @@ export function CategoriasDestinos({
                       src={c.img}
                       alt=""
                       fill
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className="object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                     <div
@@ -162,8 +167,8 @@ export function CategoriasDestinos({
                       className="absolute inset-0"
                       style={{ background: 'linear-gradient(to top, rgba(8, 18, 38, 0.88) 0%, rgba(8, 18, 38, 0.25) 60%, rgba(8, 18, 38, 0.1) 100%)' }}
                     />
-                    <span className="absolute inset-x-3 bottom-2.5">
-                      <span className="block font-plus-jakarta text-sm font-extrabold leading-tight text-white sm:text-base">
+                    <span className="absolute inset-x-4 bottom-3">
+                      <span className="block font-plus-jakarta text-xl font-extrabold leading-tight text-white transition-colors group-hover:text-gold sm:text-2xl">
                         {c.titulo}
                       </span>
                       <span className="font-inter text-[11px] font-medium" style={{ color: activo ? 'var(--orange)' : 'rgba(255,255,255,0.75)' }}>
