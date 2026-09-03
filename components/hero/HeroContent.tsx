@@ -25,7 +25,7 @@ export function HeroContent({ destino }: HeroContentProps) {
       )}
 
       <h1
-        className="text-4xl uppercase sm:text-6xl"
+        className="text-4xl sm:text-6xl"
         style={{
           fontFamily: 'var(--font-plus-jakarta)',
           fontWeight: 800,
