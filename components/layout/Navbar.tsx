@@ -34,7 +34,13 @@ function goFiltro(e: React.MouseEvent, href: string) {
   e.preventDefault()
   window.history.replaceState(null, '', href)
   window.dispatchEvent(new Event(EVENTO_FILTRO))
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  // Directo al listado filtrado (o al tope si se eligió "Todos los destinos").
+  const resultados = document.getElementById('resultados')
+  if (href.includes('?f=') && resultados) {
+    resultados.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  } else {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 }
 
 /**

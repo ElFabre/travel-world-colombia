@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, useSyncExternalStore } from 'react'
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import dynamic from 'next/dynamic'
 import { MapPin, Globe, X } from 'lucide-react'
 import type { Destino } from '@/types/destino'
@@ -200,6 +200,26 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
     regionesSet,
     new Set(conteoPaises.keys())
   )
+
+  // Al LLEGAR a /destinos con un filtro en la URL (submenú del navbar, enlace
+  // compartido), bajar directo al listado filtrado: aterrizar en el hero hace
+  // parecer que la elección no aplicó. Solo una vez por montaje — los cambios
+  // de filtro dentro de la página ya deciden su propio scroll en setFiltro.
+  const scrollInicialHecho = useRef(false)
+  useEffect(() => {
+    if (scrollInicialHecho.current) return
+    // En la navegación SPA el primer render llega ANTES de que la URL cambie
+    // (filtro aún 'todos'): no cerrar el candado hasta ver el filtro real.
+    if (filtro === 'todos') return
+    scrollInicialHecho.current = true
+    // Diferido: Next hace su scroll-al-tope al confirmar la navegación y
+    // pisaría este. SIN cleanup: en dev, Strict Mode monta dos veces y el
+    // clearTimeout del primer montaje cancelaba el scroll; si el componente se
+    // desmonta antes de disparar, el getElementById devuelve null y no pasa nada.
+    setTimeout(() => {
+      document.getElementById('resultados')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 150)
+  }, [filtro])
 
   /**
    * Cambia el filtro y lo refleja en la URL con el History API nativo (shallow:
