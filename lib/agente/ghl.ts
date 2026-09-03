@@ -108,6 +108,12 @@ export function rutaDeRespuesta(mensajes: MensajeGhl[]): RutaMensaje {
   switch (entrante?.messageType) {
     case 'TYPE_CUSTOM_SMS':
       return { tipo: 'SMS', conversationProviderId: entrante.conversationProviderId }
+    // App de marketplace "Whatsapp, iMessage and SMS" (WhatsApp por QR): el
+    // contacto NO tiene teléfono en GHL, así que un envío con `type: 'SMS'` o
+    // `type: 'WhatsApp'` devuelve 422 CONVERSATIONS_MSG_NO_PHONE. Hay que salir
+    // como `Custom` por el mismo proveedor (verificado el 2026-09-02).
+    case 'TYPE_CUSTOM_PROVIDER_SMS':
+      return { tipo: 'Custom', conversationProviderId: entrante.conversationProviderId }
     case 'TYPE_SMS':
       return { tipo: 'SMS' }
     case 'TYPE_INSTAGRAM':
