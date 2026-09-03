@@ -76,7 +76,9 @@ export function HeroSection({ destinos }: HeroSectionProps) {
 
       {/* Contenido — remount por key dispara el fadeUp en cada cambio */}
       <div className="flex flex-1 flex-col justify-center pt-20">
-        <HeroContent key={active.id} destino={active} />
+        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center">
+          <HeroContent key={active.id} destino={active} />
+        </div>
       </div>
 
       <ThumbnailBar destinos={destinos} activeIndex={activeIndex} onSelect={select} />

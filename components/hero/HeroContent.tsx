@@ -14,7 +14,7 @@ export function HeroContent({ destino }: HeroContentProps) {
     <div
       // key remount en el padre dispara este fadeUp en cada cambio de destino
       style={{ animation: 'fadeUp 0.35s ease both' }}
-      className="relative z-10 flex max-w-[580px] flex-1 flex-col justify-center px-6"
+      className="relative z-10 flex max-w-[580px] flex-1 flex-col justify-center px-6 sm:px-10"
     >
       {destino.nombre_local && (
         <p
@@ -30,7 +30,7 @@ export function HeroContent({ destino }: HeroContentProps) {
           fontFamily: 'var(--font-plus-jakarta)',
           fontWeight: 800,
           fontSize: 'clamp(38px, 8.5vw, 68px)',
-          lineHeight: 0.9,
+          lineHeight: 1.05,
           letterSpacing: '-0.02em',
           color: 'var(--white)',
           textShadow: '0 2px 24px rgba(8, 18, 38,0.55)',
