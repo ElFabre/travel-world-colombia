@@ -1,12 +1,25 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useMemo, useState, useSyncExternalStore } from 'react'
+import dynamic from 'next/dynamic'
 import { MapPin, Globe, X } from 'lucide-react'
 import type { Destino } from '@/types/destino'
+import { fbCustomEvent } from '@/lib/analytics/fbpixel'
 import { DestinoCard } from './DestinoCard'
-import { MapaDestinos, type SeleccionMapa } from './MapaDestinos'
+import type { SeleccionMapa } from './MapaDestinos'
 import { CategoriasDestinos, grupos as gruposCategorias } from './CategoriasDestinos'
+
+// El mapa (y sus ~120 KB de geografía) se cargan en un chunk aparte: no pesan
+// en el bundle inicial de /destinos ni bloquean el primer render del listado.
+const MapaDestinos = dynamic(() => import('./MapaDestinos').then(m => m.MapaDestinos), {
+  ssr: false,
+  loading: () => (
+    <div
+      className="tema-oscuro rounded-2xl"
+      style={{ background: 'var(--bg)', border: '1px solid var(--border)', aspectRatio: '960 / 540' }}
+    />
+  ),
+})
 
 /**
  * Filtro único del explorador. Vive en la URL (?f=...) para que las tarjetas
@@ -39,6 +52,23 @@ function agrupar(items: Destino[], clave: (d: Destino) => string): [string, Dest
     else m.set(k, [d])
   }
   return [...m.entries()]
+}
+
+/**
+ * La URL (?f=) es la única fuente de verdad del filtro, leída con
+ * useSyncExternalStore: en el servidor devuelve '' (el HTML estático trae el
+ * listado completo, clave para SEO) y tras hidratar React aplica el deep-link
+ * sin mismatch. El evento propio avisa los replaceState que hacemos nosotros
+ * (replaceState no dispara popstate).
+ */
+const EVENTO_FILTRO = 'twc:filtro-destinos'
+function suscribirUrl(cb: () => void) {
+  window.addEventListener('popstate', cb)
+  window.addEventListener(EVENTO_FILTRO, cb)
+  return () => {
+    window.removeEventListener('popstate', cb)
+    window.removeEventListener(EVENTO_FILTRO, cb)
+  }
 }
 
 /** Valida el ?f= de la URL contra los datos reales; lo desconocido cae a 'todos'. */
@@ -135,10 +165,12 @@ function SeccionInternacional({ destinos }: { destinos: Destino[] }) {
 }
 
 export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
-  const searchParams = useSearchParams()
-  // Fallback de estado para entornos sin sync del History API (no debería
-  // ocurrir en App Router, pero garantiza que la UI siempre reaccione al clic).
-  const [filtroLocal, setFiltroLocal] = useState<Filtro | null>(null)
+  // SEO: el filtro NO usa useSearchParams — eso forzaba render solo-cliente de
+  // todo el explorador y el HTML estático de /destinos perdía las tarjetas y
+  // sus links internos. Ver suscribirUrl arriba.
+  const search = useSyncExternalStore(suscribirUrl, () => window.location.search, () => '')
+  // El mapa en móvil va colapsado (la página era muy larga antes del listado).
+  const [mapaAbierto, setMapaAbierto] = useState(false)
 
   const { nacionales, internacionales, favoritos, finAno } = useMemo(() => ({
     nacionales: destinos.filter(esNacional),
@@ -163,18 +195,23 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
     [internacionales]
   )
 
-  const filtro = filtroLocal ?? normalizarFiltro(searchParams.get('f'), regionesSet, new Set(conteoPaises.keys()))
+  const filtro = normalizarFiltro(
+    new URLSearchParams(search).get('f'),
+    regionesSet,
+    new Set(conteoPaises.keys())
+  )
 
   /**
    * Cambia el filtro y lo refleja en la URL con el History API nativo (shallow:
-   * sin ronda al servidor). `scrollAResultados` acerca el listado tras elegir
-   * una tarjeta de categoría o un país del mapa.
+   * sin ronda al servidor). `scroll` acerca el listado tras elegir una tarjeta
+   * o un país del mapa; `origen` reporta el uso del filtro al píxel de Meta.
    */
-  const setFiltro = (f: Filtro, scrollAResultados = false) => {
-    setFiltroLocal(f)
+  const setFiltro = (f: Filtro, opts?: { scroll?: boolean; origen?: 'tarjeta' | 'mapa' | 'chip' }) => {
     const url = f === 'todos' ? window.location.pathname : `${window.location.pathname}?f=${encodeURIComponent(f)}`
     window.history.replaceState(null, '', url)
-    if (scrollAResultados && f !== 'todos') {
+    window.dispatchEvent(new Event(EVENTO_FILTRO))
+    if (f !== 'todos' && opts?.origen) fbCustomEvent('FiltroDestinos', { filtro: f, origen: opts.origen })
+    if (opts?.scroll && f !== 'todos') {
       document.getElementById('resultados')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }
@@ -232,16 +269,28 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
     <div>
       {/* Tarjetas de categorías (pedido del cliente): navegación rápida por
           transporte, región y país; aplican el mismo filtro que el mapa. */}
-      <CategoriasDestinos grupos={grupos} filtro={filtro} onSelect={f => setFiltro(f, f !== 'todos')} />
+      <CategoriasDestinos grupos={grupos} filtro={filtro} onSelect={f => setFiltro(f, { scroll: f !== 'todos', origen: 'tarjeta' })} />
 
-      {/* Mapa interactivo por país (en móvil se muestra también) */}
+      {/* Mapa interactivo por país. En móvil va colapsado tras un botón para
+          que el listado quede más a mano; en sm+ siempre visible. */}
       <div className="mx-auto mb-8 max-w-3xl">
-        <MapaDestinos
-          paises={conteoPaises}
-          nacionales={nacionales.length}
-          seleccion={seleccionMapa}
-          onSelect={sel => setFiltro(sel ?? 'todos', sel !== null)}
-        />
+        <button
+          type="button"
+          aria-expanded={mapaAbierto}
+          onClick={() => setMapaAbierto(v => !v)}
+          className="mb-3 w-full rounded-full px-5 py-2.5 font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase sm:hidden"
+          style={{ background: 'var(--bg-alt)', color: 'var(--text-dim)', border: '1px solid var(--border)' }}
+        >
+          🗺️ {mapaAbierto ? 'Ocultar el mapa' : 'Explorar el mapa'}
+        </button>
+        <div className={`${mapaAbierto ? 'block' : 'hidden'} sm:block`}>
+          <MapaDestinos
+            paises={conteoPaises}
+            nacionales={nacionales.length}
+            seleccion={seleccionMapa}
+            onSelect={sel => setFiltro(sel ?? 'todos', { scroll: sel !== null, origen: 'mapa' })}
+          />
+        </div>
       </div>
 
       {/* Facetas transversales + chip para limpiar la selección activa */}
@@ -262,7 +311,7 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
             <button
               key={c.key}
               type="button"
-              onClick={() => setFiltro(activo ? 'todos' : c.key)}
+              onClick={() => setFiltro(activo ? 'todos' : c.key, { origen: 'chip' })}
               className="flex items-center gap-1.5 rounded-full px-5 py-2 font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase transition-all duration-200"
               style={
                 activo

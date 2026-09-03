@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import type { Destino } from '@/types/destino'
-import { destinoCardImg } from '@/lib/hero'
+import { destinoCardImg, PLACEHOLDER_DESTINO } from '@/lib/hero'
 import type { Filtro } from './DestinosExplorador'
 
 /**
@@ -34,9 +34,16 @@ interface Grupo {
 
 const esNacional = (d: Destino) => d.pais === 'Colombia'
 
-/** Foto representativa de una categoría: destacados primero, luego por orden. */
+/**
+ * Foto representativa de una categoría: primero los destinos CON foto propia
+ * (evita el placeholder de marca cuando un hermano sí tiene foto), luego
+ * destacados, luego por orden.
+ */
 function imagenDe(ds: Destino[]): string {
-  const mejor = [...ds].sort((a, b) => Number(b.destacado) - Number(a.destacado) || a.orden - b.orden)[0]
+  const conFoto = (d: Destino) => destinoCardImg(d) !== PLACEHOLDER_DESTINO
+  const mejor = [...ds].sort(
+    (a, b) => Number(conFoto(b)) - Number(conFoto(a)) || Number(b.destacado) - Number(a.destacado) || a.orden - b.orden
+  )[0]
   return destinoCardImg(mejor)
 }
 

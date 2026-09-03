@@ -6,6 +6,13 @@ export function fbEvent(eventName: string, data?: object) {
   }
 }
 
+/** Evento personalizado (fbq trackCustom) — ej. FiltroDestinos. */
+export function fbCustomEvent(eventName: string, data?: object) {
+  if (typeof window !== 'undefined' && window.fbq) {
+    window.fbq('trackCustom', eventName, data)
+  }
+}
+
 export function fbPageView() {
   if (typeof window !== 'undefined' && window.fbq) {
     window.fbq('track', 'PageView')

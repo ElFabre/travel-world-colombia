@@ -1,4 +1,3 @@
-import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { getDestinos } from '@/lib/destinos'
@@ -66,10 +65,9 @@ export default async function DestinosPage() {
       {/* Lista + filtros */}
       <section className="px-6 py-14">
         <div className="mx-auto max-w-6xl">
-          {/* Suspense: el explorador lee ?f= con useSearchParams y la página es estática (ISR) */}
-          <Suspense fallback={null}>
-            <DestinosExplorador destinos={destinos} />
-          </Suspense>
+          {/* Sin Suspense/useSearchParams a propósito: así el listado completo
+              queda en el HTML estático (SEO); el ?f= se aplica en cliente. */}
+          <DestinosExplorador destinos={destinos} />
         </div>
       </section>
     </div>

@@ -10,7 +10,7 @@ import { HighlightsEditor } from './HighlightsEditor'
 import { ItinerarioEditor } from './ItinerarioEditor'
 import { GaleriaEditor } from './GaleriaEditor'
 import { BUCKET_DESTINOS, subirAStorage, validarImagen, slugDelFormulario } from '@/lib/supabase/upload-cliente'
-import { PAISES } from '@/lib/paises'
+import { PAISES, REGIONES } from '@/lib/paises'
 
 type Action = (prev: FormState, fd: FormData) => Promise<FormState>
 
@@ -317,7 +317,20 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
           hint="Se genera solo desde el nombre; puedes ajustarlo. Solo minúsculas, números y guiones."
         />
         <CampoSelect label="País" name="pais" defaultValue={d?.pais} required opciones={PAISES} hint="Define el filtro en /destinos." />
-        <Campo label="Región / Continente" name="region" defaultValue={d?.region} placeholder="Caribe" hint="En internacionales agrupa por continente (Europa, Norteamérica…)." />
+        <div>
+          <label className={labelCls} style={labelStyle}>Región / Continente</label>
+          {/* Lista cerrada (antes texto libre): un typo como "Suramerica" creaba
+              una categoría huérfana que el mapa y las tarjetas no reconocen. */}
+          <select name="region" defaultValue={d?.region ?? ''} className={inputCls} style={inputStyle}>
+            <option value="" style={{ background: 'var(--bg-alt)' }}>— Sin región (nacional)</option>
+            {(d?.region && !REGIONES.includes(d.region) ? [d.region, ...REGIONES] : REGIONES).map(r => (
+              <option key={r} value={r} style={{ background: 'var(--bg-alt)' }}>{r}</option>
+            ))}
+          </select>
+          <p className="mt-1 font-inter text-xs" style={{ color: 'var(--text-muted)' }}>
+            En internacionales agrupa por continente y activa su zona en el mapa y las tarjetas de /destinos.
+          </p>
+        </div>
         <div>
           <label className={labelCls} style={labelStyle}>Transporte (solo nacional)</label>
           <select name="transporte" defaultValue={d?.transporte ?? ''} className={inputCls} style={inputStyle}>

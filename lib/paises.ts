@@ -2,6 +2,22 @@
 // filtros de /destinos. Mantener nombres consistentes (en español) para que
 // el filtro por país agrupe correctamente los tours.
 
+/**
+ * Regiones/continentes canónicos del sitio. Alimentan el desplegable del panel
+ * y DEBEN coincidir con las zonas del mapa (components/destinos/mapa-mundo.ts)
+ * para que el filtro, las tarjetas de categorías y el mapa casen entre sí.
+ */
+export const REGIONES: string[] = [
+  'Norteamérica',
+  'Centroamérica',
+  'Caribe',
+  'Suramérica',
+  'Europa',
+  'África',
+  'Asia',
+  'Oceanía',
+]
+
 export const PAISES: string[] = [
   // Colombia y Latinoamérica
   'Colombia',
