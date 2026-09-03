@@ -295,56 +295,129 @@ export default function NosotrosPage() {
       {/* ── RNT ── */}
       <section className="px-6 py-16">
         <div className="mx-auto max-w-6xl">
-          <div
-            className="flex flex-col items-center gap-8 rounded-xl p-10 sm:flex-row sm:items-start"
-            style={{ background: 'color-mix(in srgb, var(--orange) 6%, transparent)', border: '1px solid var(--border-orange)' }}
-          >
-            {/* Placeholder certificado */}
+          <div className="grid gap-6 sm:grid-cols-2">
+            {/* RNT agencia de viajes */}
             <div
-              className="flex h-32 w-32 shrink-0 items-center justify-center rounded-lg"
-              style={{ background: 'color-mix(in srgb, var(--orange) 10%, transparent)', border: '1px solid var(--border-orange)' }}
+              className="flex flex-col items-center gap-6 rounded-xl p-10 text-center sm:items-start sm:text-left"
+              style={{ background: 'color-mix(in srgb, var(--orange) 6%, transparent)', border: '1px solid var(--border-orange)' }}
             >
-              <Award size={44} strokeWidth={1} style={{ color: 'var(--orange)' }} />
+              <div
+                className="flex h-24 w-24 shrink-0 items-center justify-center rounded-lg"
+                style={{ background: 'color-mix(in srgb, var(--orange) 10%, transparent)', border: '1px solid var(--border-orange)' }}
+              >
+                <Award size={38} strokeWidth={1} style={{ color: 'var(--orange)' }} />
+              </div>
+
+              <div>
+                <SectionTag className="mb-3">Registro Oficial</SectionTag>
+                <h2
+                  className="font-plus-jakarta text-2xl font-extrabold sm:text-3xl"
+                  style={{ color: 'var(--text-primary)' }}
+                >
+                  RNT {SITE.rnt}
+                </h2>
+                <p
+                  className="mt-3 font-inter text-base leading-relaxed"
+                  style={{ color: 'rgba(13, 30, 60,0.82)', lineHeight: '1.75' }}
+                >
+                  <strong style={{ color: 'var(--text-primary)' }}>
+                    Travel World Colombia Agencia de Viajes
+                  </strong>{' '}
+                  está registrada ante el{' '}
+                  <strong style={{ color: 'var(--text-primary)' }}>
+                    Registro Nacional de Turismo
+                  </strong>{' '}
+                  como <strong>agencia de viajes</strong> bajo el número{' '}
+                  <strong style={{ color: 'var(--orange)' }}>{SITE.rnt}</strong>, cumpliendo
+                  con todos los requisitos legales exigidos por el Ministerio de Comercio,
+                  Industria y Turismo de Colombia.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3 justify-center sm:justify-start">
+                  <span
+                    className="rounded-full px-4 py-1.5 font-inter text-xs"
+                    style={{ background: 'rgba(34,197,94,0.12)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.3)' }}
+                  >
+                    ✓ Agencia legalmente constituida
+                  </span>
+                  <span
+                    className="rounded-full px-4 py-1.5 font-inter text-xs"
+                    style={{ background: 'rgba(34,197,94,0.12)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.3)' }}
+                  >
+                    ✓ Certificado vigente
+                  </span>
+                </div>
+                <a
+                  href={SITE.rntVerificarUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-5 inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-inter text-sm font-semibold transition-opacity hover:opacity-85"
+                  style={{ background: 'var(--orange)', color: 'var(--orange-contrast)' }}
+                >
+                  Verificar en el RUES →
+                </a>
+              </div>
             </div>
 
-            <div className="text-center sm:text-left">
-              <SectionTag className="mb-3">Registro Oficial</SectionTag>
-              <h2
-                className="font-plus-jakarta text-2xl font-extrabold sm:text-3xl"
-                style={{ color: 'var(--text-primary)' }}
+            {/* RNT mayorista de turismo */}
+            <div
+              className="flex flex-col items-center gap-6 rounded-xl p-10 text-center sm:items-start sm:text-left"
+              style={{ background: 'color-mix(in srgb, var(--orange) 6%, transparent)', border: '1px solid var(--border-orange)' }}
+            >
+              <div
+                className="flex h-24 w-24 shrink-0 items-center justify-center rounded-lg"
+                style={{ background: 'color-mix(in srgb, var(--orange) 10%, transparent)', border: '1px solid var(--border-orange)' }}
               >
-                RNT {SITE.rnt}
-              </h2>
-              <p
-                className="mt-3 max-w-lg font-inter text-base leading-relaxed"
-                style={{ color: 'rgba(13, 30, 60,0.82)', lineHeight: '1.75' }}
-              >
-                Travel World Colombia está registrada ante el{' '}
-                <strong style={{ color: 'var(--text-primary)' }}>
-                  Registro Nacional de Turismo
-                </strong>{' '}
-                bajo el número <strong style={{ color: 'var(--orange)' }}>{SITE.rnt}</strong>,
-                cumpliendo con todos los requisitos legales exigidos por el Ministerio
-                de Comercio, Industria y Turismo de Colombia.
-                Operamos con plena transparencia y respaldo institucional.
-              </p>
-              <div className="mt-4 flex flex-wrap gap-3 justify-center sm:justify-start">
-                <span
-                  className="rounded-full px-4 py-1.5 font-inter text-xs"
-                  style={{ background: 'rgba(34,197,94,0.12)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.3)' }}
-                >
-                  ✓ Agencia legalmente constituida
-                </span>
-                <span
-                  className="rounded-full px-4 py-1.5 font-inter text-xs"
-                  style={{ background: 'rgba(34,197,94,0.12)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.3)' }}
-                >
-                  ✓ Certificado vigente
-                </span>
+                <Award size={38} strokeWidth={1} style={{ color: 'var(--orange)' }} />
               </div>
-              <p className="mt-4 font-inter text-xs" style={{ color: 'var(--text-dim)' }}>
-                📎 Imagen del certificado — próximamente
-              </p>
+
+              <div>
+                <SectionTag className="mb-3">Registro Oficial</SectionTag>
+                <h2
+                  className="font-plus-jakarta text-2xl font-extrabold sm:text-3xl"
+                  style={{ color: 'var(--text-primary)' }}
+                >
+                  RNT {SITE.rntMayorista}
+                </h2>
+                <p
+                  className="mt-3 font-inter text-base leading-relaxed"
+                  style={{ color: 'rgba(13, 30, 60,0.82)', lineHeight: '1.75' }}
+                >
+                  <strong style={{ color: 'var(--text-primary)' }}>
+                    Travel World Mayorista de Turismo
+                  </strong>{' '}
+                  cuenta con un segundo registro ante el{' '}
+                  <strong style={{ color: 'var(--text-primary)' }}>
+                    Registro Nacional de Turismo
+                  </strong>{' '}
+                  como <strong>agencia de viajes mayorista</strong> bajo el número{' '}
+                  <strong style={{ color: 'var(--orange)' }}>{SITE.rntMayorista}</strong>,
+                  que nos permite operar y distribuir planes turísticos a otras agencias
+                  con pleno respaldo institucional.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3 justify-center sm:justify-start">
+                  <span
+                    className="rounded-full px-4 py-1.5 font-inter text-xs"
+                    style={{ background: 'rgba(34,197,94,0.12)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.3)' }}
+                  >
+                    ✓ Mayorista de turismo
+                  </span>
+                  <span
+                    className="rounded-full px-4 py-1.5 font-inter text-xs"
+                    style={{ background: 'rgba(34,197,94,0.12)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.3)' }}
+                  >
+                    ✓ Certificado vigente
+                  </span>
+                </div>
+                <a
+                  href={SITE.rntVerificarUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-5 inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-inter text-sm font-semibold transition-opacity hover:opacity-85"
+                  style={{ background: 'var(--orange)', color: 'var(--orange-contrast)' }}
+                >
+                  Verificar en el RUES →
+                </a>
+              </div>
             </div>
           </div>
         </div>

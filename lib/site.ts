@@ -4,6 +4,8 @@
 export const SITE = {
   nombre: 'Travel World Colombia',
   rnt: '27287',
+  rntMayorista: '118011',
+  rntVerificarUrl: 'https://www.rues.org.co/registro-nt',
   // Fuente única de la URL del sitio. En local/preview cae al dominio de
   // Vercel; al conectar el dominio propio basta con definir NEXT_PUBLIC_SITE_URL
   // en Vercel (Production) — no hay que tocar código.

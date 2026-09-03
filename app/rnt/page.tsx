@@ -4,7 +4,7 @@ import { SITE } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Registro Nacional de Turismo',
-  description: `${SITE.nombre} opera legalmente con Registro Nacional de Turismo: RNT ${SITE.rnt} (agencia de viajes y turismo) y RNT 118011 (agencia de viajes mayorista).`,
+  description: `${SITE.nombre} opera legalmente con Registro Nacional de Turismo: RNT ${SITE.rnt} (agencia de viajes y turismo) y RNT ${SITE.rntMayorista} (agencia de viajes mayorista).`,
   alternates: { canonical: '/rnt' },
 }
 
@@ -27,7 +27,7 @@ export default function RntPage() {
             de viajes y turismo.
           </>,
           <>
-            <strong style={{ color: 'var(--text-primary)' }}>RNT 118011</strong> — Agencia de
+            <strong style={{ color: 'var(--text-primary)' }}>RNT {SITE.rntMayorista}</strong> — Agencia de
             viajes mayorista.
           </>,
         ]}
@@ -35,15 +35,15 @@ export default function RntPage() {
 
       <LegalP>
         Puedes verificar la vigencia de nuestros registros en el portal oficial del Registro
-        Nacional de Turismo, administrado por las Cámaras de Comercio:{' '}
+        Nacional de Turismo, administrado por las Cámaras de Comercio a través del RUES:{' '}
         <a
-          href="https://rnt.confecamaras.co"
+          href={SITE.rntVerificarUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="underline transition-colors hover:text-orange"
           style={{ color: 'var(--text-primary)' }}
         >
-          rnt.confecamaras.co
+          rues.org.co/registro-nt
         </a>
         .
       </LegalP>
