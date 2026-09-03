@@ -165,7 +165,7 @@ export default async function DestinoPage({ params }: Props) {
         <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-16 pt-32">
           <div className="destino-hero-in">
             <SectionTag className="mb-4">{d.pais}</SectionTag>
-            <h1 className="font-plus-jakarta text-5xl font-extrabold leading-none sm:text-7xl lg:text-8xl" style={{ color: 'var(--text-primary)' }}>
+            <h1 className="font-plus-jakarta text-4xl font-extrabold leading-none sm:text-6xl" style={{ color: 'var(--text-primary)' }}>
               {d.nombre}
             </h1>
             {d.frase_hero && (
@@ -191,7 +191,7 @@ export default async function DestinoPage({ params }: Props) {
                 </span>
               )}
               {precioMostrar && (
-                <span className="flex items-center gap-2 rounded-full px-4 py-2 font-plus-jakarta text-sm font-bold" style={{ background: 'var(--orange)', color: 'var(--orange-contrast)', boxShadow: '0 4px 20px color-mix(in srgb, var(--orange) 45%, transparent)' }}>
+                <span className="flex items-center gap-2 rounded-full px-6 py-3 font-plus-jakarta text-lg font-extrabold sm:text-xl" style={{ background: 'var(--orange)', color: 'var(--orange-contrast)', boxShadow: '0 4px 20px color-mix(in srgb, var(--orange) 45%, transparent)' }}>
                   {precioMostrar}
                 </span>
               )}
