@@ -7,6 +7,12 @@
       "runtimeArgs": ["run", "dev"],
       "port": 3100,
       "openPath": "/contacto"
+    },
+    {
+      "name": "twc-auto",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["node_modules/next/dist/bin/next", "dev", "-p", "3199"],
+      "port": 3199
     }
   ]
 }

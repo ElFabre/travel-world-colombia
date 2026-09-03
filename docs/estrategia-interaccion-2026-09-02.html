@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <title>Estrategia Meta Ads — Interacción WhatsApp (TWC)</title>
+  <style>
+    body { font-family: 'Lato', sans-serif; background: #F5F6F7; color: #2e3848; padding: 32px; margin:0; }
+    h1 { color: #2e3848; font-size: 28px; font-weight: 900; margin-bottom: 4px; }
+    .subtitle { color: #666; margin-bottom: 24px; font-size: 14px; font-weight: 300; }
+    .presupuesto-total { background: #2e3848; color: #74fbfb; padding: 14px 22px; border-radius: 12px; margin: 0 12px 12px 0; font-size: 16px; font-weight: 700; display: inline-block; }
+    .nota { background: #fff; border-left: 4px solid #74fbfb; border-radius: 8px; padding: 14px 18px; margin: 16px 0 28px; font-size: 13.5px; line-height: 1.6; max-width: 900px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 0; }
+    .tab { background: #dfe3e8; border: none; border-radius: 10px 10px 0 0; padding: 12px 26px; font-family: 'Lato', sans-serif; font-size: 15px; font-weight: 900; color: #2e3848; cursor: pointer; }
+    .tab.active { background: #2e3848; color: #74fbfb; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .campaña { background: white; border-radius: 0 16px 16px 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(46,56,72,0.08); }
+    .campaña-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+    .campaña-nombre { font-size: 20px; font-weight: 900; }
+    .campaña-presupuesto { background: rgba(116,251,251,0.15); color: #376290; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 13px; }
+    .params { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .param { background: #F5F6F7; border-radius: 8px; padding: 12px; }
+    .param-label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; font-weight: 700; }
+    .param-value { font-size: 14px; font-weight: 700; color: #2e3848; }
+    .conjunto { border: 1px solid #e9ecef; border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+    .conjunto-titulo { font-weight: 900; color: #376290; margin-bottom: 12px; font-size: 15px; }
+    .conjunto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media(max-width:640px){ .conjunto-grid{grid-template-columns:1fr} }
+    .campo-label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; font-weight: 700; }
+    .campo-valor { font-size: 13px; color: #2e3848; line-height: 1.5; }
+    .presupuesto-diario { background: rgba(116,251,251,0.1); border: 1px solid #8dd0df; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 13px; }
+    .presupuesto-diario strong { color: #376290; }
+    .creativos { background: #F5F6F7; border-radius: 10px; padding: 16px; margin-top: 8px; }
+    .creativos h3 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .5px; color: #376290; }
+    .creativos ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.7; }
+    .no-aplica { background: #f8d7da; color: #842029; padding: 12px 16px; border-radius: 8px; font-size: 14px; margin-bottom: 24px; }
+    .footer { margin-top: 40px; background: #2e3848; padding: 28px; text-align: center; color: #8dd0df; font-size: 12px; border-radius: 12px; line-height: 1.7; }
+    .disclaimer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(46,56,72,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    .disclaimer-box { background: white; border-radius: 16px; padding: 40px; max-width: 520px; text-align: center; }
+    .disclaimer-box h2 { font-size: 20px; font-weight: 900; margin-bottom: 16px; color: #2e3848; }
+    .disclaimer-box p { font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 24px; }
+    .disclaimer-box button { background: #2e3848; color: #74fbfb; border: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; }
+    .disclaimer-box button:hover { background: #376290; }
+  </style>
+</head>
+<body>
+  <div class="disclaimer-overlay" id="disclaimer">
+    <div class="disclaimer-box">
+      <h2>Antes de continuar</h2>
+      <p>Este reporte es una herramienta de apoyo basada en los datos que proporcionaste. Las estructuras de campañas, presupuestos y creativos son <strong>ideas y puntos de partida</strong>, no recomendaciones definitivas.<br><br>Cada negocio es diferente. Usa este reporte como complemento de lo que aprendes en la comunidad de Fabrizio Villanueva, no como sustituto.</p>
+      <button onclick="document.getElementById('disclaimer').style.display='none'">Acepto y entiendo →</button>
+    </div>
+  </div>
+
+  <h1>📊 Estrategia Meta Ads — Travel World Colombia</h1>
+  <p class="subtitle">Interacción (WhatsApp) · Metodología Fabrizio Villanueva — generado con Claude · 2 sep 2026</p>
+
+  <div class="presupuesto-total">💰 Escenario A: $450.000 COP/mes ($15.000/día)</div>
+  <div class="presupuesto-total">💰 Escenario B: $1.500.000 COP/mes ($50.000/día)</div>
+
+  <div class="nota">
+    <strong>Por qué Interacción y no Reconocimiento:</strong> el historial de la cuenta muestra que las campañas de mensajes a WhatsApp generaron conversaciones a $950–$1.500 COP con CTR de 3–5&nbsp;%, mientras las campañas a la web fracasaron (2 registros a $5.722 c/u). Con la segmentación local (Fusagasugá + radio 30&nbsp;km) el reconocimiento se logra por frecuencia local <em>y además</em> cada peso deja una conversación medible que Sol atiende.<br><br>
+    <strong>Regla de presupuesto bajo aplicada:</strong> ambos escenarios están por debajo del equivalente a $600 USD/mes → solo 2 campañas: Presentación (80&nbsp;%) + Evaluación (20&nbsp;%). Ascensión se activa cuando el presupuesto supere ~$2.500.000 COP/mes (el negocio sí tiene recompra).<br>
+    <strong>Adaptación local:</strong> la metodología usa «País» en Presentación; aquí los conjuntos Abierto e Intereses van geolocalizados (Fusagasugá + 30&nbsp;km) por el objetivo de posicionamiento local del cliente. El conjunto Similares va a Colombia porque el lookalike de la lista de clientes dentro del radio sería demasiado pequeño.
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-t="p1">Presentación</button>
+    <button class="tab" data-t="p2">Evaluación</button>
+  </div>
+
+  <div class="panel active" id="p1">
+    <div class="campaña">
+      <div class="campaña-header">
+        <div class="campaña-nombre">🎯 Presentación — 80%</div>
+        <div class="campaña-presupuesto">A: $360.000/mes · $4.000/día por conjunto &nbsp;|&nbsp; B: $1.200.000/mes · $13.333/día por conjunto</div>
+      </div>
+      <div class="params">
+        <div class="param"><div class="param-label">Objetivo</div><div class="param-value">Interacción</div></div>
+        <div class="param"><div class="param-label">App de mensajería</div><div class="param-value">WhatsApp</div></div>
+        <div class="param"><div class="param-label">CBO Advantage+</div><div class="param-value">ON</div></div>
+        <div class="param"><div class="param-label">Evento de conversión</div><div class="param-value">— (no aplica)</div></div>
+        <div class="param"><div class="param-label">Calendario</div><div class="param-value">Indefinido</div></div>
+        <div class="param"><div class="param-label">Ubicaciones</div><div class="param-value">Advantage+</div></div>
+      </div>
+      <div class="presupuesto-diario"><strong>Presupuesto diario campaña:</strong> A: $12.000 COP/día · B: $40.000 COP/día (CBO reparte entre los 3 conjuntos)</div>
+      <div class="conjunto">
+        <div class="conjunto-titulo">Conjunto 1 — Abierto (local)</div>
+        <div class="conjunto-grid">
+          <div><div class="campo-label">Público</div><div class="campo-valor">Fusagasugá + radio 30 km, H+M, 20-65+</div></div>
+          <div><div class="campo-label">Exclusiones</div><div class="campo-valor">FB 90d · IG 90d · Video +10s 90d · Web 90d · Compradores 180d · Lista clientes</div></div>
+        </div>
+      </div>
+      <div class="conjunto">
+        <div class="conjunto-titulo">Conjunto 2 — Intereses (local)</div>
+        <div class="conjunto-grid">
+          <div><div class="campo-label">Público</div><div class="campo-valor">Fusagasugá + radio 30 km, H+M, 20-55 + intereses: viajes, turismo, cruceros, aerolíneas, paquetes vacacionales, luna de miel</div></div>
+          <div><div class="campo-label">Exclusiones</div><div class="campo-valor">Mismas del Conjunto 1</div></div>
+        </div>
+      </div>
+      <div class="conjunto">
+        <div class="conjunto-titulo">Conjunto 3 — Similares</div>
+        <div class="conjunto-grid">
+          <div><div class="campo-label">Público</div><div class="campo-valor">Colombia, H+M, 20-55 · LAL 1% Lista de clientes (GHL) + LAL 1% Compradores 180d</div></div>
+          <div><div class="campo-label">Exclusiones</div><div class="campo-valor">Mismas del Conjunto 1</div></div>
+        </div>
+      </div>
+      <div class="creativos">
+        <h3>Anuncios recomendados (3–6, los mismos en los 3 conjuntos)</h3>
+        <ul>
+          <li><strong>Humano/Humor</strong> — replicar el video más visto del trimestre (humor «tratamiento médico»)</li>
+          <li><strong>Aspiracional</strong> — estilo reel «4 imperdibles de Tailandia» (el de más guardados)</li>
+          <li><strong>Educativo</strong> — «3 señales de que esa agencia te va a estafar» (ya probado en orgánico)</li>
+          <li><strong>Beneficios</strong> — agencia de Fusagasugá, atención inmediata por WhatsApp, contratos claros</li>
+          <li><strong>Demostración</strong> — cómo es cotizar con TWC en 3 mensajes</li>
+        </ul>
+        <p style="font-size:12px;color:#666;margin:8px 0 0">Nivel de consciencia: Inconsciente, Problema y Solución. Los 3 ads de fin de año de la campaña ráfaga pausada entran aquí como creativos.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="p2">
+    <div class="campaña">
+      <div class="campaña-header">
+        <div class="campaña-nombre">🔁 Evaluación — 20%</div>
+        <div class="campaña-presupuesto">A: $90.000/mes · $3.000/día &nbsp;|&nbsp; B: $300.000/mes · $10.000/día</div>
+      </div>
+      <div class="params">
+        <div class="param"><div class="param-label">Objetivo</div><div class="param-value">Interacción</div></div>
+        <div class="param"><div class="param-label">App de mensajería</div><div class="param-value">WhatsApp</div></div>
+        <div class="param"><div class="param-label">CBO Advantage+</div><div class="param-value">ON</div></div>
+        <div class="param"><div class="param-label">Evento de conversión</div><div class="param-value">— (no aplica)</div></div>
+        <div class="param"><div class="param-label">Calendario</div><div class="param-value">Indefinido</div></div>
+        <div class="param"><div class="param-label">Ubicaciones</div><div class="param-value">Advantage+</div></div>
+      </div>
+      <div class="conjunto">
+        <div class="conjunto-titulo">Conjunto único — Retargeting 30d</div>
+        <div class="conjunto-grid">
+          <div><div class="campo-label">Público</div><div class="campo-valor">Colombia, H+M, 18-65 — FB 30d + IG 30d + Video medio 30d + Web 30d</div></div>
+          <div><div class="campo-label">Exclusiones</div><div class="campo-valor">Compradores 30d · Lista clientes</div></div>
+        </div>
+      </div>
+      <div class="creativos">
+        <h3>Anuncios recomendados (3–6)</h3>
+        <ul>
+          <li><strong>Testimonio</strong> — reseñas de viajeros reales (recolectar con el widget de reseñas de GHL)</li>
+          <li><strong>Producto</strong> — paquete concreto con fecha y qué incluye (Eje Cafetero dic, crucero fin de año)</li>
+          <li><strong>Beneficios</strong> — todo incluido, acompañamiento de inicio a fin, respaldo legal</li>
+          <li><strong>Promociones</strong> — preventa VAMOS 2027 (tarifa 2026 + 10% dcto), últimas cabinas</li>
+        </ul>
+        <p style="font-size:12px;color:#666;margin:8px 0 0">Nivel de consciencia: Producto y Decisión. Encender cuando los públicos de 30 días acumulen ≥ 1.000 personas (2–3 semanas después de lanzar Presentación).</p>
+      </div>
+    </div>
+    <div class="no-aplica">🚫 Conversión: no aplica (no hay catálogo ni presupuesto > $1.000 USD). Ascensión: se activa al superar ~$2.500.000 COP/mes — el negocio sí tiene recompra, así que queda en la hoja de ruta.</div>
+  </div>
+
+  <div class="footer">
+    Estrategia Meta Ads · Travel World Colombia · Interacción WhatsApp · Metodología Fabrizio Villanueva<br>
+    Escenario A = mínimo viable · Escenario B = recomendado para acelerar aprendizaje y volumen
+  </div>
+
+  <script>
+    document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById(t.dataset.t).classList.add('active');
+    }));
+  </script>
+</body>
+</html>
