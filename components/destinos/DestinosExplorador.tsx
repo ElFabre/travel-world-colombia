@@ -1,12 +1,27 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { MapPin, Globe, X } from 'lucide-react'
 import type { Destino } from '@/types/destino'
 import { DestinoCard } from './DestinoCard'
 import { MapaDestinos, type SeleccionMapa } from './MapaDestinos'
+import { CategoriasDestinos, grupos as gruposCategorias } from './CategoriasDestinos'
 
-type Filtro = 'todos' | 'nacional' | 'internacional' | 'favoritos' | 'fin_ano' | `region:${string}`
+/**
+ * Filtro único del explorador. Vive en la URL (?f=...) para que las tarjetas
+ * de categorías, el mapa y los enlaces externos apliquen el mismo estado y la
+ * vista filtrada sea compartible. `transporte:` implica nacional (bus/avión/
+ * otros); `pais:` y `region:` son internacionales.
+ */
+export type Filtro =
+  | 'todos'
+  | 'nacional'
+  | 'favoritos'
+  | 'fin_ano'
+  | `region:${string}`
+  | `pais:${string}`
+  | `transporte:${string}`
 
 const esNacional = (d: Destino) => d.pais === 'Colombia'
 const minOrden = (ds: Destino[]) => Math.min(...ds.map(d => d.orden))
@@ -24,6 +39,15 @@ function agrupar(items: Destino[], clave: (d: Destino) => string): [string, Dest
     else m.set(k, [d])
   }
   return [...m.entries()]
+}
+
+/** Valida el ?f= de la URL contra los datos reales; lo desconocido cae a 'todos'. */
+function normalizarFiltro(raw: string | null, regiones: Set<string>, paises: Set<string>): Filtro {
+  if (raw === 'nacional' || raw === 'favoritos' || raw === 'fin_ano') return raw
+  if (raw?.startsWith('region:') && regiones.has(raw.slice(7))) return raw as Filtro
+  if (raw?.startsWith('pais:') && paises.has(raw.slice(5))) return raw as Filtro
+  if (raw?.startsWith('transporte:') && ['bus', 'avion', 'otros'].includes(raw.slice(11))) return raw as Filtro
+  return 'todos'
 }
 
 function Grid({ destinos }: { destinos: Destino[] }) {
@@ -111,7 +135,10 @@ function SeccionInternacional({ destinos }: { destinos: Destino[] }) {
 }
 
 export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
-  const [filtro, setFiltro] = useState<Filtro>('todos')
+  const searchParams = useSearchParams()
+  // Fallback de estado para entornos sin sync del History API (no debería
+  // ocurrir en App Router, pero garantiza que la UI siempre reaccione al clic).
+  const [filtroLocal, setFiltroLocal] = useState<Filtro | null>(null)
 
   const { nacionales, internacionales, favoritos, finAno } = useMemo(() => ({
     nacionales: destinos.filter(esNacional),
@@ -120,33 +147,75 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
     finAno: destinos.filter(d => d.salida_fin_ano),
   }), [destinos])
 
-  // Conteo por región (solo internacionales) para el mapa.
-  const conteoRegiones = useMemo(() => {
-    const m = new Map<string, number>()
+  // País → { conteo, región } (solo internacionales) para el mapa por país.
+  const conteoPaises = useMemo(() => {
+    const m = new Map<string, { n: number; region: string }>()
     for (const d of internacionales) {
-      const r = d.region ?? 'Otros destinos'
-      m.set(r, (m.get(r) ?? 0) + 1)
+      const e = m.get(d.pais)
+      if (e) e.n += 1
+      else m.set(d.pais, { n: 1, region: d.region ?? 'Otros destinos' })
     }
     return m
   }, [internacionales])
 
-  const regionSel = filtro.startsWith('region:') ? filtro.slice(7) : null
-  const seleccionMapa: SeleccionMapa = regionSel ?? (filtro === 'nacional' ? 'nacional' : null)
+  const regionesSet = useMemo(
+    () => new Set(internacionales.map(d => d.region ?? 'Otros destinos')),
+    [internacionales]
+  )
 
-  // La geografía (Todos/Nacionales/Internacionales) ya la cubre el mapa; los
-  // chips quedan solo para las facetas transversales que el mapa NO puede
-  // expresar. Cada uno es un toggle (clic estando activo → volver a todos).
+  const filtro = filtroLocal ?? normalizarFiltro(searchParams.get('f'), regionesSet, new Set(conteoPaises.keys()))
+
+  /**
+   * Cambia el filtro y lo refleja en la URL con el History API nativo (shallow:
+   * sin ronda al servidor). `scrollAResultados` acerca el listado tras elegir
+   * una tarjeta de categoría o un país del mapa.
+   */
+  const setFiltro = (f: Filtro, scrollAResultados = false) => {
+    setFiltroLocal(f)
+    const url = f === 'todos' ? window.location.pathname : `${window.location.pathname}?f=${encodeURIComponent(f)}`
+    window.history.replaceState(null, '', url)
+    if (scrollAResultados && f !== 'todos') {
+      document.getElementById('resultados')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
+  const grupos = useMemo(() => gruposCategorias(destinos), [destinos])
+
+  const regionSel = filtro.startsWith('region:') ? filtro.slice(7) : null
+  const paisSel = filtro.startsWith('pais:') ? filtro.slice(5) : null
+  const transpSel = filtro.startsWith('transporte:') ? filtro.slice(11) : null
+
+  // El mapa entiende 'nacional', pais: y region: (region llega de las tarjetas
+  // y solo tiñe los países de esa zona).
+  const seleccionMapa: SeleccionMapa =
+    filtro === 'nacional' || filtro.startsWith('pais:') || filtro.startsWith('region:')
+      ? (filtro as SeleccionMapa)
+      : null
+
+  // Facetas transversales que ni las tarjetas ni el mapa expresan. Cada chip es
+  // un toggle (clic estando activo → volver a todos).
   const chips = ([
     { key: 'favoritos', label: '⭐ Favoritos', n: favoritos.length },
     { key: 'fin_ano', label: '🎄 Salidas fin de año', n: finAno.length },
   ] as const).filter(c => c.n > 0)
 
-  // Etiqueta del chip "limpiar filtro" cuando la selección vino del mapa.
+  const nacionalesDeTransp = transpSel
+    ? nacionales.filter(d => (d.transporte ?? 'otros') === transpSel)
+    : []
+  const destinosDePais = paisSel
+    ? internacionales.filter(d => d.pais === paisSel).sort((a, b) => a.orden - b.orden)
+    : []
+
+  // Etiqueta del chip "limpiar filtro" cuando la selección vino de tarjeta/mapa.
   const etiquetaLimpiar = regionSel
-    ? `📍 ${regionSel} · ${conteoRegiones.get(regionSel) ?? 0}`
-    : filtro === 'nacional'
-      ? `🇨🇴 Colombia · ${nacionales.length}`
-      : null
+    ? `📍 ${regionSel} · ${internacionales.filter(d => (d.region ?? 'Otros destinos') === regionSel).length}`
+    : paisSel
+      ? `📍 ${paisSel} · ${destinosDePais.length}`
+      : transpSel
+        ? `${TRANSP_LABEL[transpSel] ?? 'Colombia'} · ${nacionalesDeTransp.length}`
+        : filtro === 'nacional'
+          ? `🇨🇴 Colombia · ${nacionales.length}`
+          : null
 
   if (destinos.length === 0) {
     return (
@@ -157,24 +226,25 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
   }
 
   const verNacional = filtro === 'todos' || filtro === 'nacional'
-  const verInternacional = filtro === 'todos' || filtro === 'internacional'
+  const verInternacional = filtro === 'todos'
 
   return (
     <div>
-      {/* Mapa interactivo (en móvil A PRUEBA en el preview: se muestra en todas
-          las pantallas para evaluarlo; los chips siguen debajo como respaldo) */}
+      {/* Tarjetas de categorías (pedido del cliente): navegación rápida por
+          transporte, región y país; aplican el mismo filtro que el mapa. */}
+      <CategoriasDestinos grupos={grupos} filtro={filtro} onSelect={f => setFiltro(f, f !== 'todos')} />
+
+      {/* Mapa interactivo por país (en móvil se muestra también) */}
       <div className="mx-auto mb-8 max-w-3xl">
         <MapaDestinos
-          regiones={conteoRegiones}
+          paises={conteoPaises}
           nacionales={nacionales.length}
           seleccion={seleccionMapa}
-          onSelect={sel =>
-            setFiltro(sel === null ? 'todos' : sel === 'nacional' ? 'nacional' : `region:${sel}`)
-          }
+          onSelect={sel => setFiltro(sel ?? 'todos', sel !== null)}
         />
       </div>
 
-      {/* Facetas transversales + chip para limpiar la selección del mapa */}
+      {/* Facetas transversales + chip para limpiar la selección activa */}
       <div className="mb-10 flex flex-wrap justify-center gap-2">
         {etiquetaLimpiar && (
           <button
@@ -206,7 +276,7 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
         })}
       </div>
 
-      <div className="flex flex-col gap-10">
+      <div id="resultados" className="flex flex-col gap-10 scroll-mt-24">
         {filtro === 'favoritos' && <Grid destinos={favoritos} />}
         {filtro === 'fin_ano' && <Grid destinos={finAno} />}
         {regionSel && (
@@ -214,6 +284,12 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
             destinos={internacionales.filter(d => (d.region ?? 'Otros destinos') === regionSel)}
           />
         )}
+        {paisSel && destinosDePais.length > 0 && (
+          <Caja icon={<Globe size={18} />} titulo={paisSel} total={destinosDePais.length}>
+            <Grid destinos={destinosDePais} />
+          </Caja>
+        )}
+        {transpSel && nacionalesDeTransp.length > 0 && <SeccionNacional destinos={nacionalesDeTransp} />}
         {verNacional && nacionales.length > 0 && <SeccionNacional destinos={nacionales} />}
         {verInternacional && internacionales.length > 0 && <SeccionInternacional destinos={internacionales} />}
       </div>

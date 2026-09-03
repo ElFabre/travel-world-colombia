@@ -1,60 +1,62 @@
 'use client'
 
 import { useState } from 'react'
-import { MAPA_VIEWBOX, REGION_PATHS, REGION_CENTROIDES, COLOMBIA_XY } from './mapa-mundo'
+import { MAPA_VIEWBOX, PAIS_PATHS, PAIS_XY, PAIS_REGION, FONDO_REGIONES, COLOMBIA_XY } from './mapa-mundo'
 
 /**
  * Mapamundi interactivo de /destinos con geografía REAL (Natural Earth 110m,
- * dominio público; ver scripts/generar-mapa-mundo.mjs). Cada región es una
- * silueta clicable: las que tienen programas se iluminan y llevan una pastilla
- * con su conteo; las vacías quedan tenues y decorativas. Colombia (nacional)
- * tiene su propio pin animado.
+ * dominio público; ver scripts/generar-mapa-mundo.mjs), ahora POR PAÍS: cada
+ * país con programas se ilumina, lleva un punto marcador y es clicable (clic =
+ * filtrar por ese país). Las zonas/regiones quedan como tinte de fondo. Las
+ * micro-islas sin silueta a 110m (Aruba, Curazao, Singapur, Maldivas) se
+ * representan solo con el punto. Colombia (nacional) mantiene su pin animado.
  *
  * El mapa no filtra por sí mismo: reporta la selección al padre
- * (DestinosExplorador) vía onSelect, y pinta el estado `seleccion`.
+ * (DestinosExplorador) vía onSelect, y pinta el estado `seleccion`. Una
+ * selección `region:X` (hecha desde las tarjetas de categorías) también se
+ * refleja tiñendo los países de esa región.
  */
 
-export type SeleccionMapa = string | 'nacional' | null
+export type SeleccionMapa = 'nacional' | `pais:${string}` | `region:${string}` | null
 
 interface MapaDestinosProps {
-  /** Conteo de programas por región (solo internacionales). */
-  regiones: Map<string, number>
+  /** Conteo de programas por país (solo internacionales) + región del sitio. */
+  paises: Map<string, { n: number; region: string }>
   /** Conteo de programas nacionales (pin de Colombia). */
   nacionales: number
-  /** Región seleccionada ('nacional' para Colombia) o null. */
   seleccion: SeleccionMapa
-  onSelect: (sel: SeleccionMapa) => void
+  /** El mapa emite 'nacional', `pais:X` o null (limpiar). */
+  onSelect: (sel: 'nacional' | `pais:${string}` | null) => void
 }
 
-/** Orden de dibujo y ajuste fino de cada pastilla respecto al centroide. */
-const REGIONES: { nombre: string; dx: number; dy: number }[] = [
-  { nombre: 'Norteamérica', dx: -10, dy: 10 },
-  { nombre: 'Centroamérica', dx: -105, dy: 30 },
-  { nombre: 'Caribe', dx: 55, dy: -14 },
-  { nombre: 'Suramérica', dx: 55, dy: 30 },
-  { nombre: 'Europa', dx: -25, dy: -55 },
-  { nombre: 'África', dx: -5, dy: 15 },
-  { nombre: 'Asia', dx: 30, dy: -5 },
-  { nombre: 'Oceanía', dx: 15, dy: 45 },
-]
+/** Tinte RGB de fondo por zona (sutil; solo diferencia visualmente las regiones). */
+const ZONA_RGB: Record<string, string> = {
+  Norteamérica: '90, 150, 235',
+  Centroamérica: '32, 200, 180',
+  Caribe: '255, 204, 41',
+  Suramérica: '60, 200, 120',
+  Europa: '70, 130, 220',
+  África: '225, 145, 65',
+  Asia: '230, 168, 23',
+  Oceanía: '160, 120, 230',
+}
+const tinteZona = (region?: string) => `rgba(${ZONA_RGB[region ?? ''] ?? '255, 255, 255'}, 0.12)`
 
 function Pill({
-  x, y, texto, activo, tenue, onClick, onHover, onLeave,
+  x, y, texto, activo, onClick, onHover, onLeave,
 }: {
-  x: number; y: number; texto: string; activo: boolean; tenue?: boolean
+  x: number; y: number; texto: string; activo: boolean
   onClick?: () => void; onHover?: () => void; onLeave?: () => void
 }) {
   // El mapa se muestra compacto (max-w-3xl ≈ escala 0.8), así que la pastilla
   // es un poco más grande en unidades SVG para que quede legible en pantalla.
-  // Las pastillas con onClick también filtran (mismo gesto que la silueta);
-  // sin onClick quedan decorativas y dejan pasar el clic a lo que hay debajo.
   const w = texto.length * 7.4 + 22
   return (
     <g
       transform={`translate(${x - w / 2}, ${y - 13})`}
       style={{ pointerEvents: onClick ? 'auto' : 'none', cursor: onClick ? 'pointer' : undefined }}
-      // stopPropagation: la pastilla de Colombia vive dentro del <g> clicable
-      // del pin; sin esto el clic haría toggle dos veces y se anularía.
+      // stopPropagation: la pastilla puede vivir dentro del <g> clicable de su
+      // marcador; sin esto el clic haría toggle dos veces y se anularía.
       onClick={onClick ? e => { e.stopPropagation(); onClick() } : undefined}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
@@ -63,7 +65,7 @@ function Pill({
         width={w}
         height={26}
         rx={13}
-        fill={activo ? 'var(--orange)' : 'rgba(13, 30, 60, 0.72)'}
+        fill={activo ? 'var(--orange)' : 'rgba(13, 30, 60, 0.85)'}
         stroke={activo ? 'var(--orange)' : 'rgba(255,255,255,0.22)'}
       />
       <text
@@ -72,7 +74,7 @@ function Pill({
         textAnchor="middle"
         fontSize={13}
         fontWeight={700}
-        fill={activo ? 'var(--orange-contrast)' : tenue ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.9)'}
+        fill={activo ? 'var(--orange-contrast)' : 'rgba(255,255,255,0.9)'}
         style={{ fontFamily: 'var(--font-inter, Inter), sans-serif' }}
       >
         {texto}
@@ -81,11 +83,23 @@ function Pill({
   )
 }
 
-export function MapaDestinos({ regiones, nacionales, seleccion, onSelect }: MapaDestinosProps) {
+export function MapaDestinos({ paises, nacionales, seleccion, onSelect }: MapaDestinosProps) {
   const [hover, setHover] = useState<string | null>(null)
 
-  const toggle = (sel: SeleccionMapa) => onSelect(seleccion === sel ? null : sel)
+  const togglePais = (pais: string) =>
+    onSelect(seleccion === `pais:${pais}` ? null : `pais:${pais}`)
   const nacionalActivo = seleccion === 'nacional'
+  const regionSel = seleccion?.startsWith('region:') ? seleccion.slice(7) : null
+
+  // Países del catálogo con programas, ordenados para que el activo/hover se
+  // dibuje al final (su borde queda por encima de los vecinos).
+  const conProgramas = [...paises.entries()].sort(([a], [b]) =>
+    (seleccion === `pais:${a}` || hover === a ? 1 : 0) - (seleccion === `pais:${b}` || hover === b ? 1 : 0)
+  )
+
+  // País del que hay que mostrar pastilla: el seleccionado, o el que está en hover.
+  const paisSel = seleccion?.startsWith('pais:') ? seleccion.slice(5) : null
+  const paisPill = hover && paises.has(hover) ? hover : paisSel
 
   return (
     <div
@@ -93,68 +107,93 @@ export function MapaDestinos({ regiones, nacionales, seleccion, onSelect }: Mapa
       style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}
     >
       <p className="mb-1 px-2 font-plus-jakarta text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
-        Explora por región
+        Explora el mapa
       </p>
       <p className="mb-3 px-2 font-inter text-xs" style={{ color: 'var(--text-muted)' }}>
-        Haz clic en una región del mapa para ver sus destinos.
+        Los países iluminados tienen programas: haz clic en uno para ver sus destinos.
       </p>
 
-      <svg viewBox={MAPA_VIEWBOX} className="h-auto w-full" role="group" aria-label="Mapa de regiones con destinos">
-        {/* Siluetas (regiones con datos van clicables; el resto decorativo) */}
-        {REGIONES.map(({ nombre }) => {
-          const d = REGION_PATHS[nombre]
-          if (!d) return null
-          const n = regiones.get(nombre) ?? 0
-          const conDatos = n > 0
-          const activo = seleccion === nombre
-          const enHover = hover === nombre
+      <svg viewBox={MAPA_VIEWBOX} className="h-auto w-full" role="group" aria-label="Mapa de países con destinos">
+        {/* Fondo decorativo: resto del mundo teñido por zona */}
+        {Object.entries(FONDO_REGIONES).map(([region, d]) => (
+          <path key={region} d={d} fill={tinteZona(region)} stroke="rgba(8, 18, 38, 0.9)" strokeWidth={0.5} />
+        ))}
 
+        {/* Países del catálogo SIN programas: mismo tratamiento que el fondo */}
+        {Object.entries(PAIS_PATHS).map(([pais, d]) => {
+          if (paises.has(pais) || pais === 'Colombia') return null
+          return <path key={pais} d={d} fill={tinteZona(PAIS_REGION[pais])} stroke="rgba(8, 18, 38, 0.9)" strokeWidth={0.5} />
+        })}
+
+        {/* Colombia: silueta destacada (el pin de abajo es el control) */}
+        {PAIS_PATHS['Colombia'] && (
+          <path
+            d={PAIS_PATHS['Colombia']}
+            fill={nacionalActivo || hover === 'CO' ? 'var(--orange)' : nacionales > 0 ? '#33507f' : tinteZona('Suramérica')}
+            stroke={nacionalActivo ? 'color-mix(in srgb, var(--orange) 70%, #000)' : 'rgba(8, 18, 38, 0.9)'}
+            strokeWidth={0.7}
+            onClick={nacionales > 0 ? () => onSelect(nacionalActivo ? null : 'nacional') : undefined}
+            onMouseEnter={nacionales > 0 ? () => setHover('CO') : undefined}
+            onMouseLeave={nacionales > 0 ? () => setHover(null) : undefined}
+            style={{ cursor: nacionales > 0 ? 'pointer' : 'default', transition: 'fill .2s' }}
+          />
+        )}
+
+        {/* Países con programas: silueta clicable */}
+        {conProgramas.map(([pais, { n, region }]) => {
+          const d = PAIS_PATHS[pais]
+          if (!d) return null // micro-isla: solo marcador (abajo)
+          const activo = seleccion === `pais:${pais}`
+          const enRegion = regionSel !== null && region === regionSel
           const fill = activo
             ? 'var(--orange)'
-            : enHover && conDatos
+            : hover === pais
               ? 'color-mix(in srgb, var(--orange) 55%, #7a92c4)'
-              : conDatos
-                ? '#33507f'
-                : 'rgba(255,255,255,0.07)'
-
+              : enRegion
+                ? 'color-mix(in srgb, var(--orange) 40%, #33507f)'
+                : '#33507f'
           return (
             <path
-              key={nombre}
+              key={pais}
               d={d}
               fill={fill}
               stroke={activo ? 'color-mix(in srgb, var(--orange) 70%, #000)' : 'rgba(8, 18, 38, 0.9)'}
               strokeWidth={0.7}
-              role={conDatos ? 'button' : undefined}
-              tabIndex={conDatos ? 0 : undefined}
-              aria-pressed={conDatos ? activo : undefined}
-              aria-label={conDatos ? `${nombre}: ${n} programa${n !== 1 ? 's' : ''}` : undefined}
-              onClick={conDatos ? () => toggle(nombre) : undefined}
-              onKeyDown={conDatos ? e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(nombre) } } : undefined}
-              onMouseEnter={conDatos ? () => setHover(nombre) : undefined}
-              onMouseLeave={conDatos ? () => setHover(null) : undefined}
-              style={{ cursor: conDatos ? 'pointer' : 'default', outline: 'none', transition: 'fill .2s' }}
+              role="button"
+              tabIndex={0}
+              aria-pressed={activo}
+              aria-label={`${pais}: ${n} programa${n !== 1 ? 's' : ''}`}
+              onClick={() => togglePais(pais)}
+              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePais(pais) } }}
+              onMouseEnter={() => setHover(pais)}
+              onMouseLeave={() => setHover(null)}
+              style={{ cursor: 'pointer', outline: 'none', transition: 'fill .2s' }}
             />
           )
         })}
 
-        {/* Pastillas (encima de todas las siluetas) */}
-        {REGIONES.map(({ nombre, dx, dy }) => {
-          if (!REGION_PATHS[nombre]) return null
-          const n = regiones.get(nombre) ?? 0
-          const conDatos = n > 0
-          const [cx, cy] = REGION_CENTROIDES[nombre] ?? [0, 0]
+        {/* Marcadores puntuales de los países con programas (clave para islas
+            y países pequeños, difíciles de acertar con el dedo) */}
+        {conProgramas.map(([pais, { n }]) => {
+          const xy = PAIS_XY[pais]
+          if (!xy) return null
+          const activo = seleccion === `pais:${pais}` || hover === pais
           return (
-            <Pill
-              key={nombre}
-              x={cx + dx}
-              y={cy + dy}
-              texto={conDatos ? `${nombre} · ${n}` : nombre}
-              activo={seleccion === nombre || (hover === nombre && conDatos)}
-              tenue={!conDatos}
-              onClick={conDatos ? () => toggle(nombre) : undefined}
-              onHover={conDatos ? () => setHover(nombre) : undefined}
-              onLeave={conDatos ? () => setHover(null) : undefined}
-            />
+            <g
+              key={`pin-${pais}`}
+              role="button"
+              tabIndex={PAIS_PATHS[pais] ? -1 : 0}
+              aria-pressed={seleccion === `pais:${pais}`}
+              aria-label={`${pais}: ${n} programa${n !== 1 ? 's' : ''}`}
+              onClick={() => togglePais(pais)}
+              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePais(pais) } }}
+              onMouseEnter={() => setHover(pais)}
+              onMouseLeave={() => setHover(null)}
+              style={{ cursor: 'pointer', outline: 'none' }}
+            >
+              <circle cx={xy[0]} cy={xy[1]} r={12} fill="transparent" />
+              <circle cx={xy[0]} cy={xy[1]} r={3.5} fill={activo ? 'var(--orange)' : '#FFD84D'} stroke="rgba(0,0,0,0.4)" />
+            </g>
           )
         })}
 
@@ -165,8 +204,8 @@ export function MapaDestinos({ regiones, nacionales, seleccion, onSelect }: Mapa
             tabIndex={0}
             aria-pressed={nacionalActivo}
             aria-label={`Colombia: ${nacionales} programas nacionales`}
-            onClick={() => toggle('nacional')}
-            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle('nacional') } }}
+            onClick={() => onSelect(nacionalActivo ? null : 'nacional')}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(nacionalActivo ? null : 'nacional') } }}
             onMouseEnter={() => setHover('CO')}
             onMouseLeave={() => setHover(null)}
             style={{ cursor: 'pointer', outline: 'none' }}
@@ -187,11 +226,24 @@ export function MapaDestinos({ regiones, nacionales, seleccion, onSelect }: Mapa
               y={COLOMBIA_XY[1] + 22}
               texto={`Colombia · ${nacionales}`}
               activo={nacionalActivo || hover === 'CO'}
-              onClick={() => toggle('nacional')}
+              onClick={() => onSelect(nacionalActivo ? null : 'nacional')}
               onHover={() => setHover('CO')}
               onLeave={() => setHover(null)}
             />
           </g>
+        )}
+
+        {/* Pastilla del país en hover o seleccionado (encima de todo) */}
+        {paisPill && PAIS_XY[paisPill] && (
+          <Pill
+            x={PAIS_XY[paisPill][0]}
+            y={PAIS_XY[paisPill][1] - 16}
+            texto={`${paisPill} · ${paises.get(paisPill)?.n ?? 0}`}
+            activo={seleccion === `pais:${paisPill}` || hover === paisPill}
+            onClick={() => togglePais(paisPill)}
+            onHover={() => setHover(paisPill)}
+            onLeave={() => setHover(null)}
+          />
         )}
       </svg>
     </div>
