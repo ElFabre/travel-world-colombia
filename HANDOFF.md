@@ -1,6 +1,6 @@
 # HANDOFF — Travel World Colombia
 
-> Punto de entrada para una **sesión nueva**. Actualizado **2026-08-30**.
+> Punto de entrada para una **sesión nueva**. Actualizado **2026-09-03**.
 > Lee también `AGENTS.md` (esta versión de Next tiene cambios de API: consulta
 > `node_modules/next/dist/docs/` antes de escribir código nuevo) y la memoria
 > persistente del proyecto (se carga sola; `MEMORY.md` es el índice).
@@ -213,7 +213,26 @@ por Bot (Actualización en Pipeline)"** que **asigna asesora automáticamente**.
 
 ---
 
-## 🌐 WEB — estado al 2026-08-25
+## 🌐 WEB — estado al 2026-09-03
+
+### Actualizaciones 2026-09-03 (en producción)
+
+- **Doble RNT en `/nosotros`**: la sección "Registro Oficial" ahora son 2
+  tarjetas — RNT 27287 (Travel World Colombia **Agencia de Viajes**) y RNT
+  118011 (Travel World **Mayorista de Turismo**) — cada una con botón
+  "Verificar en el RUES →" (link de Ginna:
+  https://www.rues.org.co/registro-nt). Fuente única en `lib/site.ts`
+  (`rntMayorista`, `rntVerificarUrl`); `/rnt` también usa esas constantes y su
+  enlace de verificación pasó de confecamaras al RUES. Commit `3c27e26`.
+- **Menú con dropdowns HECHO** (era la "Fase 4"): submenús de Destinos
+  (regiones) y Servicios (`ef7010d`), hover amarillo (`2d4e2ea`), y al llegar
+  a `/destinos` con filtro del menú aterriza en el listado filtrado
+  (`c029120`).
+- **`/servicios` ampliada**: catálogo completo con los 11 servicios pedidos
+  por el cliente (`5787a99`).
+- **`/destinos`**: tarjetas de categorías dinámicas al tamaño de producto,
+  mapa clicable POR PAÍS, mapa arriba, filtro en URL (`?f=`). Falta que el
+  cliente etiquete datos en el panel (ver Pendientes del usuario).
 
 ### `/destinos` — taxonomía + mapa interactivo (aprobado por el cliente)
 
@@ -237,12 +256,12 @@ por Bot (Actualización en Pipeline)"** que **asigna asesora automáticamente**.
 
 ### Páginas nuevas
 
-- **`/servicios`**: Renta de autos · Seguro de viajes · SIM internacional,
-  con CTA de WhatsApp (contenido hardcodeado).
+- **`/servicios`**: catálogo completo de 11 servicios con CTA de WhatsApp
+  (contenido hardcodeado; ampliada 2026-09-03).
 - **`/cruceros`**: lista los destinos con `es_crucero` (checkbox en el panel);
   estado vacío "Muy pronto" + CTA mientras no haya cruceros cargados.
-- **Nav**: Inicio · Destinos · Cruceros · Servicios · Nosotros · Contacto.
-  (Fase 4 pendiente: agrupar en dropdowns.)
+- **Nav**: Inicio · Destinos · Cruceros · Servicios · Nosotros · Contacto,
+  con dropdowns de Destinos (regiones) y Servicios (hecho 2026-09-03).
 
 ### Panel admin
 
@@ -310,7 +329,7 @@ esa es la fuente de verdad.
 - **El curso de inducción GHL** (prioridad — ver sección al inicio).
 - Auditoría de la carpeta "Clientes en Viaje" (si el usuario trae capturas).
 - Alta de TWC en el TMS (sesión con el repo `tms-agencias`).
-- Fase 4 de la web: menú con dropdowns.
+- ~~Fase 4 de la web: menú con dropdowns~~ → hecho 2026-09-03.
 - Botón "Editar" en el panel de FAQs.
 - Probar un seguimiento real de punta a punta (tras resolver el cron).
 - Migrar el correo a Google Workspace/Zoho para poder cancelar el hosting
@@ -322,7 +341,7 @@ esa es la fuente de verdad.
 
 ## 📦 ESTADO DEL PROYECTO
 
-**Stack:** Next.js 16.2.7 (App Router, Turbopack) · React 19 · Tailwind v4 ·
+**Stack:** Next.js 16.3.4 (App Router, Turbopack) · React 19 · Tailwind v4 ·
 TypeScript · Supabase · GoHighLevel (API REST con `GHL_TWC_PIT`) · Claude Opus 5.
 **Repo:** `C:\Users\efabr\Travelworldcolombia`.
 **Producción:** https://travelworldcolombia.com (el alias
