@@ -1,5 +1,18 @@
 import type { Metadata } from 'next'
-import { Car, ShieldCheck, Smartphone, ArrowRight } from 'lucide-react'
+import {
+  Plane,
+  BedDouble,
+  Luggage,
+  Route,
+  Compass,
+  FerrisWheel,
+  Car,
+  ShieldCheck,
+  Smartphone,
+  TrainFront,
+  Ship,
+  ArrowRight,
+} from 'lucide-react'
 import { SectionTag } from '@/components/ui/SectionTag'
 import { Button } from '@/components/ui/Button'
 import { WHATSAPP } from '@/lib/site'
@@ -9,7 +22,7 @@ export const revalidate = 86400
 export const metadata: Metadata = {
   title: 'Servicios de Viaje',
   description:
-    'Servicios complementarios para tu viaje: renta de autos, seguro de viajes y SIM internacional. Todo con el respaldo de Travel World Colombia.',
+    'Todo para tu viaje en un solo lugar: vuelos, alojamientos, paquetes, circuitos, actividades, parques temáticos, alquiler de vehículos, seguro de viajes, SIM card, tickets de tren y cruceros. Con el respaldo de Travel World Colombia.',
   alternates: { canonical: '/servicios' },
 }
 
@@ -19,10 +32,55 @@ function waServicio(servicio: string): string {
   return `https://wa.me/${WHATSAPP.principal}?text=${encodeURIComponent(texto)}`
 }
 
-const SERVICIOS = [
+interface Servicio {
+  icon: typeof Plane
+  titulo: string
+  descripcion: string
+  /** Si existe, la tarjeta enlaza a esta ruta interna en vez de WhatsApp. */
+  href?: string
+  cta?: string
+}
+
+const SERVICIOS: Servicio[] = [
+  {
+    icon: Plane,
+    titulo: 'Vuelos',
+    descripcion:
+      'Encontramos el vuelo que mejor se ajusta a tus fechas y presupuesto: nacionales e internacionales, con asesoría en escalas, equipaje y las mejores tarifas disponibles.',
+  },
+  {
+    icon: BedDouble,
+    titulo: 'Alojamientos',
+    descripcion:
+      'Hoteles, apartamentos y estadías con la ubicación y el confort que buscas. Reservamos por ti con tarifas convenidas y la tranquilidad de tener todo confirmado.',
+  },
+  {
+    icon: Luggage,
+    titulo: 'Paquetes',
+    descripcion:
+      'Vuelo, hotel, traslados y experiencias en un solo plan, armado a tu medida. Tú eliges el destino y nosotros nos encargamos de todo lo demás.',
+  },
+  {
+    icon: Route,
+    titulo: 'Circuitos',
+    descripcion:
+      'Recorre varias ciudades o países en un solo viaje con rutas organizadas, guías y logística resuelta. Ideal para conocer más, sin preocuparte por nada.',
+  },
+  {
+    icon: Compass,
+    titulo: 'Actividades',
+    descripcion:
+      'Tours, excursiones y experiencias en tu destino: gastronomía, aventura, cultura y más. Reservadas con anticipación para que no te quedes por fuera.',
+  },
+  {
+    icon: FerrisWheel,
+    titulo: 'Parques temáticos',
+    descripcion:
+      'Entradas a los parques más visitados del mundo: Disney, Universal y muchos más. Con asesoría para elegir los días y pases que más te convienen.',
+  },
   {
     icon: Car,
-    titulo: 'Renta de autos',
+    titulo: 'Alquiler de vehículos',
     descripcion:
       'Muévete a tu ritmo en tu destino. Gestionamos el alquiler de tu vehículo con tarifas competitivas, cobertura y todo el respaldo para que solo te ocupes de disfrutar.',
   },
@@ -34,9 +92,23 @@ const SERVICIOS = [
   },
   {
     icon: Smartphone,
-    titulo: 'SIM internacional',
+    titulo: 'SIM card',
     descripcion:
       'Mantente conectado desde que aterrizas. Datos, llamadas y mensajes en el exterior sin las sorpresas del roaming, listos antes de salir de viaje.',
+  },
+  {
+    icon: TrainFront,
+    titulo: 'Tickets de tren',
+    descripcion:
+      'Boletos de tren para moverte entre ciudades en Europa, Asia y más. Horarios, clases y conexiones resueltas antes de tu viaje, sin filas ni complicaciones.',
+  },
+  {
+    icon: Ship,
+    titulo: 'Cruceros',
+    descripcion:
+      'Navega por el Caribe, el Mediterráneo y los destinos más soñados. Te asesoramos con la naviera, la cabina y el itinerario perfectos para ti.',
+    href: '/cruceros',
+    cta: 'Ver cruceros',
   },
 ]
 
@@ -61,8 +133,8 @@ export default function ServiciosPage() {
             <span style={{ color: 'var(--orange)' }}>servicios</span>
           </h1>
           <p className="mt-5 max-w-lg font-inter text-sm leading-relaxed sm:text-base" style={{ color: 'var(--text-primary)', opacity: 0.9 }}>
-            Complementamos tu viaje con todo lo que necesitas: movilidad, protección y conexión,
-            con la misma asesoría cercana de siempre.
+            Todo lo que tu viaje necesita, en un solo lugar: vuelos, alojamientos, paquetes,
+            experiencias y más, con la misma asesoría cercana de siempre.
           </p>
         </div>
       </section>
@@ -70,7 +142,7 @@ export default function ServiciosPage() {
       {/* Tarjetas de servicios */}
       <section className="px-6 py-16">
         <div className="mx-auto grid max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {SERVICIOS.map(({ icon: Icon, titulo, descripcion }) => (
+          {SERVICIOS.map(({ icon: Icon, titulo, descripcion, href, cta }) => (
             <article
               key={titulo}
               className="u-lift flex flex-col rounded-2xl p-7"
@@ -88,9 +160,15 @@ export default function ServiciosPage() {
               <p className="mb-6 flex-1 font-inter text-base leading-relaxed" style={{ color: 'var(--text-dim)' }}>
                 {descripcion}
               </p>
-              <Button href={waServicio(titulo)} variant="whatsapp" size="sm" className="self-start" target="_blank" rel="noopener noreferrer">
-                Consultar <ArrowRight size={13} />
-              </Button>
+              {href ? (
+                <Button href={href} size="sm" className="self-start">
+                  {cta} <ArrowRight size={13} />
+                </Button>
+              ) : (
+                <Button href={waServicio(titulo)} variant="whatsapp" size="sm" className="self-start" target="_blank" rel="noopener noreferrer">
+                  Consultar <ArrowRight size={13} />
+                </Button>
+              )}
             </article>
           ))}
         </div>
