@@ -29,7 +29,7 @@ export function HeroContent({ destino }: HeroContentProps) {
         style={{
           fontFamily: 'var(--font-plus-jakarta)',
           fontWeight: 800,
-          fontSize: 'clamp(52px, 12vw, 100px)',
+          fontSize: 'clamp(38px, 8.5vw, 68px)',
           lineHeight: 0.9,
           letterSpacing: '-0.02em',
           color: 'var(--white)',
