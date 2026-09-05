@@ -96,6 +96,10 @@ export function ItinerarioEditor({ name, inicial }: { name: string; inicial?: Di
         Define el slug arriba antes de subir fotos. La fecha es opcional (solo salidas con fecha
         fija) y se muestra junto al número del día, ej. &quot;DÍA 03 · 11 NOV&quot;.
       </p>
+      <p className="mt-1 font-inter text-xs" style={{ color: 'var(--text-muted)' }}>
+        Fotos: horizontales en proporción 4:3 (ideal 1200 × 900 px), JPG o WebP de menos de 500 KB
+        para que la página cargue rápido (máximo 5 MB).
+      </p>
     </div>
   )
 }
