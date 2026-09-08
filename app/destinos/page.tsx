@@ -65,8 +65,8 @@ export default async function DestinosPage() {
       {/* Lista + filtros */}
       <section className="px-6 py-14">
         <div className="mx-auto max-w-6xl">
-          {/* Sin Suspense/useSearchParams a propósito: así el listado completo
-              queda en el HTML estático (SEO); el ?f= se aplica en cliente. */}
+          {/* Sin Suspense/useSearchParams a propósito: así el menú de
+              categorías queda en el HTML estático; el ?f= se aplica en cliente. */}
           <DestinosExplorador destinos={destinos} />
         </div>
       </section>

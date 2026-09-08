@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import dynamic from 'next/dynamic'
-import { MapPin, Globe, X } from 'lucide-react'
+import { MapPin, Globe, Star, CalendarDays, ArrowLeft } from 'lucide-react'
 import type { Destino } from '@/types/destino'
 import { fbCustomEvent } from '@/lib/analytics/fbpixel'
 import { DestinoCard } from './DestinoCard'
@@ -57,9 +57,9 @@ function agrupar(items: Destino[], clave: (d: Destino) => string): [string, Dest
 /**
  * La URL (?f=) es la única fuente de verdad del filtro, leída con
  * useSyncExternalStore: en el servidor devuelve '' (el HTML estático trae el
- * listado completo, clave para SEO) y tras hidratar React aplica el deep-link
- * sin mismatch. El evento propio avisa los replaceState que hacemos nosotros
- * (replaceState no dispara popstate).
+ * menú de categorías) y tras hidratar React aplica el deep-link sin mismatch.
+ * El evento propio avisa los replaceState que hacemos nosotros (replaceState
+ * no dispara popstate).
  */
 const EVENTO_FILTRO = 'twc:filtro-destinos'
 function suscribirUrl(cb: () => void) {
@@ -232,8 +232,20 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
     window.dispatchEvent(new Event(EVENTO_FILTRO))
     if (f !== 'todos' && opts?.origen) fbCustomEvent('FiltroDestinos', { filtro: f, origen: opts.origen })
     if (opts?.scroll && f !== 'todos') {
-      document.getElementById('resultados')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      // Diferido: al filtrar las categorías se ocultan y #resultados cambia de
+      // posición, así que hay que medir el scroll DESPUÉS del re-render.
+      setTimeout(() => {
+        document.getElementById('resultados')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 50)
     }
+  }
+
+  /** Vuelve al menú de categorías (quita el filtro) y lo deja a la vista. */
+  const volverAlMenu = () => {
+    setFiltro('todos')
+    setTimeout(() => {
+      document.getElementById('categorias')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 50)
   }
 
   const grupos = useMemo(() => gruposCategorias(destinos), [destinos])
@@ -249,8 +261,8 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
       ? (filtro as SeleccionMapa)
       : null
 
-  // Facetas transversales que ni las tarjetas ni el mapa expresan. Cada chip es
-  // un toggle (clic estando activo → volver a todos).
+  // Facetas transversales que ni las tarjetas ni el mapa expresan; solo se
+  // muestran en el menú (con filtro activo, el botón de volver las reemplaza).
   const chips = ([
     { key: 'favoritos', label: '⭐ Favoritos', n: favoritos.length },
     { key: 'fin_ano', label: '🎄 Salidas fin de año', n: finAno.length },
@@ -263,17 +275,6 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
     ? internacionales.filter(d => d.pais === paisSel).sort((a, b) => a.orden - b.orden)
     : []
 
-  // Etiqueta del chip "limpiar filtro" cuando la selección vino de tarjeta/mapa.
-  const etiquetaLimpiar = regionSel
-    ? `📍 ${regionSel} · ${internacionales.filter(d => (d.region ?? 'Otros destinos') === regionSel).length}`
-    : paisSel
-      ? `📍 ${paisSel} · ${destinosDePais.length}`
-      : transpSel
-        ? `${TRANSP_LABEL[transpSel] ?? 'Colombia'} · ${nacionalesDeTransp.length}`
-        : filtro === 'nacional'
-          ? `🇨🇴 Colombia · ${nacionales.length}`
-          : null
-
   if (destinos.length === 0) {
     return (
       <p className="py-20 text-center font-inter text-sm" style={{ color: 'var(--text-dim)' }}>
@@ -282,8 +283,22 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
     )
   }
 
-  const verNacional = filtro === 'todos' || filtro === 'nacional'
-  const verInternacional = filtro === 'todos'
+  // Vista tipo menú (pedido del cliente, sep-2026): sin filtro se ve SOLO el
+  // menú (mapa + tarjetas de categorías + chips), sin el listado de destinos;
+  // con un filtro activo se ocultan las categorías y se ve SOLO el listado
+  // filtrado, con un botón para volver al menú.
+  const filtrando = filtro !== 'todos'
+
+  const botonVolver = (
+    <button
+      type="button"
+      onClick={volverAlMenu}
+      className="flex items-center gap-2 rounded-full px-6 py-2.5 font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase transition-all duration-200"
+      style={{ background: 'var(--orange)', color: 'var(--orange-contrast)', border: '1px solid var(--orange)' }}
+    >
+      <ArrowLeft size={14} /> Volver a todos los destinos
+    </button>
+  )
 
   return (
     <div>
@@ -310,45 +325,43 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
         </div>
       </div>
 
-      {/* Tarjetas de categorías (pedido del cliente): navegación rápida por
+      {/* Menú de categorías (solo sin filtro): navegación rápida por
           transporte, región y país; aplican el mismo filtro que el mapa. */}
-      <CategoriasDestinos grupos={grupos} filtro={filtro} onSelect={f => setFiltro(f, { scroll: f !== 'todos', origen: 'tarjeta' })} />
+      {!filtrando && (
+        <div id="categorias" className="scroll-mt-24">
+          <CategoriasDestinos grupos={grupos} filtro={filtro} onSelect={f => setFiltro(f, { scroll: f !== 'todos', origen: 'tarjeta' })} />
+        </div>
+      )}
 
-      {/* Facetas transversales + chip para limpiar la selección activa */}
+      {/* Con filtro: botón para volver al menú. Sin filtro: facetas
+          transversales (favoritos / fin de año) que el menú no expresa. */}
       <div className="mb-10 flex flex-wrap justify-center gap-2">
-        {etiquetaLimpiar && (
-          <button
-            type="button"
-            onClick={() => setFiltro('todos')}
-            className="flex items-center gap-1.5 rounded-full px-5 py-2 font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase transition-all duration-200"
-            style={{ background: 'var(--orange)', color: 'var(--orange-contrast)', border: '1px solid var(--orange)' }}
-          >
-            {etiquetaLimpiar} <X size={12} />
-          </button>
-        )}
-        {chips.map(c => {
-          const activo = filtro === c.key
-          return (
-            <button
-              key={c.key}
-              type="button"
-              onClick={() => setFiltro(activo ? 'todos' : c.key, { origen: 'chip' })}
-              className="flex items-center gap-1.5 rounded-full px-5 py-2 font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase transition-all duration-200"
-              style={
-                activo
-                  ? { background: 'var(--orange)', color: 'var(--orange-contrast)', border: '1px solid var(--orange)' }
-                  : { background: 'var(--bg-alt)', color: 'var(--text-dim)', border: '1px solid var(--border)' }
-              }
-            >
-              {c.label} · {c.n} {activo && <X size={12} />}
-            </button>
-          )
-        })}
+        {filtrando
+          ? botonVolver
+          : chips.map(c => (
+              <button
+                key={c.key}
+                type="button"
+                onClick={() => setFiltro(c.key, { scroll: true, origen: 'chip' })}
+                className="flex items-center gap-1.5 rounded-full px-5 py-2 font-plus-jakarta text-[11px] font-bold tracking-[0.12em] uppercase transition-all duration-200"
+                style={{ background: 'var(--bg-alt)', color: 'var(--text-dim)', border: '1px solid var(--border)' }}
+              >
+                {c.label} · {c.n}
+              </button>
+            ))}
       </div>
 
       <div id="resultados" className="flex flex-col gap-10 scroll-mt-24">
-        {filtro === 'favoritos' && <Grid destinos={favoritos} />}
-        {filtro === 'fin_ano' && <Grid destinos={finAno} />}
+        {filtro === 'favoritos' && (
+          <Caja icon={<Star size={18} />} titulo="Favoritos" total={favoritos.length}>
+            <Grid destinos={favoritos} />
+          </Caja>
+        )}
+        {filtro === 'fin_ano' && (
+          <Caja icon={<CalendarDays size={18} />} titulo="Salidas de fin de año" total={finAno.length}>
+            <Grid destinos={finAno} />
+          </Caja>
+        )}
         {regionSel && (
           <SeccionInternacional
             destinos={internacionales.filter(d => (d.region ?? 'Otros destinos') === regionSel)}
@@ -360,8 +373,10 @@ export function DestinosExplorador({ destinos }: { destinos: Destino[] }) {
           </Caja>
         )}
         {transpSel && nacionalesDeTransp.length > 0 && <SeccionNacional destinos={nacionalesDeTransp} />}
-        {verNacional && nacionales.length > 0 && <SeccionNacional destinos={nacionales} />}
-        {verInternacional && internacionales.length > 0 && <SeccionInternacional destinos={internacionales} />}
+        {filtro === 'nacional' && nacionales.length > 0 && <SeccionNacional destinos={nacionales} />}
+        {/* Repetido al final del listado: tras recorrer muchas tarjetas, el
+            camino de vuelta al menú queda a mano sin subir toda la página. */}
+        {filtrando && <div className="flex justify-center">{botonVolver}</div>}
       </div>
     </div>
   )
