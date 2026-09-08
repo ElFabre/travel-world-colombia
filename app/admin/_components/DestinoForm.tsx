@@ -9,6 +9,7 @@ import { RepetidorObjetos } from './RepetidorObjetos'
 import { HighlightsEditor } from './HighlightsEditor'
 import { ItinerarioEditor } from './ItinerarioEditor'
 import { GaleriaEditor } from './GaleriaEditor'
+import { ArchivosEditor } from './ArchivosEditor'
 import { BUCKET_DESTINOS, subirAStorage, validarImagen, slugDelFormulario } from '@/lib/supabase/upload-cliente'
 import { PAISES, REGIONES } from '@/lib/paises'
 
@@ -277,6 +278,13 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
         ayuda="Fotos adicionales del destino que se muestran en una cuadrícula en su página. Sube varias; cada una se guarda al elegirla."
       >
         <GaleriaEditor name="galeria" inicial={d?.galeria} />
+      </Seccion>
+
+      <Seccion
+        titulo="Documentos"
+        ayuda="PDFs o Word del viaje (itinerario detallado, condiciones, folleto…). Aparecen en la sección 'Documentos del viaje' de la página del producto, solo si subes alguno. Cada archivo se guarda al elegirlo; el título es lo que ve el cliente."
+      >
+        <ArchivosEditor name="archivos" inicial={d?.archivos} />
       </Seccion>
 
       <Seccion

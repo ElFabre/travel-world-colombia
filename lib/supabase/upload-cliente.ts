@@ -21,6 +21,29 @@ export function validarImagen(file: File): string | null {
   return null
 }
 
+/** Bucket de documentos (PDF/Word) de los viajes y su tope por archivo. */
+export const BUCKET_DOCUMENTOS = 'documentos'
+export const MAX_DOCUMENTO_BYTES = 20 * 1024 * 1024 // 20 MB (coincide con file_size_limit del bucket)
+
+/** 'pdf' | 'word' según el archivo, o null si no es un tipo permitido. */
+export function tipoDeDocumento(file: File): 'pdf' | 'word' | null {
+  const ext = (file.name.split('.').pop() || '').toLowerCase()
+  if (file.type === 'application/pdf' || ext === 'pdf') return 'pdf'
+  if (
+    file.type === 'application/msword' ||
+    file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+    ext === 'doc' || ext === 'docx'
+  ) return 'word'
+  return null
+}
+
+/** Valida tamaño/tipo de un documento antes de subir. Devuelve un error legible o null. */
+export function validarDocumento(file: File): string | null {
+  if (!tipoDeDocumento(file)) return 'El archivo debe ser un PDF o un Word (.pdf, .doc, .docx).'
+  if (file.size > MAX_DOCUMENTO_BYTES) return 'El documento supera 20 MB. Comprímelo o divídelo en partes.'
+  return null
+}
+
 /**
  * Sube un archivo al bucket indicado y devuelve su URL pública.
  * `slug` y `campo` solo arman una ruta legible dentro del bucket.

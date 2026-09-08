@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Script from 'next/script'
 import { notFound } from 'next/navigation'
-import { Clock, Users, ArrowRight, Quote, Star } from 'lucide-react'
+import { Clock, Users, ArrowRight, Quote, Star, FileText, Download, Eye } from 'lucide-react'
 import { getDestino, getDestinos, getResenaDestino } from '@/lib/destinos'
 import { InfoClaveCarousel } from '@/components/destinos/InfoClaveCarousel'
 import { ItinerarioTimeline } from '@/components/destinos/ItinerarioTimeline'
@@ -19,6 +19,12 @@ export const revalidate = 1800
 
 interface Props {
   params: Promise<{ slug: string }>
+}
+
+/** "2.3 MB" / "850 KB" para los documentos adjuntos. */
+function pesoLegible(bytes: number): string {
+  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  return `${Math.max(1, Math.round(bytes / 1024))} KB`
 }
 
 /**
@@ -394,6 +400,67 @@ export default async function DestinoPage({ params }: Props) {
               {d.galeria.map((src, i) => (
                 <li key={i} className={`destino-reveal exp-card relative overflow-hidden rounded-xl ${i === 0 ? 'col-span-2 row-span-2' : ''}`} style={{ aspectRatio: i === 0 ? '4/3' : '1/1' }}>
                   <Image src={src} alt={`${d.nombre} — foto ${i + 1}`} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" className="object-cover" />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
+
+      {/* ── DOCUMENTOS DEL VIAJE (PDF/Word subidos desde el panel) ── */}
+      {d.archivos && d.archivos.length > 0 && (
+        <section className="px-6 py-24" style={{ background: 'var(--bg-alt)' }}>
+          <div className="mx-auto max-w-4xl">
+            <div className="destino-reveal mb-10 text-center">
+              <SectionTag className="mb-4">Para descargar</SectionTag>
+              <h2 className="font-plus-jakarta text-3xl font-bold sm:text-4xl" style={{ color: 'var(--text-primary)' }}>
+                Documentos del viaje
+              </h2>
+            </div>
+            <ul className="grid gap-4 sm:grid-cols-2">
+              {d.archivos.map(f => (
+                <li
+                  key={f.url}
+                  className="destino-reveal exp-card flex flex-wrap items-center gap-4 rounded-2xl p-5"
+                  style={{ background: '#fff', border: '1px solid var(--border)' }}
+                >
+                  <span
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full"
+                    style={{ background: 'color-mix(in srgb, var(--orange) 12%, transparent)', color: 'var(--orange)' }}
+                  >
+                    <FileText size={20} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-plus-jakarta text-sm font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>
+                      {f.titulo}
+                    </h3>
+                    <p className="font-inter text-xs" style={{ color: 'var(--text-dim)' }}>
+                      {f.tipo === 'pdf' ? 'PDF' : 'Word'}
+                      {f.bytes ? ` · ${pesoLegible(f.bytes)}` : ''}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 gap-2">
+                    {/* Word no se muestra en el navegador: solo descarga. */}
+                    {f.tipo === 'pdf' && (
+                      <a
+                        href={f.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 rounded-full px-4 py-2 font-plus-jakarta text-xs font-bold"
+                        style={{ border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                      >
+                        <Eye size={14} /> Ver
+                      </a>
+                    )}
+                    {/* `?download` hace que Supabase responda como adjunto. */}
+                    <a
+                      href={`${f.url}?download`}
+                      className="flex items-center gap-1.5 rounded-full px-4 py-2 font-plus-jakarta text-xs font-bold"
+                      style={{ background: 'var(--orange)', color: 'var(--orange-contrast)' }}
+                    >
+                      <Download size={14} /> Descargar
+                    </a>
+                  </div>
                 </li>
               ))}
             </ul>

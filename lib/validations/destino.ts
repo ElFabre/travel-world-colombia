@@ -37,6 +37,7 @@ export const destinoSchema = z.object({
   highlights: z.array(z.object({ icono: z.string(), titulo: z.string(), descripcion: z.string(), imagen: z.string().optional(), precio: z.string().optional(), duracion: z.string().optional() })).optional(),
   info_clave: z.array(z.object({ icono: z.string(), label: z.string(), valor: z.string(), sub: z.string().optional() })).optional(),
   itinerario: z.array(z.object({ titulo: z.string(), badge: z.string().optional(), descripcion: z.string().optional(), fecha: z.string().optional(), imagen: z.string().optional() })).optional(),
+  archivos: z.array(z.object({ titulo: z.string().min(1, 'Cada documento necesita un título.'), url: z.string().min(1), tipo: z.enum(['pdf', 'word']), bytes: z.number().optional() })).optional(),
   galeria: z.array(z.string()).optional(),
 
   cta_titulo: z.string().optional(),

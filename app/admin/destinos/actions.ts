@@ -94,6 +94,7 @@ function construirPayload(formData: FormData) {
     highlights: jsonArray(formData.get('highlights')),
     info_clave: jsonArray(formData.get('info_clave')),
     itinerario: jsonArray(formData.get('itinerario')),
+    archivos: jsonArray(formData.get('archivos')),
     galeria: jsonArray(formData.get('galeria')),
     cta_titulo: texto(formData.get('cta_titulo')),
     cta_subtitulo: texto(formData.get('cta_subtitulo')),

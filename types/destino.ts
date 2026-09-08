@@ -33,6 +33,17 @@ export interface ItinerarioDia {
   imagen?: string
 }
 
+/** Documento descargable del viaje (subido desde el panel al bucket `documentos`). */
+export interface ArchivoAdjunto {
+  /** Nombre visible en la web, ej. "Itinerario detallado". */
+  titulo: string
+  url: string
+  /** 'pdf' se puede ver en el navegador; 'word' solo se descarga. */
+  tipo: 'pdf' | 'word'
+  /** Peso del archivo, para mostrar "2.3 MB" junto al enlace. */
+  bytes?: number
+}
+
 export interface Destino {
   id: string
   slug: string
@@ -64,6 +75,7 @@ export interface Destino {
   galeria?: string[]
   info_clave?: InfoClave[]
   itinerario?: ItinerarioDia[]
+  archivos?: ArchivoAdjunto[]
 
   /** LEGADO: texto libre; derivado del estructurado al guardar desde el panel. */
   precio_desde?: string
