@@ -33,6 +33,37 @@ export interface ItinerarioDia {
   imagen?: string
 }
 
+/** Tipo de habitación dentro de una opción de hospedaje. */
+export interface HabitacionHospedaje {
+  /** Ej. "Sencilla", "Doble", "Triple", "Niño". */
+  tipo: string
+  /** Texto libre, ej. "USD $1.440 por persona" (opcional). */
+  precio?: string
+}
+
+/** Ciudad con sus hoteles dentro de una opción de hospedaje. */
+export interface CiudadHospedaje {
+  nombre: string
+  hoteles: string[]
+}
+
+/**
+ * Opción/categoría de hospedaje del paquete (una pestaña de la sección
+ * "Hospedaje" del producto): ej. "Hostal o similares" 2★, "Hotel turista" 3★.
+ * El paquete muestra la sección solo si tiene opciones cargadas.
+ */
+export interface OpcionHospedaje {
+  titulo: string
+  /** Categoría 1–5 estrellas (opcional). */
+  estrellas?: number
+  descripcion?: string
+  imagen?: string
+  ciudades?: CiudadHospedaje[]
+  /** Chips cortos, ej. "Wi-Fi", "Desayuno buffet". */
+  amenidades?: string[]
+  habitaciones?: HabitacionHospedaje[]
+}
+
 /** Documento descargable del viaje (subido desde el panel al bucket `documentos`). */
 export interface ArchivoAdjunto {
   /** Nombre visible en la web, ej. "Itinerario detallado". */
@@ -76,6 +107,7 @@ export interface Destino {
   info_clave?: InfoClave[]
   itinerario?: ItinerarioDia[]
   archivos?: ArchivoAdjunto[]
+  hospedaje?: OpcionHospedaje[]
 
   /** LEGADO: texto libre; derivado del estructurado al guardar desde el panel. */
   precio_desde?: string

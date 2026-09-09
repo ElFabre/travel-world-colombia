@@ -7,6 +7,7 @@ import { getDestino, getDestinos, getResenaDestino } from '@/lib/destinos'
 import { InfoClaveCarousel } from '@/components/destinos/InfoClaveCarousel'
 import { ItinerarioTimeline } from '@/components/destinos/ItinerarioTimeline'
 import { IncluyeTabs } from '@/components/destinos/IncluyeTabs'
+import { HospedajeShowcase } from '@/components/destinos/HospedajeShowcase'
 import { SectionTag } from '@/components/ui/SectionTag'
 import { Icono } from '@/components/ui/Icono'
 import { Button } from '@/components/ui/Button'
@@ -302,6 +303,21 @@ export default async function DestinoPage({ params }: Props) {
           </div>
         </section>
       ) : null}
+
+      {/* ── HOSPEDAJE (solo paquetes que lo incluyen; se carga en el panel) ── */}
+      {d.hospedaje && d.hospedaje.length > 0 && (
+        <section className="px-6 py-24">
+          <div className="mx-auto max-w-6xl">
+            <div className="destino-reveal mb-10 text-center">
+              <SectionTag className="mb-4">Dónde te alojarás</SectionTag>
+              <h2 className="font-plus-jakarta text-3xl font-bold sm:text-4xl" style={{ color: 'var(--text-primary)' }}>
+                Hospedaje
+              </h2>
+            </div>
+            <HospedajeShowcase opciones={d.hospedaje} destino={d.nombre} />
+          </div>
+        </section>
+      )}
 
       {/* ── EXPERIENCIAS ÚNICAS (todas las cargadas en el panel) ── */}
       {d.highlights && d.highlights.length > 0 && (

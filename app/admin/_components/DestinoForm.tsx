@@ -10,6 +10,7 @@ import { HighlightsEditor } from './HighlightsEditor'
 import { ItinerarioEditor } from './ItinerarioEditor'
 import { GaleriaEditor } from './GaleriaEditor'
 import { ArchivosEditor } from './ArchivosEditor'
+import { HospedajeEditor } from './HospedajeEditor'
 import { BUCKET_DESTINOS, subirAStorage, validarImagen, slugDelFormulario } from '@/lib/supabase/upload-cliente'
 import { PAISES, REGIONES } from '@/lib/paises'
 
@@ -285,6 +286,13 @@ export function DestinoForm({ action, destino, titulo }: { action: Action; desti
         ayuda="PDFs o Word del viaje (itinerario detallado, condiciones, folleto…). Aparecen en la sección 'Documentos del viaje' de la página del producto, solo si subes alguno. Cada archivo se guarda al elegirlo; el título es lo que ve el cliente."
       >
         <ArchivosEditor name="archivos" inicial={d?.archivos} />
+      </Seccion>
+
+      <Seccion
+        titulo="Hospedaje"
+        ayuda="Solo para paquetes que incluyen hospedaje: carga una opción por categoría (2★ hostal, 3★ turista…) con sus hoteles por ciudad, amenidades y tipos de habitación. En la web se ve como una tarjeta grande con pestañas. Si el paquete no incluye hospedaje, deja esto vacío y la sección no aparece."
+      >
+        <HospedajeEditor name="hospedaje" inicial={d?.hospedaje} />
       </Seccion>
 
       <Seccion

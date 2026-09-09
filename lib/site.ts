@@ -53,6 +53,13 @@ export function whatsappDudasUrl(destino: string): string {
   return `https://wa.me/${WHATSAPP.principal}?text=${encodeURIComponent(texto)}`
 }
 
+/** URL de WhatsApp para consultar una opción de hospedaje de un programa. */
+export function whatsappHospedajeUrl(destino: string, opcion: string, habitacion?: string): string {
+  const hab = habitacion ? `, habitación ${habitacion}` : ''
+  const texto = `Hola! Me interesa el viaje a ${destino} con hospedaje ${opcion}${hab} 🏨`
+  return `https://wa.me/${WHATSAPP.principal}?text=${encodeURIComponent(texto)}`
+}
+
 export const SOCIALS = {
   facebook: 'https://www.facebook.com/travelworldcolombia',
   instagram: 'https://www.instagram.com/travelworldcolombiaoficial',

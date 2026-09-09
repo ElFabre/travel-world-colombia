@@ -1,0 +1,23 @@
+-- ============================================================
+-- Travel World Colombia — Hospedaje del paquete
+-- Migración 019: columna `hospedaje` en destinos
+-- ============================================================
+-- Cada elemento del array es una opción/categoría de hospedaje del
+-- paquete (una pestaña de la sección "Hospedaje" del producto):
+--   [{titulo, estrellas, descripcion, imagen, ciudades, amenidades, habitaciones}]
+--   titulo       → "Hostal o similares"
+--   estrellas    → 1..5 (opcional)
+--   descripcion  → texto corto de la categoría
+--   imagen       → foto (bucket destinos)
+--   ciudades     → [{nombre, hoteles: [..]}]
+--   amenidades   → chips cortos ["Wi-Fi", "Desayuno buffet"]
+--   habitaciones → [{tipo, precio}] (precio texto libre, opcional)
+--
+-- La sección solo aparece en los paquetes con opciones cargadas
+-- (habilitar/deshabilitar = cargar o vaciar la lista en el panel).
+--
+-- IMPORTANTE: aplicar en producción ANTES de desplegar el panel con
+-- el editor de hospedaje (si no, guardar un viaje fallará con
+-- "Could not find the 'hospedaje' column").
+
+alter table destinos add column if not exists hospedaje jsonb;

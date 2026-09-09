@@ -56,6 +56,14 @@ function bloqueDetalle(d: Destino): string {
     d.highlights?.length
       ? `- experiencias: ${d.highlights.map(h => h.titulo.trim() + (h.duracion ? `, ${h.duracion}` : '') + (h.precio ? ` (${h.precio})` : '')).join(' · ')}`
       : null,
+    d.hospedaje?.length
+      ? `- hospedaje: ${recortar(d.hospedaje.map(o => {
+          const cat = o.estrellas ? `${o.estrellas}★ ` : ''
+          const hoteles = (o.ciudades ?? []).map(c => `${c.nombre}: ${c.hoteles.join(', ')}`).join(' / ')
+          const habs = (o.habitaciones ?? []).map(h => h.tipo + (h.precio ? ` ${h.precio}` : '')).join(', ')
+          return `${cat}${o.titulo}${hoteles ? ` [${hoteles}]` : ''}${habs ? ` (hab: ${habs})` : ''}`
+        }).join(' · '), 500)}`
+      : null,
     `- página: ${SITE.url}/destinos/${d.slug}`,
   ]
   return partes.filter(Boolean).join('\n')
