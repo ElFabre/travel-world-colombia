@@ -115,7 +115,8 @@ const nextConfig: NextConfig = {
       '/viajes-nacionales-en-bus',
     ]
     const aServicios = ['/seguros-de-viaje', '/renta-autos']
-    const aContacto = ['/contactanos', '/pagos']
+    // /pagos ya NO redirige: la página se reconstruyó en el sitio nuevo (sep-2026).
+    const aContacto = ['/contactanos']
     const aInicio = ['/tienda', '/carrito', '/mi-cuenta', '/finalizar-compra']
     // Páginas legales del WP viejo → sus equivalentes nuevas (slug limpio).
     const legales = [

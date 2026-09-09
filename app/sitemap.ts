@@ -34,6 +34,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.8,
     },
+    {
+      url: `${base}/pagos`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
     // Páginas legales — poco cambio, prioridad baja
     ...['/sostenibilidad', '/codigo-de-conducta', '/rnt', '/privacidad', '/terminos-y-condiciones'].map(
       path => ({
