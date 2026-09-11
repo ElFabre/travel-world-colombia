@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { Landmark, CreditCard, DollarSign, ShieldCheck, MessageCircle, ExternalLink, Building2 } from 'lucide-react'
+import Image from 'next/image'
+import { DollarSign, ShieldCheck, MessageCircle, ExternalLink } from 'lucide-react'
 import { SectionTag } from '@/components/ui/SectionTag'
 import { BotonCopiar } from '@/components/ui/BotonCopiar'
 import { WHATSAPP } from '@/lib/site'
@@ -21,39 +22,59 @@ export const metadata: Metadata = {
 const PSE_URL = 'https://portalpagos.davivienda.com/#/comercio/9012/VAMOS%20POR%20MAS%20SAS'
 const WOMPI_URL = 'https://checkout.wompi.co/l/VPOS_Gkcr2Y'
 
+/** Logos de los medios de pago (en /public/img/pagos, recortados a 160 px de alto). */
+const LOGOS = {
+  pse: { src: '/img/pagos/pse.png', w: 160, h: 160 },
+  visa: { src: '/img/pagos/visa.png', w: 492, h: 160 },
+  mastercard: { src: '/img/pagos/mastercard.png', w: 206, h: 160 },
+  amex: { src: '/img/pagos/amex.png', w: 219, h: 160 },
+  bancolombia: { src: '/img/pagos/bancolombia.png', w: 680, h: 160 },
+  davivienda: { src: '/img/pagos/davivienda.png', w: 800, h: 74 },
+  zelle: { src: '/img/pagos/zelle.png', w: 303, h: 160 },
+  chase: { src: '/img/pagos/chase.png', w: 855, h: 160 },
+} as const
+
+const TARJETAS = [
+  { logo: LOGOS.visa, alt: 'Visa' },
+  { logo: LOGOS.mastercard, alt: 'Mastercard' },
+  { logo: LOGOS.amex, alt: 'American Express' },
+]
+
 const CUENTAS_COLOMBIA = [
-  { banco: 'Bancolombia', tipo: 'Cuenta de ahorros', numero: '264-133178-51' },
-  { banco: 'Davivienda', tipo: 'Cuenta corriente', numero: '406-169997292' },
+  { banco: 'Bancolombia', tipo: 'Cuenta de ahorros', numero: '264-133178-51', logo: LOGOS.bancolombia },
+  { banco: 'Davivienda', tipo: 'Cuenta corriente', numero: '406-169997292', logo: LOGOS.davivienda },
 ]
 
 const CUENTAS_USA = [
-  { banco: 'Zelle', tipo: 'Referencia de pago', numero: 'vamospormasusa@gmail.com' },
-  { banco: 'Chase Bank', tipo: 'Cuenta corriente', numero: '53-18-59-687' },
+  { banco: 'Zelle', tipo: 'Referencia de pago', numero: 'vamospormasusa@gmail.com', logo: LOGOS.zelle },
+  { banco: 'Chase Bank', tipo: 'Cuenta corriente', numero: '53-18-59-687', logo: LOGOS.chase },
 ]
 
 const whatsappComprobante = `https://wa.me/${WHATSAPP.principal}?text=${encodeURIComponent(
   'Hola! Acabo de realizar un pago y quiero enviar mi comprobante 🧾'
 )}`
 
-function TarjetaCuenta({ banco, tipo, numero }: { banco: string; tipo: string; numero: string }) {
+function TarjetaCuenta({
+  banco, tipo, numero, logo,
+}: {
+  banco: string
+  tipo: string
+  numero: string
+  logo: { src: string; w: number; h: number }
+}) {
   return (
     <div
       className="flex flex-wrap items-center justify-between gap-3 rounded-2xl p-5"
       style={{ background: '#fff', border: '1px solid var(--border)' }}
     >
       <div className="flex items-center gap-4">
-        <span
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full"
-          style={{ background: 'color-mix(in srgb, var(--orange) 12%, transparent)', color: 'var(--orange)' }}
-        >
-          <Landmark size={20} />
+        {/* Caja fija + object-contain: los logos tienen proporciones muy distintas. */}
+        <span className="relative h-10 w-24 shrink-0 sm:w-28">
+          <Image src={logo.src} alt={banco} fill sizes="112px" className="object-contain object-left" />
         </span>
         <div>
-          <p className="font-plus-jakarta text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
-            {banco}
-          </p>
           <p className="font-inter text-xs" style={{ color: 'var(--text-dim)' }}>
-            {tipo}
+            {banco} · {tipo}
           </p>
           <p className="mt-0.5 font-plus-jakarta text-lg font-extrabold tracking-wide" style={{ color: 'var(--text-primary)' }}>
             {numero}
@@ -99,12 +120,13 @@ export default function PagosPage() {
           <div className="grid gap-6 sm:grid-cols-2">
             {/* PSE */}
             <div className="flex flex-col gap-4 rounded-2xl p-6 sm:p-8" style={{ background: 'var(--bg-alt)', border: '1px solid var(--border)' }}>
-              <span
-                className="flex h-12 w-12 items-center justify-center rounded-full"
-                style={{ background: 'color-mix(in srgb, var(--orange) 12%, transparent)', color: 'var(--orange)' }}
-              >
-                <Building2 size={22} />
-              </span>
+              <Image
+                src={LOGOS.pse.src}
+                alt="PSE — Pagos Seguros en Línea"
+                width={LOGOS.pse.w}
+                height={LOGOS.pse.h}
+                className="h-14 w-14 rounded-full"
+              />
               <div className="flex-1">
                 <h3 className="font-plus-jakarta text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
                   Pagos con PSE
@@ -127,12 +149,19 @@ export default function PagosPage() {
 
             {/* Tarjeta de crédito */}
             <div className="flex flex-col gap-4 rounded-2xl p-6 sm:p-8" style={{ background: 'var(--bg-alt)', border: '1px solid var(--border)' }}>
-              <span
-                className="flex h-12 w-12 items-center justify-center rounded-full"
-                style={{ background: 'color-mix(in srgb, var(--orange) 12%, transparent)', color: 'var(--orange)' }}
-              >
-                <CreditCard size={22} />
-              </span>
+              <div className="flex h-14 items-center gap-2">
+                {TARJETAS.map(t => (
+                  <span
+                    key={t.alt}
+                    className="relative flex h-12 w-[4.25rem] items-center justify-center rounded-lg p-1.5"
+                    style={{ background: '#fff', border: '1px solid var(--border)' }}
+                  >
+                    <span className="relative h-full w-full">
+                      <Image src={t.logo.src} alt={t.alt} fill sizes="68px" className="object-contain" />
+                    </span>
+                  </span>
+                ))}
+              </div>
               <div className="flex-1">
                 <h3 className="font-plus-jakarta text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
                   Tarjeta de crédito
